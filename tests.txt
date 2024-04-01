@@ -1,0 +1,12 @@
+When leaving it
+
+ LOG  {"nextTrack": 20, "position": 2.33, "track": 19, "type": "playback-track-changed"}
+ LOG  [{"index": 4, "title": "Bell.oga"}, {"index": 5, "title": "Motion at Backyard (Windchimes).oga"}, {"index": 0, "title": "Motion at Front.oga"}, {"index": 1, "title": "Antique Ding Dong.oga"}, {"index": 3, "title": "Halloween - Spooky Organ 2.oga"}]
+ LOG  0
+
+ When skipping in app
+
+ LOG  {"nextTrack": 0, "position": 0, "type": "playback-track-changed"}
+ LOG  [{"index": 1, "title": "Antique Ding Dong.oga"}]
+ LOG  0
+ When skipping in media
