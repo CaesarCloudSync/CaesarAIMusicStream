@@ -2,10 +2,12 @@ import { View,Text, ScrollView, FlatList,Image,SafeAreaView} from "react-native"
 
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
+import CarouselItem from "./CarouselItem";
 export default function Home(){
     const [initialfeed,setInitialFeed] = useState([]);
     const [initialrnb,setInitialRNB] = useState([]);
     const [initialhiphop,setInitialHipHop] = useState([]);
+    const [access_token,setAccessToken] = useState("")
     const favouriteplaylists = [{"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
     {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
     {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
@@ -37,8 +39,9 @@ export default function Home(){
         //console.log(result)
         // https://api.spotify.com/v1/browse/new-releases
         const access_token = await get_access_token();
+        setAccessToken(access_token)
         const headers = {Authorization: `Bearer ${access_token}`}
-        const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?limit=26', {headers: headers})
+        const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?limit=12', {headers: headers})
         const feedresult = await resp.json()
         //console.log(feedresult.albums.items)
         setInitialFeed(feedresult.albums.items)
@@ -73,7 +76,7 @@ const getinitialhiphop = async () =>{
     const feedresult = await resp.json()
    // console.log(feedresult)
     const chunks = chunkcards(feedresult.tracks)
-    console.log(chunks)
+    
     setInitialHipHop(chunks)
     //console.log(feedresult)
 
@@ -130,10 +133,7 @@ function capitalizeFirstLetter(string) {
                 <FlatList
                 data={playlists}
                 horizontal={true}
-                renderItem={({item}) =>{console.log(item);return(    <View style={{backgroundColor:"white",width:300,height:favouritecards ? 50 : 300,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
-
-                
-                </View>)}}
+                renderItem={({item}) =><CarouselItem access_token={access_token} favouritecards={favouritecards} spotifyid={item.album.id}thumbnail={item.album.images[0].url} album_name={item.album.name} artist_name={item.album.artists[0].name} total_tracks={item.album.total_tracks} release_date={item.album.release_date} album_type={item.album.album_type}/>}
                 />
                 
 
@@ -144,7 +144,7 @@ function capitalizeFirstLetter(string) {
     const getall = async () =>{
         await getintialfeed()
         await getinitialrnb()
-        //await getinitialhiphop()
+        await getinitialhiphop()
     }
     useEffect(() =>{
         getall()
@@ -160,20 +160,35 @@ function capitalizeFirstLetter(string) {
             {/*Main Scroll Body*/}
             <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
                 {/* Favourite Playlists */}
-                {initialfeed.length > 0 && <FavouritePlaylists favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
-                
+                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
+                {initialfeed.length > 0 && access_token !== ""  &&
                 <View style={{flex:1}}>
                     <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest Playlists</Text>
                 </View>
-                {initialfeed.length > 0 && <FavouritePlaylists favouritecards={false} playlists={initialfeed.slice(8,)}/>}
+                }
+                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists favouritecards={false} playlists={initialfeed.slice(8,)}/>}
+
+                {initialfeed.length > 0 && access_token !== ""  && 
                 <View style={{flex:1}}>
                     <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest RnB and HipHop</Text>
                 </View>
+                }
                 
-                {initialrnb !== undefined && initialrnb.length > 0 && 
+                {initialrnb.length > 0 && access_token !== ""  && 
                 initialrnb.map((rnbcarousel) =>{
                     return(
                         <FavouriteRecommendations favouritecards={false} playlists={rnbcarousel}/>
+                    )
+                })
+
+                }
+                {initialhiphop.length > 0 && access_token !== "" && <View style={{flex:1}}>
+                    <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest HipHop</Text>
+                </View>}
+                {initialhiphop.length > 0 && access_token !== ""   && 
+                initialhiphop.map((hiphopcarousel) =>{
+                    return(
+                        <FavouriteRecommendations favouritecards={false} playlists={hiphopcarousel}/>
                     )
                 })
 

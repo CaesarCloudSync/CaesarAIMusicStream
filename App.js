@@ -19,6 +19,7 @@ import { NativeRouter, Route, Link ,Routes} from "react-router-native";
 import Home from './components/HomeScreen/HomeScreen';
 import Search from './components/SearchScreen/SearchScreen';
 import LibraryScreen from './components/LibraryScreen/LibraryScreen';
+import Tracks from './components/Tracks/Tracks';
 function App() { 
 
 
@@ -31,11 +32,11 @@ function App() {
     async function setup() {
       let isSetup = await setupPlayer();
       
-      const queue = await TrackPlayer.getQueue();
+      /*const queue = await TrackPlayer.getQueue();
       if(isSetup && queue.length <= 0) {
         await addTracks(); 
         //const name = await extractTracks();
-      }
+      }*/
 
       setIsPlayerReady(isSetup);
     }
@@ -45,22 +46,24 @@ function App() {
     
   }, []);
 
-
+/*
   if(!isPlayerReady) {
     return (
       <SafeAreaView style={styles.container}>
         <ActivityIndicator size="large" color="#bbb"/>
       </SafeAreaView>
     );
-  }
+  }*/
   
   return (
     <NativeRouter>
+      
 
     <Routes>
     <Route exact path="/" element={<Home />}></Route>
     <Route path="/search" element={<Search/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>
+    <Route path="/tracks" element={<Tracks/>}></Route>
   
     </Routes>
     {/*The NativeRouter*/}

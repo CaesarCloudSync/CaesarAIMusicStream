@@ -6,7 +6,7 @@ import { Link } from "react-router-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 export default function NavigationFooter({currentpage}){
     return(
-        <View style={{flex:0.13,backgroundColor:"blue"}}>
+        <View style={{flex:0.13,backgroundColor:"#141212"}}>
         <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
             <Link underlayColor={"transparent"} to="/">
