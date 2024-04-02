@@ -18,8 +18,8 @@ export default function Home(){
         // https://api.spotify.com/v1/browse/new-releases
         const body = {
             "grant_type":"client_credentials",
-            "client_id":"50c42d50290a46f7b9f118c1ca4f8f58",
-            "client_secret":"f0319982991b4e2ea1677201caf8e4f9"
+            "client_id": "4eb4425aaa3f4b299e278b30fb9cf329",//"50c42d50290a46f7b9f118c1ca4f8f58",
+            "client_secret":"88b3038a35424fb8831c8b77022aa748"//"f0319982991b4e2ea1677201caf8e4f9"
         }
         const formBody = Object.keys(body).map(key =>      encodeURIComponent(key) + '=' + encodeURIComponent(body[key])).join('&');
         const response = await fetch('https://accounts.spotify.com/api/token', {
@@ -73,7 +73,7 @@ const getinitialhiphop = async () =>{
     const feedresult = await resp.json()
    // console.log(feedresult)
     const chunks = chunkcards(feedresult.tracks)
-   //console.log(chunks)
+    console.log(chunks)
     setInitialHipHop(chunks)
     //console.log(feedresult)
 
