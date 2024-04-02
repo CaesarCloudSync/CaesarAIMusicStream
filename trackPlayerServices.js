@@ -40,6 +40,7 @@ export async function setupPlayer() {
         Capability.Pause,
         Capability.SkipToNext,
       ],
+      
       progressUpdateEventInterval: 2,
     });
 

@@ -14,7 +14,23 @@ export default function Tracks({currentTrack,setCurrentTrack}){
     const [album_tracks,setAlbumTracks] = useState(location.state);
  
     useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
-        const queue = await TrackPlayer.getQueue();
+    
+        const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
+        if (idx+1 > album_tracks.length){
+            getaudio(album_tracks[0],setCurrentTrack)
+        }
+        else{
+            getaudio(album_tracks[idx+1],setCurrentTrack)
+        }
+        
+        
+
+        
+        //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
+        //console.log(event,"ji")
+      });
+      useTrackPlayerEvents([Event.RemoteNext], async (event) => {
+    
         const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
         if (idx+1 > album_tracks.length){
             getaudio(album_tracks[0],setCurrentTrack)

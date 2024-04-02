@@ -8,13 +8,13 @@ import TrackPlayer, {
 import { Alert } from "react-native";
 export const addTrack = async (streaming_link,album_track) =>{
     //files = files.filter((file) =>{return(file.mime === "audio/mpeg" && !file.name.includes(".trashed"))})
-    //const CaesarAIMusicLogo = require('./assets/CaesarAILogo.png')
-    const track = {isActive:true,id:album_track.name,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail}
+    //const CaesarAIMusicLogo = require('../../assets/CaesarAILogo.png')
+    const track = [{isActive:true,id:album_track.name,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail}]
     //console.log(alltracks)
 
     await TrackPlayer.reset()
     await TrackPlayer.add(track);
-    //await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
     await TrackPlayer.play()
 }
 export  const getstreaminglink =async (album_track) =>{

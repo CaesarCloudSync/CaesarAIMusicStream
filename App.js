@@ -9,7 +9,6 @@ import TrackPlayer from 'react-native-track-player';
 import { setupPlayer, addTracks } from './trackPlayerServices';
 import Header from './components/header';
 import Playlist from './components/playlist';
-import TrackProgress from './components/trackprogress';
 import CaesarSongSearch from './components/caesarsongsearch';
 import axios from 'axios';
 import AskPermission from './components/askpermission';
@@ -23,6 +22,7 @@ import Tracks from './components/Tracks/Tracks';
 function App() { 
 
   const [currentTrack,setCurrentTrack] = useState("")
+  
   const [seek, setSeek] = useState(0);
   const [songchanged,setSongsChanged] = useState(false);
   const [nextqueue,setNextQueue] = useState([]);
@@ -60,7 +60,7 @@ function App() {
       
 
     <Routes>
-    <Route exact path="/" element={<Home />}></Route>
+    <Route exact path="/" element={<Home seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/search" element={<Search/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>
     <Route path="/tracks" element={<Tracks currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
