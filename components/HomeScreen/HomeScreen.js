@@ -13,8 +13,8 @@ export default function Home(){
         // https://api.spotify.com/v1/browse/new-releases
         const body = {
             "grant_type":"client_credentials",
-            "client_id": "ecb8dc94048249348aa3add658926ec3",//"4eb4425aaa3f4b299e278b30fb9cf329",
-            "client_secret":"ad2b84b5f8ed4f27a07d9a0d7cf7ecac"//"88b3038a35424fb8831c8b77022aa748"
+            "client_id": "2f86df823b294b8193071167035d2770",
+            "client_secret":"272596c38cd54bc39398eac5513ab12c"
         }
         const formBody = Object.keys(body).map(key =>      encodeURIComponent(key) + '=' + encodeURIComponent(body[key])).join('&');
         const response = await fetch('https://accounts.spotify.com/api/token', {

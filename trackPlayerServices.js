@@ -104,6 +104,10 @@ export async function playbackService() {
     console.log('Event.RemotePause');
     TrackPlayer.pause();
   });
+  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
+    console.log('Event.PlaybackQueueEnded');
+  ;
+  });
 
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
     console.log('Event.RemotePlay');

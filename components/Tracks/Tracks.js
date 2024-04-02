@@ -4,13 +4,31 @@ import { useLocation,useNavigate } from "react-router-native"
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import TrackItem from "./TrackItem";
 import AntDesign from "react-native-vector-icons/AntDesign"
-import CircularQueue from "./CircularQueue";
+import { getaudio } from "./getstreamlinks";
+import TrackPlayer,{ useTrackPlayerEvents ,Event} from "react-native-track-player";
+
 export default function Tracks(){
     const location = useLocation();
     const navigate = useNavigate();
     
     const [album_tracks,setAlbumTracks] = useState(location.state);
-    const [trackqueue,setTrackQueue] = useState(new CircularQueue(album_tracks.length,album_tracks))
+    const [currentTrack,setCurrentTrack] = useState("")
+    useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
+        const queue = await TrackPlayer.getQueue();
+        const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
+        if (idx+1 > album_tracks.length){
+            getaudio(album_tracks[0],setCurrentTrack)
+        }
+        else{
+            getaudio(album_tracks[idx+1],setCurrentTrack)
+        }
+        
+        
+
+        
+        //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
+        console.log(event,"ji")
+      });
 
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
@@ -29,7 +47,7 @@ export default function Tracks(){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item}) =><TrackItem trackqueue={trackqueue} album_track={item}/>}
+            renderItem={({item}) =><TrackItem setCurrentTrack={setCurrentTrack}  album_track={item}/>}
             />
   
             <NavigationFooter currentpage={"home"}/>
