@@ -7,12 +7,12 @@ import AntDesign from "react-native-vector-icons/AntDesign"
 import { getaudio } from "./getstreamlinks";
 import TrackPlayer,{ useTrackPlayerEvents ,Event} from "react-native-track-player";
 
-export default function Tracks(){
+export default function Tracks({currentTrack,setCurrentTrack}){
     const location = useLocation();
     const navigate = useNavigate();
     
     const [album_tracks,setAlbumTracks] = useState(location.state);
-    const [currentTrack,setCurrentTrack] = useState("")
+ 
     useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
         const queue = await TrackPlayer.getQueue();
         const idx = album_tracks.findIndex(({ name }) => name === currentTrack);

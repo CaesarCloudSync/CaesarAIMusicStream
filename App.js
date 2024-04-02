@@ -22,7 +22,7 @@ import LibraryScreen from './components/LibraryScreen/LibraryScreen';
 import Tracks from './components/Tracks/Tracks';
 function App() { 
 
-
+  const [currentTrack,setCurrentTrack] = useState("")
   const [seek, setSeek] = useState(0);
   const [songchanged,setSongsChanged] = useState(false);
   const [nextqueue,setNextQueue] = useState([]);
@@ -63,7 +63,7 @@ function App() {
     <Route exact path="/" element={<Home />}></Route>
     <Route path="/search" element={<Search/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>
-    <Route path="/tracks" element={<Tracks/>}></Route>
+    <Route path="/tracks" element={<Tracks currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
   
     </Routes>
     {/*The NativeRouter*/}

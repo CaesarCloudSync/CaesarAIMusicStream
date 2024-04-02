@@ -3,7 +3,8 @@ import { View,Text, ScrollView, FlatList,Image,SafeAreaView} from "react-native"
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
 import CarouselItem from "./CarouselItem";
-export default function Home(){
+import TrackProgress from "../trackprogress";
+export default function Home({seek, setSeek}){
     const [initialfeed,setInitialFeed] = useState([]);
     const [initialrnb,setInitialRNB] = useState([]);
     const [initialhiphop,setInitialHipHop] = useState([]);
@@ -193,7 +194,8 @@ function capitalizeFirstLetter(string) {
 
             </ScrollView>
             {/*Song Progress Tracker */}
-            <View style={{flex:0.10,backgroundColor:"red"}}>
+            <View style={{flex:0.50,backgroundColor:"red"}}>
+                <TrackProgress seek={seek} setSeek={setSeek}/>
 
             </View>
 
