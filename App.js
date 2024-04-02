@@ -3,6 +3,7 @@ import {
   SafeAreaView,
   StyleSheet,
   ActivityIndicator,
+  View,
 } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 import { setupPlayer, addTracks } from './trackPlayerServices';
@@ -12,6 +13,12 @@ import TrackProgress from './components/trackprogress';
 import CaesarSongSearch from './components/caesarsongsearch';
 import axios from 'axios';
 import AskPermission from './components/askpermission';
+import { Text } from 'react-native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { NativeRouter, Route, Link ,Routes} from "react-router-native";
+import Home from './components/HomeScreen/HomeScreen';
+import Search from './components/SearchScreen/SearchScreen';
+import LibraryScreen from './components/LibraryScreen/LibraryScreen';
 function App() { 
 
 
@@ -48,18 +55,16 @@ function App() {
   }
   
   return (
-    <SafeAreaView style={{flex:1}}>
-      {/*<AskPermission/>*/}
-      <CaesarSongSearch/>
+    <NativeRouter>
 
-      
-          
-      <Header nextqueue={nextqueue} />
-      <TrackProgress seek={seek} setSeek={setSeek}/>
-      
-      <Playlist nextqueue={nextqueue} setNextQueue={setNextQueue}  seek={seek} setSeek={setSeek}/>
-      
-    </SafeAreaView>
+    <Routes>
+    <Route exact path="/" element={<Home />}></Route>
+    <Route path="/search" element={<Search/>}></Route>
+    <Route path="/library" element={<LibraryScreen/>}></Route>
+  
+    </Routes>
+    {/*The NativeRouter*/}
+  </NativeRouter>
   );
 }
 
@@ -73,3 +78,13 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+/*
+      <CaesarSongSearch/>
+
+      
+          
+      <Header nextqueue={nextqueue} />
+      <TrackProgress seek={seek} setSeek={setSeek}/>
+      
+      <Playlist nextqueue={nextqueue} setNextQueue={setNextQueue}  seek={seek} setSeek={setSeek}/>
+       */
