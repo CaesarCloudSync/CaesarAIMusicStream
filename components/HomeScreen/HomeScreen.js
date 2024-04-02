@@ -1,4 +1,4 @@
-import { View,Text, ScrollView, FlatList,Image} from "react-native";
+import { View,Text, ScrollView, FlatList,Image,SafeAreaView} from "react-native";
 
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
@@ -123,53 +123,28 @@ function capitalizeFirstLetter(string) {
     }
 
     function FavouriteRecommendations({favouritecards,playlists}){
-        //console.log(playlists)
         return(
-            <ScrollView horizontal={true} style={{flex:1,marginTop:10}}>
+            <SafeAreaView style={{flex: 1,marginTop:10}}>
             <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
                 
-                    {playlists.map((album) =>{
-                        return(
-                            <View style={{backgroundColor:"#141212",width:300,height:favouritecards ? 50 : 300,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
-                            <View  key={album.album.name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "center":"flex-start",alignItems:favouritecards === true ? "center": "stretch",flex:1}}>
-                                <View style={{flex:favouritecards ? 0.5 : 1}}>
-                                    <Image style={{width: '100%', height: '100%'}} source={{uri:album.album.images[0].url}}></Image>
-                                </View>
-                                <View style={{padding:10}}>
-                                </View>
-                                <Text style={{color:"white"}}>
-                                    {album.album.name} | {capitalizeFirstLetter(album.album.album_type)}
-                                </Text>
-                                <Text>
-                                    Artist: {album.artists[0].name}
-                                </Text>
-                    
-   
-                                <Text>
-                                    Total Tracks: {album.album.total_tracks}
-                                </Text>
-                                <Text>
-                                    Release Date: {album.album.release_date}
-                                </Text>
-                            
+                <FlatList
+                data={playlists}
+                horizontal={true}
+                renderItem={({item}) =>{console.log(item);return(    <View style={{backgroundColor:"white",width:300,height:favouritecards ? 50 : 300,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
 
-
-                            </View>
-                            
-                        </View>
-                        
-                        )
-                    })}
+                
+                </View>)}}
+                />
                 
 
             </View>
-        </ScrollView>
+        </SafeAreaView>
         )
     }
     const getall = async () =>{
         await getintialfeed()
         await getinitialrnb()
-        await getinitialhiphop()
+        //await getinitialhiphop()
     }
     useEffect(() =>{
         getall()
@@ -194,6 +169,7 @@ function capitalizeFirstLetter(string) {
                 <View style={{flex:1}}>
                     <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest RnB and HipHop</Text>
                 </View>
+                
                 {initialrnb !== undefined && initialrnb.length > 0 && 
                 initialrnb.map((rnbcarousel) =>{
                     return(
@@ -202,17 +178,7 @@ function capitalizeFirstLetter(string) {
                 })
 
                 }
-                <View style={{flex:1}}>
-                    <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest HipHop</Text>
-                </View>
-                {initialhiphop !== undefined && initialhiphop.length > 0 && 
-                initialhiphop.map((hiphopcarousel) =>{
-                    return(
-                        <FavouriteRecommendations favouritecards={false} playlists={hiphopcarousel}/>
-                    )
-                })
 
-                }
 
 
  
@@ -231,3 +197,16 @@ function capitalizeFirstLetter(string) {
         </View>
     )
 }
+
+/*
+                <View style={{flex:1}}>
+                    <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest HipHop</Text>
+                </View>
+                {initialhiphop !== undefined && initialhiphop.length > 0 && 
+                initialhiphop.map((hiphopcarousel) =>{
+                    return(
+                        <FavouriteRecommendations favouritecards={false} playlists={hiphopcarousel}/>
+                    )
+                })
+
+                } */
