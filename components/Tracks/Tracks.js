@@ -29,7 +29,7 @@ export default function Tracks(){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item}) =><TrackItem trackqueue={trackqueue} album_tracks={album_tracks} album_track={item}/>}
+            renderItem={({item}) =><TrackItem trackqueue={trackqueue} album_track={item}/>}
             />
   
             <NavigationFooter currentpage={"home"}/>

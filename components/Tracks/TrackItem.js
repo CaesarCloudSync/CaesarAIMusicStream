@@ -1,4 +1,4 @@
-import { View,Text,Image,TouchableOpacity } from "react-native";
+import { View,Text,Image,TouchableOpacity, Alert } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import axios from "axios";
 import TrackPlayer, {
@@ -7,7 +7,7 @@ import TrackPlayer, {
     RepeatMode,
     Event,
   } from 'react-native-track-player';
-export default function TrackItem({album_track,album_tracks,trackqueue}){
+export default function TrackItem({album_track,trackqueue}){
     const addTrack = async (streaming_link) =>{
         //files = files.filter((file) =>{return(file.mime === "audio/mpeg" && !file.name.includes(".trashed"))})
         //const CaesarAIMusicLogo = require('./assets/CaesarAILogo.png')
@@ -25,10 +25,15 @@ export default function TrackItem({album_track,album_tracks,trackqueue}){
         let videos = response.data.result
         let video_link = videos[1].link
         const responseaudio = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/getaudiowatch?url=${video_link}`)
-        let streaming_link = responseaudio.data.media
-        console.log(streaming_link)
-        console.log(trackqueue,"quque")
-        await addTrack(streaming_link)
+        console.log(responseaudio.data)
+        if (responseaudio.data.title === "Video Not Available.mp3"){
+            Alert.alert("Backend Error")
+        }
+        else{
+            let streaming_link = responseaudio.data.media
+            console.log(streaming_link)
+            await addTrack(streaming_link)
+    }
         
         //trackqueue.enqueue()
         

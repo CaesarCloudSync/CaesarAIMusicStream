@@ -8,20 +8,13 @@ export default function Home(){
     const [initialrnb,setInitialRNB] = useState([]);
     const [initialhiphop,setInitialHipHop] = useState([]);
     const [access_token,setAccessToken] = useState("")
-    const favouriteplaylists = [{"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
-    {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
-    {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
-    {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
-    {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
-    {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
-    {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"},
-    {"playlist_thumbnail":"https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2F49278979817c9ea4b28d39251a032c03.1000x1000x1.jpg","playlist_name":"PlayBoy","playlist_link":"https://"}]
+
     const get_access_token = async () =>{
         // https://api.spotify.com/v1/browse/new-releases
         const body = {
             "grant_type":"client_credentials",
-            "client_id": "4eb4425aaa3f4b299e278b30fb9cf329",//"50c42d50290a46f7b9f118c1ca4f8f58",
-            "client_secret":"88b3038a35424fb8831c8b77022aa748"//"f0319982991b4e2ea1677201caf8e4f9"
+            "client_id": "ecb8dc94048249348aa3add658926ec3",//"4eb4425aaa3f4b299e278b30fb9cf329",
+            "client_secret":"ad2b84b5f8ed4f27a07d9a0d7cf7ecac"//"88b3038a35424fb8831c8b77022aa748"
         }
         const formBody = Object.keys(body).map(key =>      encodeURIComponent(key) + '=' + encodeURIComponent(body[key])).join('&');
         const response = await fetch('https://accounts.spotify.com/api/token', {
