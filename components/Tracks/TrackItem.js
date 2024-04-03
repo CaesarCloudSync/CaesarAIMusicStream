@@ -4,14 +4,6 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { getaudio } from "./getstreamlinks";
 export default function TrackItem({album_track,setCurrentTrack}){
 
-
-
-        //trackqueue.enqueue()
-        
-
-    
-
-
         
     return(
         <View style={{flex:1}}>

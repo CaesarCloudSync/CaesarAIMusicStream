@@ -63,7 +63,7 @@ function App() {
     <Route exact path="/" element={<Home seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/search" element={<Search/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>
-    <Route path="/tracks" element={<Tracks currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
+    <Route path="/tracks" element={<Tracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
   
     </Routes>
     {/*The NativeRouter*/}

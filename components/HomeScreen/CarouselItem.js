@@ -2,7 +2,7 @@ import { View,Text,Image, TouchableOpacity } from "react-native"
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from "axios";
 import { useNavigate } from "react-router-native";
-import { Pressable } from "react-native";
+import { TouchableHighlight} from "react-native";
 export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type}){
     const navigate = useNavigate();
     function capitalizeFirstLetter(string) {
@@ -21,24 +21,69 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
     /*
     
   */
-    return(
-        <Pressable onPress={() =>{getalbumtracks()}}>
-        <View style={{backgroundColor:"white",width:300,height:favouritecards ? 50 : 300,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
+    if (favouritecards !== true){
+        return(
+            <TouchableHighlight onPress={() =>{getalbumtracks()}}>
+            <View style={{backgroundColor:"white",width:favouritecards === true ? 50 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
+            
+                <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
+                    <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
+                        <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                    </View>
+                    <View style={{padding:10}}>
+                    </View>
+                    <Text style={{color:"white"}}>
+                        {album_name} | {capitalizeFirstLetter(album_type)}
+                    </Text>
+                    <Text>
+                        Artist: {artist_name}
+                    </Text>
+                    {favouritecards !== true&&
+                    <View>
+    
+                    <Text>
+                        Total Tracks: {total_tracks}
+                    </Text>
+                    <Text>
+                        Release Date: {release_date}
+                    </Text>
+                    <TouchableOpacity>
+                    <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white",alignSelf:"flex-end"}}/>
+                    </TouchableOpacity>
+                        </View>}
+    
+    
+                
+    
+    
+                </View>
+            
+                    
+    
         
-            <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "center":"flex-start",alignItems:favouritecards === true ? "center": "stretch",flex:1}}>
-                <View style={{flex:favouritecards ? 0.5 : 1}}>
-                    <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
-                </View>
-                <View style={{padding:10}}>
-                </View>
-                <Text style={{color:"white"}}>
-                    {album_name} | {capitalizeFirstLetter(album_type)}
-                </Text>
+        </View>
+        </TouchableHighlight>)
+    }
+    else{
+        return(
+        <TouchableHighlight onPress={() =>{getalbumtracks()}} key={album_name}style={{backgroundColor:"#141212",width:100,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
+        <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
+            <View style={{flex:favouritecards ? 0.5 : 1}}>
+                <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+            </View>
+            <View style={{padding:10}}>
+            </View>
+            <Text style={{color:"white",flex:favouritecards ? 1 : 0.15}}>
+                {album_name} | {capitalizeFirstLetter(album_type)}
+            </Text>
+        
+            {favouritecards === false &&
                 <Text>
-                    Artist: {artist_name}
-                </Text>
-
-
+                Artist: {artist_name}
+                </Text>}
+                {favouritecards === false &&
+            <View>
+                            
                 <Text>
                     Total Tracks: {total_tracks}
                 </Text>
@@ -48,15 +93,20 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
                 <TouchableOpacity>
                 <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white",alignSelf:"flex-end"}}/>
                 </TouchableOpacity>
+                </View>
+            }
+
             
 
 
-            </View>
-        
-                
 
-    
-    </View>
-    </Pressable>)
+
+
+        </View>
+        
+    </TouchableHighlight>)
+
+    }
+
     
 }

@@ -4,6 +4,8 @@ import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
 import CarouselItem from "./CarouselItem";
 import TrackProgress from "../TrackProgress/TrackProgress";
+import FavouriteItem from "./FavouriteItem";
+
 export default function Home({seek, setSeek}){
     const [initialfeed,setInitialFeed] = useState([]);
     const [initialrnb,setInitialRNB] = useState([]);
@@ -14,8 +16,8 @@ export default function Home({seek, setSeek}){
         // https://api.spotify.com/v1/browse/new-releases
         const body = {
             "grant_type":"client_credentials",
-            "client_id": "2f86df823b294b8193071167035d2770",
-            "client_secret":"272596c38cd54bc39398eac5513ab12c"
+            "client_id": "c688512a4a604b0e8c1ffa9d6e70cfd0",
+            "client_secret":"91d8ca810ef048cfb69462bd8d2cd31a"
         }
         const formBody = Object.keys(body).map(key =>      encodeURIComponent(key) + '=' + encodeURIComponent(body[key])).join('&');
         const response = await fetch('https://accounts.spotify.com/api/token', {
@@ -35,7 +37,7 @@ export default function Home({seek, setSeek}){
         const access_token = await get_access_token();
         setAccessToken(access_token)
         const headers = {Authorization: `Bearer ${access_token}`}
-        const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?limit=12', {headers: headers})
+        const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?limit=14', {headers: headers})
         const feedresult = await resp.json()
         //console.log(feedresult.albums.items)
         setInitialFeed(feedresult.albums.items)
@@ -75,40 +77,19 @@ const getinitialhiphop = async () =>{
     //console.log(feedresult)
 
 }
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+
 
 
     function FavouritePlaylists({favouritecards,playlists}){
         return(
-            <View style={{justifyContent: 'center',marginTop:10}}>
+            <View key={playlists[0].name} style={{justifyContent: 'center',marginTop:10}}>
             <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
                 
                     {playlists.map((album) =>{
+                        //console.log(album)
                         return(
-                            <View style={{backgroundColor:"#141212",width:100,height:favouritecards ? 50 : 300,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
-                            <View  key={album.name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "center":"flex-start",alignItems:favouritecards === true ? "center": "stretch",flex:1}}>
-                                <View style={{flex:favouritecards ? 0.5 : 1}}>
-                                    <Image style={{width: '100%', height: '100%'}} source={{uri:album.images[0].url}}></Image>
-                                </View>
-                                <View style={{padding:10}}>
-                                </View>
-                                {favouritecards === false &&
-                                    <Text>
-                                    Artist: {album.artists[0].name}
-                                    </Text>}
 
-                    
-                                <Text style={{color:"white",flex:favouritecards ? 1 : 0.2}}>
-                                    {album.name} | {capitalizeFirstLetter(album.album_type)}
-                                </Text>
-                            
-
-
-                            </View>
-                            
-                        </View>
+                            <CarouselItem access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
                         
                         )
                     })}
@@ -148,7 +129,14 @@ function capitalizeFirstLetter(string) {
     return(
         <View style={{flex:1}}>
             {/*Header */}
-            <View  style={{flex:0.15,backgroundColor:"green"}}>
+            <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
+                <View style={{flex:1,margin:10}}>
+                <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
+                
+                </View>
+                <View style={{flex:0.13,margin:10}}>
+                <Image style={{width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
+                </View>
 
             </View>
             {/*Main Scroll Body*/}
@@ -171,7 +159,7 @@ function capitalizeFirstLetter(string) {
                 {initialrnb.length > 0 && access_token !== ""  && 
                 initialrnb.map((rnbcarousel) =>{
                     return(
-                        <FavouriteRecommendations favouritecards={false} playlists={rnbcarousel}/>
+                        <FavouriteRecommendations  playlists={rnbcarousel}/>
                     )
                 })
 
@@ -182,7 +170,7 @@ function capitalizeFirstLetter(string) {
                 {initialhiphop.length > 0 && access_token !== ""   && 
                 initialhiphop.map((hiphopcarousel) =>{
                     return(
-                        <FavouriteRecommendations favouritecards={false} playlists={hiphopcarousel}/>
+                        <FavouriteRecommendations  playlists={hiphopcarousel}/>
                     )
                 })
 
@@ -194,7 +182,7 @@ function capitalizeFirstLetter(string) {
 
             </ScrollView>
             {/*Song Progress Tracker */}
-            <View style={{flex:0.10,backgroundColor:"red"}}>
+            <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
                 <TrackProgress seek={seek} setSeek={setSeek}/>
 
             </View>

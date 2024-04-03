@@ -30,7 +30,7 @@ export default function TrackProgress({seek,setSeek}) {
       minimumValue={0}
       maximumValue={duration}
       minimumTrackTintColor="#FFFFFF"
-      maximumTrackTintColor="#000000"
+      maximumTrackTintColor="#FFFFFF"
       value={isSeeking ? seek : position}
       onValueChange={(value) => {
         //TrackPlayer.pause();

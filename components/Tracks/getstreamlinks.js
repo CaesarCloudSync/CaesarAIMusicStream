@@ -11,19 +11,19 @@ export const addTrack = async (streaming_link,album_track) =>{
     //const CaesarAIMusicLogo = require('../../assets/CaesarAILogo.png')
     const track = [{isActive:true,id:album_track.name,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail}]
     //console.log(alltracks)
-
+    await TrackPlayer.seekTo(0)
     await TrackPlayer.reset()
     await TrackPlayer.add(track);
     await TrackPlayer.setRepeatMode(RepeatMode.Queue);
     await TrackPlayer.play()
 }
-export  const getstreaminglink =async (album_track) =>{
+export const getstreaminglink =async (album_track) =>{
     let searchquery = `${album_track.name} by ${album_track.artist}`//hoodie szn a boogie wit da hoodie album 20 tracks
     const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`)
     let videos = response.data.result
     let video_link = videos[1].link
     const responseaudio = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/getaudiowatch?url=${video_link}`)
-    console.log(responseaudio.data)
+    //console.log(responseaudio.data)
     if (responseaudio.data.title === "Video Not Available.mp3"){
         Alert.alert("Backend Error")
     }
@@ -33,7 +33,7 @@ export  const getstreaminglink =async (album_track) =>{
 }}
 export  const getaudio = async (album_track,setCurrentTrack) =>{
         let streaming_link = await getstreaminglink(album_track)
-        console.log(streaming_link)
+        //console.log(streaming_link)
        
                         
         await addTrack(streaming_link,album_track)
