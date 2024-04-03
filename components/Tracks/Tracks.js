@@ -18,7 +18,13 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const isPlaying = playerState === State.Playing;
     const [album_tracks,setAlbumTracks] = useState(location.state);
     const [loadingaudio,setLoadingAudio] = useState(false)
-
+    const highlightMusicIcon = () =>{
+        setLoadingAudio(true)
+        setTimeout(() => {
+            setLoadingAudio(false)
+          }, 6000);
+    }
+    
     useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
         if (event.position > 100){
             const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
@@ -57,13 +63,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
         //console.log(event,"ji")
       });
-    
-    const highlightMusicIcon = () =>{
-        setLoadingAudio(true)
-        setTimeout(() => {
-            setLoadingAudio(false)
-          }, 6000);
-    }
+    /*
+  
     useEffect(() =>{
         if (loadingaudio === false){
             setTimeout(() => {
@@ -84,7 +85,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
 
     },[loadingaudio])
-
+    */
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             <View style={{flexDirection:"row"}}>

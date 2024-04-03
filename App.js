@@ -18,13 +18,15 @@ import { useCallback } from 'react';
 import { connectToDatabase,createTables } from "../SQLDB/SQLDB";
 import Downloads from './components/Downloads/Downloads';
 
+
 function App() { 
 
  
   const [currentTrack,setCurrentTrack] = useState("")
   
   const [seek, setSeek] = useState(0);
-  const [songchanged,setSongsChanged] = useState(false);
+  const [songchanged,setSongsChanged] = useState(false); 
+  const [isPlayerReady,setIsPlayerReady] = useState(false);
 
 // Database
   /*const loadData = useCallback(async () => {
@@ -40,6 +42,18 @@ function App() {
     loadData()
   }, [loadData])
 */
+
+useEffect(() => {
+  async function setup() {
+    let isSetup = await setupPlayer();
+
+    setIsPlayerReady(isSetup);
+  }
+
+  setup();
+  //setTrackInfo()
+  
+}, []);
 /*
   if(!isPlayerReady) {
     return (
