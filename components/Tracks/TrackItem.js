@@ -24,7 +24,7 @@ export default function TrackItem({album_track,setCurrentTrack,highlightMusicIco
         }
     }
     const downloadsong = async () =>{
-        const youtube_link = await getyoutubelink(album_track);
+        const youtube_link = await getyoutubelink(album_track,download=true);
         //console.log(youtube_link)
         await addSong(youtube_link)
 

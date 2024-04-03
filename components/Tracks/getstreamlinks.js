@@ -17,15 +17,15 @@ export const addTrack = async (streaming_link,album_track) =>{
     await TrackPlayer.setRepeatMode(RepeatMode.Queue);
     await TrackPlayer.play()
 }
-export const getyoutubelink  = async (album_track) =>{
+export const getyoutubelink  = async (album_track,download=false) =>{
     let searchquery = `${album_track.name} by ${album_track.artist}`//hoodie szn a boogie wit da hoodie album 20 tracks
     const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`)
     let videos = response.data.result
-    let video_link = videos[1].link
+    let video_link = download === true ? videos[0].link : videos[1].link
     return video_link
 }
 export const getstreaminglink =async (album_track) =>{
-    const video_link = await getyoutubelink(album_track);
+    const video_link = await getyoutubelink(album_track,download=false);
     const responseaudio = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/getaudiowatch?url=${video_link}`)
     //console.log(responseaudio.data)
     if (responseaudio.data.title === "Video Not Available.mp3"){

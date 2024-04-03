@@ -2,34 +2,18 @@ import { View,Text, ScrollView, FlatList,Image,SafeAreaView} from "react-native"
 
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
-import CarouselItem from "./CarouselItem";
+
 import TrackProgress from "../TrackProgress/TrackProgress";
 import FavouriteItem from "./FavouriteItem";
-
+import { get_access_token } from "../access_token/getaccesstoken";
+import {FavouritePlaylists,FavouriteRecommendations} from "./FavouriteRenders";
 export default function Home({seek, setSeek}){
     const [initialfeed,setInitialFeed] = useState([]);
     const [initialrnb,setInitialRNB] = useState([]);
     const [initialhiphop,setInitialHipHop] = useState([]);
     const [access_token,setAccessToken] = useState("")
 
-    const get_access_token = async () =>{
-        // https://api.spotify.com/v1/browse/new-releases
-        const body = {
-            "grant_type":"client_credentials",
-            "client_id": "c688512a4a604b0e8c1ffa9d6e70cfd0",
-            "client_secret":"91d8ca810ef048cfb69462bd8d2cd31a"
-        }
-        const formBody = Object.keys(body).map(key =>      encodeURIComponent(key) + '=' + encodeURIComponent(body[key])).join('&');
-        const response = await fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },    
-            body: formBody
-        });
-        const result = await response.json()
-        return result.access_token
-    }
+
     const getintialfeed = async () =>{
 
         //console.log(result)
@@ -80,42 +64,6 @@ const getinitialhiphop = async () =>{
 
 
 
-    function FavouritePlaylists({favouritecards,playlists}){
-        return(
-            <View key={playlists[0].name} style={{justifyContent: 'center',marginTop:10}}>
-            <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
-                
-                    {playlists.map((album) =>{
-                        //console.log(album)
-                        return(
-
-                            <CarouselItem access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
-                        
-                        )
-                    })}
-                
-
-            </View>
-        </View>
-        )
-    }
-
-    function FavouriteRecommendations({favouritecards,playlists}){
-        return(
-            <SafeAreaView style={{flex: 1,marginTop:10}}>
-            <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
-                
-                <FlatList
-                data={playlists}
-                horizontal={true}
-                renderItem={({item}) =><CarouselItem access_token={access_token} favouritecards={favouritecards} spotifyid={item.album.id}thumbnail={item.album.images[0].url} album_name={item.album.name} artist_name={item.album.artists[0].name} total_tracks={item.album.total_tracks} release_date={item.album.release_date} album_type={item.album.album_type}/>}
-                />
-                
-
-            </View>
-        </SafeAreaView>
-        )
-    }
     const getall = async () =>{
         await getintialfeed()
         await getinitialrnb()
@@ -142,13 +90,13 @@ const getinitialhiphop = async () =>{
             {/*Main Scroll Body*/}
             <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
                 {/* Favourite Playlists */}
-                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
+                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
                 {initialfeed.length > 0 && access_token !== ""  &&
                 <View style={{flex:1}}>
                     <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest Playlists</Text>
                 </View>
                 }
-                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists favouritecards={false} playlists={initialfeed.slice(8,)}/>}
+                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={false} playlists={initialfeed.slice(8,)}/>}
 
                 {initialfeed.length > 0 && access_token !== ""  && 
                 <View style={{flex:1}}>
@@ -159,7 +107,7 @@ const getinitialhiphop = async () =>{
                 {initialrnb.length > 0 && access_token !== ""  && 
                 initialrnb.map((rnbcarousel) =>{
                     return(
-                        <FavouriteRecommendations  playlists={rnbcarousel}/>
+                        <FavouriteRecommendations access_token={access_token}  playlists={rnbcarousel}/>
                     )
                 })
 
@@ -170,7 +118,7 @@ const getinitialhiphop = async () =>{
                 {initialhiphop.length > 0 && access_token !== ""   && 
                 initialhiphop.map((hiphopcarousel) =>{
                     return(
-                        <FavouriteRecommendations  playlists={hiphopcarousel}/>
+                        <FavouriteRecommendations access_token={access_token}  playlists={hiphopcarousel}/>
                     )
                 })
 
