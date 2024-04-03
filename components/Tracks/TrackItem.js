@@ -19,11 +19,11 @@ export default function TrackItem({album_track,setCurrentTrack}){
                 <Text style={{color:"grey"}}>{album_track.artist}</Text>
                 </View>
                 </TouchableOpacity>
-                <View style={{flex:0.2,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
+                <View style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
                 <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white"}}/>
 
                 </View>
-                <View style={{flex:0.2,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
+                <View style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
                 <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white"}}/>
 
                     

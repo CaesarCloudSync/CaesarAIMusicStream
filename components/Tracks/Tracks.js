@@ -8,10 +8,13 @@ import { getaudio } from "./getstreamlinks";
 import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress} from "react-native-track-player";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";
+import { usePlaybackState } from 'react-native-track-player';
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
     const navigate = useNavigate();
     const { position, duration } = useProgress(200);
+    const playerState = usePlaybackState();
+    const isPlaying = playerState === State.Playing;
 
     const [album_tracks,setAlbumTracks] = useState(location.state);
     const [loadingaudio,setLoadingAudio] = useState(false)
@@ -20,10 +23,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         if (event.position > 100){
             const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
             if (idx+1 > album_tracks.length){
-                getaudio(album_tracks[0],setCurrentTrack)
+                await getaudio(album_tracks[0],setCurrentTrack)
             }
             else{
-                getaudio(album_tracks[idx+1],setCurrentTrack)
+                await getaudio(album_tracks[idx+1],setCurrentTrack)
             }
             highlightMusicIcon()
          
@@ -31,9 +34,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     
         // "react-native-track-player": "^3.2.0",
 
-        
+               
+
         //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
-        //console.log(event,"ji")
+        console.log(event,"ji")
         //console.log(prevduration,"dur")
       });
       useTrackPlayerEvents([Event.RemoteNext], async (event) => {
@@ -51,7 +55,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
         
         //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
-        console.log(event,"ji")
+        //console.log(event,"ji")
       });
     
     const highlightMusicIcon = () =>{
@@ -60,6 +64,26 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             setLoadingAudio(false)
           }, 6000);
     }
+    useEffect(() =>{
+        if (loadingaudio === false){
+            setTimeout(() => {
+                // IF the music is not playing after 3 seconds of playing, goes to the next song.
+                //console.log(isPlaying,"hi")
+                if (isPlaying === false){
+                    const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
+                    if (idx+1 > album_tracks.length){
+                        getaudio(album_tracks[0],setCurrentTrack)
+                    }
+                    else{
+                        getaudio(album_tracks[idx+1],setCurrentTrack)
+                    }
+            
+                }
+              }, 3000);
+        }
+
+
+    },[loadingaudio])
 
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
