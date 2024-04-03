@@ -8,7 +8,9 @@ import AntDesign from "react-native-vector-icons/AntDesign"
 import axios from "axios";
 import BottomModal from "./bottomModal";
 import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useNetInfo} from "@react-native-community/netinfo";
 export default function Search({seek, setSeek}){
+    const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
     const [access_token,setAccessToken] = useState("");
     const [initialfeed,setInitialFeed] = useState([]);
@@ -42,10 +44,13 @@ export default function Search({seek, setSeek}){
         toggleModal()
     }
     useEffect(() =>{
-        getinitialrnb()
-    
+        if (netInfo.isInternetReachable === true){
+            getinitialrnb()
+        }
 
-    },[])
+
+    },[netInfo])
+    if (netInfo.isInternetReachable){
     return(
         <View style={{flex:1}}>
             {/*Header */}
@@ -93,5 +98,40 @@ export default function Search({seek, setSeek}){
 
  
         </View>
-    )
+    )}
+    else{
+        return(
+            <View style={{flex:1}}>
+                {/*Header */}
+                <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
+                    <View style={{flex:1,margin:10}}>
+                    <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
+                    
+                    </View>
+                    <View style={{flex:0.13,margin:10}}>
+                    <Image style={{width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
+                    </View>
+
+                </View>
+                {/* No Internet Main Body */}
+                <View style={{flex:1,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
+                    <Text style={{fontSize:30}}>No Internet Connection</Text>
+                    <Text>
+                    Play your Downloads
+                    </Text>
+                </View>
+
+                {/*Song Progress Tracker */}
+                <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
+                    <TrackProgress seek={seek} setSeek={setSeek}/>
+
+                </View>
+
+                {/*Navigation Footer*/}
+                <NavigationFooter currentpage={"search"}/>
+
+            </View>
+        )
+        
+    }
 }

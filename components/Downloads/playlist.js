@@ -31,6 +31,7 @@ export default function Playlist(props) {
   
     async function loadPlaylist() {
       const queue = await TrackPlayer.getQueue();
+      console.log(queue)
       setQueue(queue);
       setIsPlayerReady(false)
     }

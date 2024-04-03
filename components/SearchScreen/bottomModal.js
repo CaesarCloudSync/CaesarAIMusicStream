@@ -6,6 +6,7 @@ import { FavouritePlaylists } from "../HomeScreen/FavouriteRenders";
 export default function BottomModal({songs,toggleModal,isModalVisible,setModalVisible,access_token}) {
   //console.log(currentTrack)
   //console.log(nextqueue)
+  console.log(songs)
   
   function QueuedItem({item,index}){
     const [removed,setRemoved] = useState(false)
@@ -39,7 +40,7 @@ export default function BottomModal({songs,toggleModal,isModalVisible,setModalVi
         <View style={styles.modalContent}>
           <View style={styles.center}>
             <View style={styles.barIcon} />
-            <Text style={styles.text}>CaesarAIMusic Queue</Text>
+            <Text style={styles.text}>CaesarAIMusic Search</Text>
             <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={songs}/>
 
 
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   text: {
     color: "#bbb",
     fontSize: 24,
-    marginTop: 100,
+    marginTop: 10,
   },
   btnContainer: {
     display: "flex",

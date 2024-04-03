@@ -23,6 +23,7 @@ export default function Downloads() {
   const [songchanged,setSongsChanged] = useState(false);
   const [nextqueue,setNextQueue] = useState([]);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  
   const [currentTrack, setCurrentTrack] = useState(0);
 
   useEffect(() => {
@@ -42,7 +43,6 @@ export default function Downloads() {
     //setTrackInfo()
     
   }, []);
-
 
   if(!isPlayerReady) {
     return (
