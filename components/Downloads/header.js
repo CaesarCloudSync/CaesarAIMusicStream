@@ -33,10 +33,10 @@ export default function Header(props) {
     const imagedim = 110
     //console.log(info)
     return(
-      <View style={{justifyContent:"center",alignItems:"center"}}>
-          <Image style={{position:"relative",top:30,width: 120,height:imagedim}} source={require("../assets/CaesarAILogo.png")}></Image>
+      <View style={{justifyContent:"center",alignItems:"center",backgroundColor:"#141212",flex:0.67}}>
+          <Image style={{position:"relative",top:30,width: 120,height:imagedim}} source={require("../../assets/CaesarAILogo.png")}></Image>
           {info !== null &&
-          <View>
+          <View style={{flex:1}}>
           <Text style={styles.songTitle}>{info.title}</Text>
           <Text style={styles.artistName}>{info.artist}</Text>
           </View>

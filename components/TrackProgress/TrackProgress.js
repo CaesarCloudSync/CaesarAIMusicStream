@@ -11,7 +11,7 @@ import {
 import TrackPlayer from 'react-native-track-player';
 import { useState } from 'react';
 import Slider from '@react-native-community/slider';
-export default function TrackProgress({seek,setSeek}) {
+export default function TrackProgress({seek,setSeek,style}) {
   const [isSeeking, setIsSeeking] = useState(false);
   
     const { position, duration } = useProgress(200);
@@ -23,7 +23,7 @@ export default function TrackProgress({seek,setSeek}) {
     }
   
     return(
-      <View style={{alignItems:"center",justifyContent:"center",flexDirection:"row"}}>
+      <View style={[{alignItems:"center",justifyContent:"center",flexDirection:"row",backgroundColor:"#141212"},style]}>
 
         <Slider
       style={{width: '80%', justifyContent: 'center'}}

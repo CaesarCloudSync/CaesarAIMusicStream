@@ -11,8 +11,9 @@ export const addTrack = async (streaming_link,album_track) =>{
     //const CaesarAIMusicLogo = require('../../assets/CaesarAILogo.png')
     const track = [{isActive:true,id:album_track.name,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail}]
     //console.log(alltracks)
-    await TrackPlayer.seekTo(0)
+    
     await TrackPlayer.reset()
+    await TrackPlayer.seekTo(0)
     await TrackPlayer.add(track);
     await TrackPlayer.setRepeatMode(RepeatMode.Queue);
     await TrackPlayer.play()
@@ -21,7 +22,7 @@ export const getyoutubelink  = async (album_track,download=false) =>{
     let searchquery = `${album_track.name} by ${album_track.artist}`//hoodie szn a boogie wit da hoodie album 20 tracks
     const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`)
     let videos = response.data.result
-    let video_link = download === true ? videos[0].link : videos[0].link
+    let video_link = download === true ? videos[0].link : videos[1].link
     return video_link
 }
 export const getstreaminglink =async (album_track) =>{

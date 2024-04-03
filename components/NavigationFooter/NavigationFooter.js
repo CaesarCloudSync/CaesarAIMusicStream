@@ -62,17 +62,22 @@ export default function NavigationFooter({currentpage}){
                 </View>
             </Link>
         </View>
-        <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-            <View>
-                <MaterialCommunityIcons name="playlist-play" style={{fontSize:30}}></MaterialCommunityIcons>
-                <Link to="/que">
-                    <Text style={{fontSize:10}}>
-                        Queue
-                    </Text>
-                </Link>
 
-            </View>
+        <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+            <Link underlayColor={"transparent"} to="/downloads">
+                <View>
+                    <MaterialCommunityIcons name="download-multiple" style={{fontSize:30,color:currentpage=== "library" ? "white" :"",marginLeft:10}}/>
+                    
+                        <Text style={{fontSize:10,color:currentpage=== "downloads" ? "white" :""}}>
+                            Downloads
+                        </Text>
+                
+
+                </View>
+            </Link>
         </View>
+
+
 
 
             

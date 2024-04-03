@@ -182,7 +182,7 @@ export default function CaesarSongSearch(){
               <Text style={{color:"white"}}>Download</Text>
               </Pressable>
               <Pressable onPress={() =>{openLink()}} >
-            <Image  style={{position:"relative",top:0.3,backgroundColor:"red",height:40}} source={require("../assets/Youtube_logo.png")}></Image>
+            <Image  style={{position:"relative",top:0.3,backgroundColor:"red",height:40}} source={require("../../assets/Youtube_logo.png")}></Image>
             </Pressable></View>:
             <ActivityIndicator style={{marginTop:10}}></ActivityIndicator>}
 
