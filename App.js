@@ -19,6 +19,8 @@ import Home from './components/HomeScreen/HomeScreen';
 import Search from './components/SearchScreen/SearchScreen';
 import LibraryScreen from './components/LibraryScreen/LibraryScreen';
 import Tracks from './components/Tracks/Tracks';
+import { useCallback } from 'react';
+import { connectToDatabase,createTables } from "../SQLDB/SQLDB";
 function App() { 
 
   const [currentTrack,setCurrentTrack] = useState("")
@@ -45,7 +47,20 @@ function App() {
     //setTrackInfo()
     
   }, []);
+// Database
+  /*const loadData = useCallback(async () => {
+    try {
+      const db = await connectToDatabase()
+      await createTables(db)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
 
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+*/
 /*
   if(!isPlayerReady) {
     return (

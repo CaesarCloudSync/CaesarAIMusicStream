@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState,useCallback } from "react"
 import { View,Text, FlatList,Image, TouchableOpacity} from "react-native"
 import { useLocation,useNavigate } from "react-router-native"
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
@@ -9,13 +9,13 @@ import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress} from "react-
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";
 import { usePlaybackState } from 'react-native-track-player';
+
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
     const navigate = useNavigate();
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
-
     const [album_tracks,setAlbumTracks] = useState(location.state);
     const [loadingaudio,setLoadingAudio] = useState(false)
 
@@ -109,8 +109,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item}) =><TrackItem setCurrentTrack={setCurrentTrack}  album_track={item}/>}
-            onTouchEnd={() =>{highlightMusicIcon()}}
+            renderItem={({item}) =><TrackItem setCurrentTrack={setCurrentTrack} album_track={item} highlightMusicIcon={highlightMusicIcon}/>}
             />
             <TrackProgress seek={seek} setSeek={setSeek}/>
   
