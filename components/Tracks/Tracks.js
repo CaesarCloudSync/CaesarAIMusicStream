@@ -51,7 +51,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
         
         //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
-        //console.log(event,"ji")
+        console.log(event,"ji")
       });
     
     const highlightMusicIcon = () =>{
