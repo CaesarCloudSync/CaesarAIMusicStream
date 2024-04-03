@@ -31,7 +31,7 @@ export default function Playlist(props) {
   
     async function loadPlaylist() {
       const queue = await TrackPlayer.getQueue();
-      console.log(queue)
+      //console.log(queue)
       setQueue(queue);
       setIsPlayerReady(false)
     }
@@ -42,9 +42,9 @@ export default function Playlist(props) {
   
     useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
       //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
-      console.log(event)
-      console.log(props.nextqueue)
-      console.log(props.seek)
+      //console.log(event)
+      //console.log(props.nextqueue)
+      //console.log(props.seek)
       if(event.state == State.nextTrack || event.state === undefined) {
         if (props.nextqueue.length > 0){
  

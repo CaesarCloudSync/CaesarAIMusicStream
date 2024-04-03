@@ -36,7 +36,7 @@ export default function Search({seek, setSeek}){
     }
     const searchsongs = async () =>{
         const headers = {Authorization: `Bearer ${access_token}`}
-        console.log(text)
+        //console.log(text)
         const resp = await fetch(`https://api.spotify.com/v1/search?q=${text}&limit=20&type=artist,album`, {headers: headers})
         const feedresult = await resp.json()
         const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
