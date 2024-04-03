@@ -6,6 +6,7 @@ import TrackPlayer, {
     Event,
   } from 'react-native-track-player';
 import { Alert } from "react-native";
+import ytdl from "react-native-ytdl";
 export const addTrack = async (streaming_link,album_track) =>{
     //files = files.filter((file) =>{return(file.mime === "audio/mpeg" && !file.name.includes(".trashed"))})
     //const CaesarAIMusicLogo = require('../../assets/CaesarAILogo.png')
@@ -22,20 +23,21 @@ export const getyoutubelink  = async (album_track,download=false) =>{
     let searchquery = `${album_track.name} by ${album_track.artist}`//hoodie szn a boogie wit da hoodie album 20 tracks
     const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`)
     let videos = response.data.result
-    let video_link = download === true ? videos[0].link :videos[1].link //videos[1].link
+    let video_link = download === true ? videos[0].link :videos[0].link //videos[1].link
     return video_link
 }
 export const getstreaminglink =async (album_track) =>{
     const video_link = await getyoutubelink(album_track,download=false);
-    const responseaudio = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/getaudiowatch?url=${video_link}`)
-    //console.log(responseaudio.data)
-    if (responseaudio.data.title === "Video Not Available.mp3"){
-        Alert.alert("Backend Error")
-    }
-    else{
-        let streaming_link = responseaudio.data.media
-        return streaming_link
-}}
+    const id = ytdl.getVideoID(video_link);
+    //console.log(id)
+    const info = await ytdl.getInfo(id);
+    //console.log(info)
+    let audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
+
+    const format = ytdl.chooseFormat(audioFormats, {quality: 'highest'});
+    let songurl = format.url
+    return songurl
+}
 export  const getaudio = async (album_track,setCurrentTrack) =>{
         let streaming_link = await getstreaminglink(album_track)
         //console.log(streaming_link)
