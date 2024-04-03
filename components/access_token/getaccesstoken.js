@@ -2,8 +2,8 @@ export const get_access_token = async () =>{
     // https://api.spotify.com/v1/browse/new-releases
     const body = {
         "grant_type":"client_credentials",
-        "client_id": "2148de389e8d4828999b6980ef96357f",
-        "client_secret":"a0c3351d0d6b434583c5bd653166004e"
+        "client_id": "0eaf3d010fb64ea880a1b6f201f67af9",
+        "client_secret":"ea68e6a2af9047a9bb472d6c9501e7fa"
     }
     const formBody = Object.keys(body).map(key =>      encodeURIComponent(key) + '=' + encodeURIComponent(body[key])).join('&');
     const response = await fetch('https://accounts.spotify.com/api/token', {

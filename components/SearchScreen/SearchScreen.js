@@ -4,9 +4,19 @@ import TrackProgress from "../TrackProgress/TrackProgress";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { FavouritePlaylists } from "../HomeScreen/FavouriteRenders";
+import AntDesign from "react-native-vector-icons/AntDesign"
+import axios from "axios";
+import BottomModal from "./bottomModal";
+import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 export default function Search({seek, setSeek}){
+    const [text, onChangeText] = useState("")
     const [access_token,setAccessToken] = useState("");
     const [initialfeed,setInitialFeed] = useState([]);
+    const [songs,setSongs] = useState([]);
+    const [isModalVisible, setModalVisible] = useState(false);
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+      };
     
     const getinitialrnb = async () =>{
         const access_token = await get_access_token();
@@ -14,13 +24,22 @@ export default function Search({seek, setSeek}){
         const resp = await fetch('https://api.spotify.com/v1/recommendations?limit=50&seed_genres=r-n-b&seed_artists=2h93pZq0e7k5yf4dywlkpM,31W5EY0aAly4Qieq6OFu6I,2jku7tDXc6XoB6MO2hFuqg', {headers: headers})
         const feedresult = await resp.json()
 
-        const result = feedresult.tracks.map((album) =>{console.log();return({"id":album.album.id,"name":album.album.name,"images":[{"url":album.album.images[0].url}],"artists":[{"name":album.album.artists[0].name}],"total_tracks":album.album.total_tracks,"release_date":album.album.release_date,"album_type":album.album.album_type})})
+        const result = feedresult.tracks.map((album) =>{return({"id":album.album.id,"name":album.album.name,"images":[{"url":album.album.images[0].url}],"artists":[{"name":album.album.artists[0].name}],"total_tracks":album.album.total_tracks,"release_date":album.album.release_date,"album_type":album.album.album_type})})
   
         setAccessToken(access_token)
         setInitialFeed(result)
         
         //console.log(feedresult)
-    
+
+    }
+    const searchsongs = async () =>{
+        const headers = {Authorization: `Bearer ${access_token}`}
+        console.log(text)
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=${text}&limit=20&type=artist,album`, {headers: headers})
+        const feedresult = await resp.json()
+        const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
+        setSongs(result)
+        toggleModal()
     }
     useEffect(() =>{
         getinitialrnb()
@@ -30,12 +49,27 @@ export default function Search({seek, setSeek}){
     return(
         <View style={{flex:1}}>
             {/*Header */}
-            <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
-                <View style={{flex:1,margin:10}}>
-                <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
+            <View  style={{flex:0.18,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
+                <View style={{flex:1, margin: 12,padding: 10,}}>
+
+                <TextInput
+                onSubmitEditing={() =>{searchsongs()}}
+                placeholder="What song would you like to listen to?"
+                placeholderTextColor={'black'}
+                style={ {
+                    height: 40,
+                   
+                    borderWidth: 1,
+                    
+                    backgroundColor:"white",
+                    color:"black"
+                  }}
+                onChangeText={onChangeText}
+                value={text}
+            />
                 
                 </View>
-                <View style={{flex:0.13,margin:10}}>
+                <View style={{flex:0.13,margin:1,marginTop:22,marginRight:10}}>
                 <Image style={{width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
                 </View>
 
@@ -50,9 +84,11 @@ export default function Search({seek, setSeek}){
                 <TrackProgress seek={seek} setSeek={setSeek}/>
 
             </View>
-
+                  
             {/*Navigation Footer*/}
             <NavigationFooter currentpage={"search"}/>
+            <BottomModal access_token={access_token} songs={songs} isModalVisible={isModalVisible} toggleModal={toggleModal} setModalVisible={setModalVisible} ></BottomModal>
+          
 
 
  
