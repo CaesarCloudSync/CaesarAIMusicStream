@@ -6,7 +6,7 @@ import { FavouritePlaylists } from "../HomeScreen/FavouriteRenders";
 export default function BottomModal({songs,toggleModal,isModalVisible,setModalVisible,access_token}) {
   //console.log(currentTrack)
   //console.log(nextqueue)
-  console.log(songs)
+  //console.log(songs)
   
   function QueuedItem({item,index}){
     const [removed,setRemoved] = useState(false)

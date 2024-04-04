@@ -73,7 +73,7 @@ const getinitialhiphop = async () =>{
         await getinitialhiphop()
     }
     useEffect(() =>{
-        console.log(netInfo)
+        //console.log(netInfo)
         if (netInfo.isInternetReachable === true){
             getall()
         }

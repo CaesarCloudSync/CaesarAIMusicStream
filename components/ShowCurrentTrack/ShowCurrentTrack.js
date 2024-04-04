@@ -53,13 +53,13 @@ export default function ShowCurrentTrack({searchscreen}) {
 
       if ( currentTrack !== null){
         return(
-          <TouchableOpacity onPress={() =>{gotoalbumtracks()}} style={{flexDirection:"row",backgroundColor:"#141212",margin:!searchscreen ? 5: 0}} >
+          <TouchableOpacity onPress={() =>{gotoalbumtracks()}} style={{flexDirection:"row",backgroundColor:"#141212",margin:!searchscreen ? 5: 0,marginLeft:30}} >
             {currentTrack.length !== 0 &&
-            <View style={{flex:0.15,marginLeft:30}}>
+            <View style={{flex:0.15}}>
             <Image style={{width: 40, height: 40}} source={{uri:currentTrack.artwork}}></Image>
             
             </View>}
-            <View>
+            <View style={{marginLeft:20}}>
             <Text >{currentTrack.title}</Text>
             <Text>{currentTrack.artist}</Text>
             </View>
