@@ -9,6 +9,7 @@ import axios from "axios";
 import BottomModal from "./bottomModal";
 import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNetInfo} from "@react-native-community/netinfo";
+import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
@@ -52,7 +53,7 @@ export default function Search({seek, setSeek}){
     },[netInfo])
     if (netInfo.isInternetReachable){
     return(
-        <View style={{flex:1}}>
+        <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
             <View  style={{flex:0.18,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
                 <View style={{flex:1, margin: 12,padding: 10,}}>
@@ -84,6 +85,7 @@ export default function Search({seek, setSeek}){
             {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={initialfeed}/>}
 
             </ScrollView>
+            <ShowCurrentTrack searchscreen={true}/>
             {/*Song Progress Tracker */}
             <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
                 <TrackProgress seek={seek} setSeek={setSeek}/>
@@ -122,6 +124,7 @@ export default function Search({seek, setSeek}){
                 </View>
 
                 {/*Song Progress Tracker */}
+                
                 <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
                     <TrackProgress seek={seek} setSeek={setSeek}/>
 

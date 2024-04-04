@@ -10,7 +10,7 @@ import ytdl from "react-native-ytdl";
 export const addTrack = async (streaming_link,album_track) =>{
     //files = files.filter((file) =>{return(file.mime === "audio/mpeg" && !file.name.includes(".trashed"))})
     //const CaesarAIMusicLogo = require('../../assets/CaesarAILogo.png')
-    const track = [{isActive:true,id:album_track.name,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail}]
+    const track = [{album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail}]
     //console.log(alltracks)
     
     await TrackPlayer.reset()

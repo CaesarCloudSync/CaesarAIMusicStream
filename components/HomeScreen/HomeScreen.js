@@ -8,6 +8,7 @@ import FavouriteItem from "./FavouriteItem";
 import { get_access_token } from "../access_token/getaccesstoken";
 import {FavouritePlaylists,FavouriteRecommendations} from "./FavouriteRenders";
 import {useNetInfo} from "@react-native-community/netinfo";
+import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 export default function Home({seek, setSeek}){
     const netInfo = useNetInfo();
     const [initialfeed,setInitialFeed] = useState([]);
@@ -81,7 +82,7 @@ const getinitialhiphop = async () =>{
     },[netInfo])
     if (netInfo.isInternetReachable === true){
     return(
-        <View style={{flex:1}}>
+        <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
             <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
                 <View style={{flex:1,margin:10}}>
@@ -135,8 +136,13 @@ const getinitialhiphop = async () =>{
  
 
             </ScrollView>
+                        {/*Song Progress Tracker */}
+       
+                <ShowCurrentTrack/>
+
+            
             {/*Song Progress Tracker */}
-            <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
+            <View style={{flex:0.018,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
                 <TrackProgress seek={seek} setSeek={setSeek}/>
 
             </View>

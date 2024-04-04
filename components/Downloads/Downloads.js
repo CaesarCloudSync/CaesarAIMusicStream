@@ -16,7 +16,10 @@ import AskPermission from './askpermission';
 import NavigationFooter from '../NavigationFooter/NavigationFooter';
 import Controls from "./Controls"
 import Footer from './footer';
+import ShowCurrentTrack from '../ShowCurrentTrack/ShowCurrentTrack';
+import { useNetInfo } from '@react-native-community/netinfo';
 export default function Downloads() { 
+  const netInfo = useNetInfo();
 
 
   const [seek, setSeek] = useState(0);
@@ -72,8 +75,9 @@ export default function Downloads() {
 
       <Playlist currentTrack={currentTrack} setCurrentTrack={setCurrentTrack} nextqueue={nextqueue} setNextQueue={setNextQueue}  seek={seek} setSeek={setSeek}/>
       {/*<Controls nextqueue={nextqueue} setSeek={setSeek} onShuffle={handleShuffle}/> */}
+      {netInfo.isInternetReachable === true && <ShowCurrentTrack />}
       <TrackProgress style={{flex:0.1}} seek={seek} setSeek={setSeek}/>
-      
+     
       <Footer styles={{flex:0.1}} nextqueue={nextqueue} currentTrack={currentTrack} isPlayerReady={isPlayerReady} ></Footer>
 
       <NavigationFooter currentpage={"downloads"}/>

@@ -9,7 +9,7 @@ import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress} from "react-
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";
 import { usePlaybackState } from 'react-native-track-player';
-
+import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
     const navigate = useNavigate();
@@ -112,7 +112,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             style={{flex:1,backgroundColor:"#141212"}}
             renderItem={({item}) =><TrackItem setCurrentTrack={setCurrentTrack} album_track={item} highlightMusicIcon={highlightMusicIcon}/>}
             />
-            <TrackProgress seek={seek} setSeek={setSeek}/>
+            <ShowCurrentTrack/>
+            <TrackProgress  seek={seek} setSeek={setSeek}/>
   
             <NavigationFooter currentpage={"home"}/>
         </View>
