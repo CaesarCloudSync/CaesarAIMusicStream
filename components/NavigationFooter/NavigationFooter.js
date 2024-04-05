@@ -52,6 +52,19 @@ export default function NavigationFooter({currentpage}){
             </View>
         </View>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+            <Link   underlayColor={"transparent"} to="/downloads">
+                <View>
+                    <MaterialCommunityIcons name="download-multiple" style={{fontSize:30,color:currentpage=== "library" ? "white" :"",marginLeft:10}}/>
+                    
+                        <Text style={{fontSize:10,color:currentpage=== "downloads" ? "white" :""}}>
+                            Downloads
+                        </Text>
+                
+
+                </View>
+            </Link>
+        </View>
+        <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
             <Link  underlayColor={"transparent"} to="/library">
                 <View>
                     <MaterialIcons name="library-music" style={{fontSize:30,color:currentpage=== "library" ? "white" :""}}></MaterialIcons>
@@ -65,19 +78,7 @@ export default function NavigationFooter({currentpage}){
             </Link>
         </View>
 
-        <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-            <Link   underlayColor={"transparent"} to="/downloads">
-                <View>
-                    <MaterialCommunityIcons name="download-multiple" style={{fontSize:30,color:currentpage=== "library" ? "white" :"",marginLeft:10}}/>
-                    
-                        <Text style={{fontSize:10,color:currentpage=== "downloads" ? "white" :""}}>
-                            Downloads
-                        </Text>
-                
 
-                </View>
-            </Link>
-        </View>
 
 
 

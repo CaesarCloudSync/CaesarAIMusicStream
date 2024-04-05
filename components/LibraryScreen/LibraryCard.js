@@ -9,7 +9,8 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
 
     }
     const removefromlibrary = async () =>{
-        await AsyncStorage.removeItem(`library:${album[0].album_name}`)
+        //console.log( await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("library:"))})))
+        await AsyncStorage.removeItem(`library:${album[0].album_name}|${album[0].artist}`)
         if (librarychanged === false){
             setLibraryChanged(true)
         }

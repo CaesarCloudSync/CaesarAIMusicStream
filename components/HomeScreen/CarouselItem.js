@@ -26,9 +26,9 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         const resp = await fetch(`https://api.spotify.com/v1/albums/${spotifyid}`, {headers: headers})
         const feedresult = await resp.json()
         let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
-        let library = await AsyncStorage.getItem(JSON.stringify(`library:${album_name}`))
+        let library = await AsyncStorage.getItem(JSON.stringify(`library:${album_name}|${artist_name}`)) 
         if (!library){
-            await AsyncStorage.setItem(`library:${album_name}`,JSON.stringify(album_tracks))
+            await AsyncStorage.setItem(`library:${album_name}|${artist_name}`,JSON.stringify(album_tracks))
         }
         navigate("/library")
         

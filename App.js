@@ -49,7 +49,7 @@ useEffect(() => {
 
     setIsPlayerReady(isSetup);
   }
-
+  
   setup();
   //setTrackInfo()
   
