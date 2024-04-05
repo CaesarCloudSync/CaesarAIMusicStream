@@ -1,7 +1,6 @@
 import { useEffect, useState,useCallback,useRef } from "react"
 import { View,Text, FlatList,Image, TouchableOpacity,AppState} from "react-native"
 import { useLocation,useNavigate } from "react-router-native"
-import NavigationTracker from "../NavigationFooter/NavigationTracker";
 import TrackItem from "./TrackItem";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import { getaudio } from "./getstreamlinks";
@@ -12,6 +11,7 @@ import { usePlaybackState } from 'react-native-track-player';
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import { getstreaminglink } from "./getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import NavigationFooter from "../NavigationFooter/NavigationFooter";
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
     const navigate = useNavigate();
@@ -148,7 +148,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <ShowCurrentTrack/>
             <TrackProgress  seek={seek} setSeek={setSeek}/>
   
-            <NavigationTracker final_tracks={final_tracks} currentpage={"home"}/>
+            <NavigationFooter currentpage={"home"}/>
         </View>
     )
 
