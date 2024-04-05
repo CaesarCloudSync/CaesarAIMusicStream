@@ -66,7 +66,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
     }
     else{
         return(
-        <TouchableHighlight onPress={() =>{getalbumtracks()}} key={album_name}style={{backgroundColor:"#141212",width:100,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
+        <TouchableHighlight onPress={() =>{getalbumtracks("/tracks")}} key={album_name}style={{backgroundColor:"#141212",width:100,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
             <View style={{flex:favouritecards ? 0.5 : 1}}>
                 <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
@@ -90,7 +90,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
                 <Text>
                     Release Date: {release_date}
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() =>{getalbumtracks("/library")}}>
                 <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white",alignSelf:"flex-end"}}/>
                 </TouchableOpacity>
                 </View>
