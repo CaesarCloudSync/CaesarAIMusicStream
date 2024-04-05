@@ -96,7 +96,7 @@ function parseISOString(s) {
             "storageWithExpiry"
           );
          
-        console.log(savedData)
+        //console.log(savedData)
         
         const currentTimestamp = new Date().toISOString()
 
@@ -104,8 +104,10 @@ function parseISOString(s) {
         // Check if expiryTime exists with the optional chaining operator `?`
         // then, we check if the current ‘now’ time is still behind expiryTime
         // if not, it means the storage data has expired and needs to be removed
-        console.log(parseISOString(currentTimestamp),parseISOString(savedData))
-        console.log(parseISOString(currentTimestamp) >= parseISOString(savedData))
+
+        if (savedData !== null){
+            //console.log(parseISOString(currentTimestamp),parseISOString(savedData))
+            //console.log(parseISOString(currentTimestamp) >= parseISOString(savedData))
         if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
           await AsyncStorage.removeItem("storageWithExpiry");
           await AsyncStorage.removeItem("initial_feed")
@@ -113,6 +115,7 @@ function parseISOString(s) {
           await AsyncStorage.removeItem("initial_hiphop")
         
    
+        }
         }
         
 
