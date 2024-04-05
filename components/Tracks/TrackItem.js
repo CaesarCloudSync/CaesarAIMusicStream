@@ -27,7 +27,6 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
     }
     const downloadsong = async () =>{
         const youtube_link = await getyoutubelink(album_track,download=true);
-        //console.log(youtube_link)
         await addSong(youtube_link)
 
     }
@@ -57,6 +56,20 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
                     await TrackPlayer.play()
                 }
 
+            }
+        }
+        else{
+            if (cached_tracks){
+                await TrackPlayer.reset();
+
+                await TrackPlayer.add(JSON.parse(cached_tracks));
+                await TrackPlayer.skip(index)
+                await TrackPlayer.play()
+            }
+            else{
+                await TrackPlayer.reset();
+                await TrackPlayer.skip(index)
+                await TrackPlayer.play()
             }
         }
     }
