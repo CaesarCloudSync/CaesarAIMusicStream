@@ -19,7 +19,7 @@ export default function Home({seek, setSeek}){
     const [access_token,setAccessToken] = useState("")
 
 
-    const getintialfeed = async () =>{
+    const getintialfeed = async (access_token) =>{
 
         //console.log(result)
         // https://api.spotify.com/v1/browse/new-releases
@@ -42,8 +42,8 @@ const chunkcards = (arr) =>{
     }
     return chunks
 }
-const getinitialrnb = async () =>{
-    const access_token = await get_access_token();
+const getinitialrnb = async (access_token) =>{
+
     const headers = {Authorization: `Bearer ${access_token}`}
     const resp = await fetch('https://api.spotify.com/v1/recommendations?limit=50&seed_genres=r-n-b&seed_artists=2h93pZq0e7k5yf4dywlkpM,31W5EY0aAly4Qieq6OFu6I,2jku7tDXc6XoB6MO2hFuqg', {headers: headers})
     const feedresult = await resp.json()
@@ -55,8 +55,7 @@ const getinitialrnb = async () =>{
     //console.log(feedresult)
 
 }
-const getinitialhiphop = async () =>{
-    const access_token = await get_access_token();
+const getinitialhiphop = async (access_token) =>{
     const headers = {Authorization: `Bearer ${access_token}`}
     const resp = await fetch('https://api.spotify.com/v1/recommendations?limit=50&seed_genres=hip-hop&seed_artists=2P5sC9cVZDToPxyomzF1UH,5K4W6rqBFWDnAN6FQUkS6x,6U3ybJ9UHNKEdsH7ktGBZ7', {headers: headers})
     const feedresult = await resp.json()
@@ -69,44 +68,45 @@ const getinitialhiphop = async () =>{
 
 }
 const createxpiration = async () =>{
-    const storageExpirationTimeInMinutes = 30; // in this case, we only want to keep the data for 30min
+    const storageExpirationTimeInMinutes = 60; // in this case, we only want to keep the data for 30min
+    console.log(storageExpirationTimeInMinutes)
     
-    const now = new Date();
-    now.setMinutes(now.getMinutes() + storageExpirationTimeInMinutes); // add the expiration time to the current Date time
-    const expiryTimeInTimestamp = Math.floor(now.getTime() / 1000); // convert the expiry time in UNIX timestamp
-    const data = {
-      itemId: 4325, // example of data you need to store
-      expiryTime: expiryTimeInTimestamp
-    };
-    
+    let dt= new Date()
+    dt = new Date(dt.getTime() + storageExpirationTimeInMinutes * 60 * 1000)
+
+  
+
     // store the data with expiration time in there
     await AsyncStorage.setItem(
       "storageWithExpiry",
-      JSON.stringify(data)
+      dt.toISOString()
     );
 }
+function parseISOString(s) {
+    var b = s.split(/\D+/);
+    return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+  }
 
 
     const getall = async () =>{
-       
-        /*
-                await AsyncStorage.removeItem("storageWithExpiry");
-        await AsyncStorage.removeItem("initial_feed")
-        await AsyncStorage.removeItem("initial_rnb")
-        await AsyncStorage.removeItem("initial_hiphop") */
+        
+
 
         let savedData = await AsyncStorage.getItem(
             "storageWithExpiry"
           );
+         
         console.log(savedData)
-
-        const currentTimestamp = Math.floor(Date.now() / 1000); // get current UNIX timestamp. Divide by 1000 to get seconds and round it down
+        
+        const currentTimestamp = new Date().toISOString()
 
         // Remove the saved data if it expires.
         // Check if expiryTime exists with the optional chaining operator `?`
         // then, we check if the current ‘now’ time is still behind expiryTime
         // if not, it means the storage data has expired and needs to be removed
-        if (currentTimestamp >= savedData?.expiryTime) {
+        console.log(parseISOString(currentTimestamp),parseISOString(savedData))
+        console.log(parseISOString(currentTimestamp) >= parseISOString(savedData))
+        if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
           await AsyncStorage.removeItem("storageWithExpiry");
           await AsyncStorage.removeItem("initial_feed")
           await AsyncStorage.removeItem("initial_rnb")
@@ -118,10 +118,13 @@ const createxpiration = async () =>{
 
         const access_token = await get_access_token();
         setAccessToken(access_token)
-        await createxpiration()
+        
         let cache_initial = await AsyncStorage.getItem("initial_feed")
         if (!cache_initial){
-            await getintialfeed()
+            console.log("hellom")
+            await getintialfeed(access_token)
+            await createxpiration()
+        
         }
         else{
             //console.log(cache_initial)
@@ -129,14 +132,14 @@ const createxpiration = async () =>{
         }
         let cache_rnb = await AsyncStorage.getItem("initial_rnb")
         if (!cache_rnb){
-            await getinitialrnb()
+            await getinitialrnb(access_token)
         }
         else{
             setInitialRNB(JSON.parse(cache_rnb))
         }
         let cache_hiphop = await AsyncStorage.getItem("initial_hiphop")
         if (!cache_hiphop){
-            await getinitialhiphop()
+            await getinitialhiphop(access_token)
         }
         else{
             setInitialHipHop(JSON.parse(cache_hiphop))

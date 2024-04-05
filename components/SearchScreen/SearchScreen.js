@@ -19,20 +19,18 @@ export default function Search({seek, setSeek}){
     const [songs,setSongs] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
     const createxpiration = async () =>{
-        const storageExpirationTimeInMinutes = 30; // in this case, we only want to keep the data for 30min
+        const storageExpirationTimeInMinutes = 60; // in this case, we only want to keep the data for 30min
+        //console.log(storageExpirationTimeInMinutes)
         
-        const now = new Date();
-        now.setMinutes(now.getMinutes() + storageExpirationTimeInMinutes); // add the expiration time to the current Date time
-        const expiryTimeInTimestamp = Math.floor(now.getTime() / 1000); // convert the expiry time in UNIX timestamp
-        const data = {
-          itemId: 4325, // example of data you need to store
-          expiryTime: expiryTimeInTimestamp
-        };
-        
+        let dt= new Date()
+        dt = new Date(dt.getTime() + storageExpirationTimeInMinutes * 60 * 1000)
+    
+      
+    
         // store the data with expiration time in there
         await AsyncStorage.setItem(
           "storageWithExpiry",
-          JSON.stringify(data)
+          dt.toISOString()
         );
     }
     
@@ -63,34 +61,37 @@ export default function Search({seek, setSeek}){
         setSongs(result)
         toggleModal()
     }
+    function parseISOString(s) {
+        var b = s.split(/\D+/);
+        return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+      }
+    
     const getinitialrnbfeed = async () =>{
 
         let savedData = await AsyncStorage.getItem(
             "storageWithExpiry"
           );
-        //console.log(savedData)
-
-        const currentTimestamp = Math.floor(Date.now() / 1000); // get current UNIX timestamp. Divide by 1000 to get seconds and round it down
-
-        // Remove the saved data if it expires.
-        // Check if expiryTime exists with the optional chaining operator `?`
-        // then, we check if the current ‘now’ time is still behind expiryTime
-        // if not, it means the storage data has expired and needs to be removed
-        if (currentTimestamp >= savedData?.expiryTime) {
-          await AsyncStorage.removeItem("storageWithExpiry");
-          await AsyncStorage.removeItem("initial_feed")
-          await AsyncStorage.removeItem("initial_rnb")
-          await AsyncStorage.removeItem("initial_hiphop")
+         
+        console.log(savedData)
         
+
+        //console.log(parseISOString(currentTimestamp),parseISOString(savedData))
+        //console.log(parseISOString(currentTimestamp) >= parseISOString(savedData))
+        if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
+          await AsyncStorage.removeItem("storageWithExpiry");
+          await AsyncStorage.removeItem("initial_search_rnb")
+
    
         }
+        
         const access_token = await get_access_token();
           
         setAccessToken(access_token)
-        await createxpiration()
+        
         let cache_initial = await AsyncStorage.getItem("initial_search_rnb")
         if (!cache_initial){
             await getinitialrnb(access_token)
+            await createxpiration()
         }
         else{
             //console.log(cache_initial)
