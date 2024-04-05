@@ -1,15 +1,16 @@
 import { useEffect, useState,useCallback,useRef } from "react"
 import { View,Text, FlatList,Image, TouchableOpacity,AppState} from "react-native"
 import { useLocation,useNavigate } from "react-router-native"
-import NavigationFooter from "../NavigationFooter/NavigationFooter";
+import NavigationTracker from "../NavigationFooter/NavigationTracker";
 import TrackItem from "./TrackItem";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import { getaudio } from "./getstreamlinks";
-import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress} from "react-native-track-player";
+import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress,RepeatMode} from "react-native-track-player";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";
 import { usePlaybackState } from 'react-native-track-player';
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
+import { getstreaminglink } from "./getstreamlinks";
 
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
@@ -21,72 +22,94 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [loadingaudio,setLoadingAudio] = useState(false)
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
+    const [final_tracks,setFinalTracks] =useState([])
+    const [hasNavigated,setHasNavigated] = useState([]);
     const highlightMusicIcon = () =>{
         setLoadingAudio(true)
         setTimeout(() => {
             setLoadingAudio(false)
           }, 6000);
     }
-    useEffect(() => {
-        const subscription = AppState.addEventListener('change', nextAppState => {
-          if (
-            appState.current.match(/inactive|background/) &&
-            nextAppState === 'active'
-          ) {
-            console.log('App has come to the foreground!');
-          }
-          else{
-            console.log("background")
-          }
-    
-          appState.current = nextAppState;
-          setAppStateVisible(appState.current);
-          //console.log('AppState', appState.current);
-        });
-    
-        return () => {
-          subscription.remove();
-        };
-      }, []);
-    
-    useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
-        if (event.position > 100){
-            const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
-            if (idx+1 > album_tracks.length){
-                await getaudio(album_tracks[0],setCurrentTrack)
-            }
-            else{
-                await getaudio(album_tracks[idx+1],setCurrentTrack)
-            }
-            highlightMusicIcon()
-         
-        }
-    
-        // "react-native-track-player": "^3.2.0",
 
-               
-
-        //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
-        console.log(event,"ji")
-        //console.log(prevduration,"dur")
-      });
-      useTrackPlayerEvents([Event.RemoteNext], async (event) => {
+    const loadsongs = async() =>{
+        await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+        const promises = album_tracks.map(async(album_track) =>{
+            let streaming_link = await getstreaminglink(album_track)
+            //console.log(streaming_link)
+            return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail})
+        })
+          
+        const final_tracks_prom = await Promise.all(promises)
+        console.log("done")
+        //console.log(album_tracks)
+        let album_order = album_tracks.map((value,index) =>{return({"order":index,"id":value.id})})
+        function customSort(a, b) {
+            //console.log(album_order)
+            const orderA = album_order.find(item => item.id === a.id).order;
     
-        const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
-        if (idx+1 > album_tracks.length){
-            getaudio(album_tracks[0],setCurrentTrack)
-        }
-        else{
-            getaudio(album_tracks[idx+1],setCurrentTrack)
+            const orderB = album_order.find(item => item.id === b.id).order;
+        
+            return orderA - orderB;
         }
 
        
+        final_tracks_prom.sort(customSort);
+
+        setFinalTracks(final_tracks_prom )
+    }
+    const preloadallsongs = async () =>{
+        let queue  = await TrackPlayer.getQueue();
+        //console.log(queue,"queue")
+        //console.log(album_tracks)
+        
+        if (queue.length !== 0) {
+            //console.log(queue[0].album_id !== album_tracks[0].album_id)
+        if (queue[0].album_id !== album_tracks[0].album_id ){
+            console.log("hi")
+            await loadsongs()
+        }
+        //await TrackPlayer.seekTo(0)
+
+    }
+    else if (queue.length === 0){
+        await loadsongs();
+    }
+
+    }
+    useEffect(()=>{
+        preloadallsongs()
+    },[])
+    useEffect(() => {
+        if (final_tracks.length !== 0){
+            const subscription = AppState.addEventListener('change',(nextAppState) => {
+                if (
+                  appState.current.match(/inactive|background/) &&
+                  nextAppState === 'active'
+                ) {
+                  console.log('App has come to the foreground!');
+                }
+                else{
+                  console.log("background")
+                  console.log(final_tracks.map((t) =>{console.log(t.title)}))
+                  TrackPlayer.reset()
+                  TrackPlayer.add(final_tracks)
+                  TrackPlayer.play();
+                }
+          
+                appState.current = nextAppState;
+                setAppStateVisible(appState.current);
+                console.log('AppState', appState.current);
+              });
+          
+              return () => {
+                subscription.remove();
+              };
+        }
         
 
-        
-        //LOG  {"nextTrack": 1, "position": 248.849, "track": 0, "type": "playback-track-changed"}
-        //console.log(event,"ji")
-      });
+      }, [final_tracks]);
+    
+
     /*
   
     useEffect(() =>{
@@ -139,7 +162,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <ShowCurrentTrack/>
             <TrackProgress  seek={seek} setSeek={setSeek}/>
   
-            <NavigationFooter currentpage={"home"}/>
+            <NavigationTracker final_tracks={final_tracks} currentpage={"home"}/>
         </View>
     )
 
