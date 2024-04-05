@@ -11,7 +11,7 @@ import TrackProgress from "../TrackProgress/TrackProgress";
 import { usePlaybackState } from 'react-native-track-player';
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import { getstreaminglink } from "./getstreamlinks";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
     const navigate = useNavigate();
@@ -24,14 +24,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
     const [final_tracks,setFinalTracks] =useState([])
     const [hasNavigated,setHasNavigated] = useState([]);
-    const highlightMusicIcon = () =>{
-        setLoadingAudio(true)
-        setTimeout(() => {
-            setLoadingAudio(false)
-          }, 6000);
-    }
+
 
     const loadsongs = async() =>{
+        setLoadingAudio(true)
         await TrackPlayer.setRepeatMode(RepeatMode.Queue);
         const promises = album_tracks.map(async(album_track) =>{
             let streaming_link = await getstreaminglink(album_track)
@@ -53,61 +49,51 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         }
 
        
-        final_tracks_prom.sort(customSort);
-
-        setFinalTracks(final_tracks_prom )
+        let final_track_fin = final_tracks_prom.sort(customSort);
+        
+        await AsyncStorage.setItem(final_track_fin[0].album_name,JSON.stringify(final_track_fin))
+        setLoadingAudio(false)
+        return final_track_fin
     }
     const preloadallsongs = async () =>{
         let queue  = await TrackPlayer.getQueue();
-        //console.log(queue,"queue")
-        //console.log(album_tracks)
-        
-        if (queue.length !== 0) {
-            //console.log(queue[0].album_id !== album_tracks[0].album_id)
-        if (queue[0].album_id !== album_tracks[0].album_id ){
-            console.log("hi")
-            await loadsongs()
-        }
-        //await TrackPlayer.seekTo(0)
+        let cached_tracks = await AsyncStorage.getItem(album_tracks[0].album_name)
+        if (cached_tracks){
+            await TrackPlayer.reset();
+            await TrackPlayer.add(JSON.parse(cached_tracks));
+            await TrackPlayer.play();
 
-    }
-    else if (queue.length === 0){
-        await loadsongs();
-    }
+
+        }
+        else{
+            if (queue.length !== 0) {
+                //console.log(queue[0].album_id !== album_tracks[0].album_id)
+            if (queue[0].album_id !== album_tracks[0].album_id ){
+                console.log("hi")
+                let final = await loadsongs()
+                await TrackPlayer.reset();
+                await TrackPlayer.add(final);
+                await TrackPlayer.play();
+                
+            }
+            //await TrackPlayer.seekTo(0)
+    
+        }
+        else if (queue.length === 0){
+            let final = await loadsongs()
+            await TrackPlayer.reset();
+            await TrackPlayer.add(final)
+            await TrackPlayer.play();
+        }
+        }
+        
+   
 
     }
     useEffect(()=>{
         preloadallsongs()
     },[])
-    useEffect(() => {
-        if (final_tracks.length !== 0){
-            const subscription = AppState.addEventListener('change',(nextAppState) => {
-                if (
-                  appState.current.match(/inactive|background/) &&
-                  nextAppState === 'active'
-                ) {
-                  console.log('App has come to the foreground!');
-                }
-                else{
-                  console.log("background")
-                  console.log(final_tracks.map((t) =>{console.log(t.title)}))
-                  TrackPlayer.reset()
-                  TrackPlayer.add(final_tracks)
-                  TrackPlayer.play();
-                }
-          
-                appState.current = nextAppState;
-                setAppStateVisible(appState.current);
-                console.log('AppState', appState.current);
-              });
-          
-              return () => {
-                subscription.remove();
-              };
-        }
-        
 
-      }, [final_tracks]);
     
 
     /*
@@ -157,7 +143,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item}) =><TrackItem setCurrentTrack={setCurrentTrack} album_track={item} highlightMusicIcon={highlightMusicIcon}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item}/>}
             />
             <ShowCurrentTrack/>
             <TrackProgress  seek={seek} setSeek={setSeek}/>

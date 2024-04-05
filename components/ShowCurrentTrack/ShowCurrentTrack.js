@@ -21,6 +21,8 @@ export default function ShowCurrentTrack({searchscreen}) {
     const navigate = useNavigate()
     const [currentTrack,setCurrentTrack] = useState(null)
     const getCurrentTrack = async () =>{
+      let queue = await TrackPlayer.getQueue();
+
       let isSetup = await setupPlayer();
       const currentTrackIndex = await TrackPlayer.getCurrentTrack()
       const currentTrack = await TrackPlayer.getTrack(currentTrackIndex)

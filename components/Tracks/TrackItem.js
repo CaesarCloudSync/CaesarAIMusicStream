@@ -9,7 +9,8 @@ import Entypo from "react-native-vector-icons/Entypo"
 import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
 import addSong from "./DownloadSong";
-export default function TrackItem({album_track,setCurrentTrack,highlightMusicIcon}){
+import TrackPlayer from "react-native-track-player";
+export default function TrackItem({album_track,setCurrentTrack,index}){
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const storeasunavailable = async () =>{
         if (songIsAvailable === true){
@@ -29,11 +30,19 @@ export default function TrackItem({album_track,setCurrentTrack,highlightMusicIco
         await addSong(youtube_link)
 
     }
+    const playnowsong = async () =>{
+        const queue = await TrackPlayer.getQueue();
+        if (queue.length !== 0){
+        await TrackPlayer.skip(index)
+        }
+
+        
+    }
         
     return(
         <View style={{flex:1}}>
             <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
-                <TouchableOpacity onPress={() =>{highlightMusicIcon();getaudio(album_track,setCurrentTrack)}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
+                <TouchableOpacity onPress={() =>{playnowsong()}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
                 <Image style={{width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
 
                 <View style={{padding:6}}>
