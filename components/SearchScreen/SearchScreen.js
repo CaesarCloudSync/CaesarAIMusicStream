@@ -74,15 +74,18 @@ export default function Search({seek, setSeek}){
          
         console.log(savedData)
         
-
+        const currentTimestamp = new Date().toISOString()
         //console.log(parseISOString(currentTimestamp),parseISOString(savedData))
         //console.log(parseISOString(currentTimestamp) >= parseISOString(savedData))
-        if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
-          await AsyncStorage.removeItem("storageWithExpiry");
-          await AsyncStorage.removeItem("initial_search_rnb")
-
-   
+        if (savedData != null){
+            if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
+                await AsyncStorage.removeItem("storageWithExpiry");
+                await AsyncStorage.removeItem("initial_search_rnb")
+      
+         
+              }
         }
+
         
         const access_token = await get_access_token();
           
