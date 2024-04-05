@@ -1,5 +1,5 @@
-import { useEffect, useState,useCallback } from "react"
-import { View,Text, FlatList,Image, TouchableOpacity} from "react-native"
+import { useEffect, useState,useCallback,useRef } from "react"
+import { View,Text, FlatList,Image, TouchableOpacity,AppState} from "react-native"
 import { useLocation,useNavigate } from "react-router-native"
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import TrackItem from "./TrackItem";
@@ -10,6 +10,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";
 import { usePlaybackState } from 'react-native-track-player';
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
+
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
     const navigate = useNavigate();
@@ -18,12 +19,35 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const isPlaying = playerState === State.Playing;
     const [album_tracks,setAlbumTracks] = useState(location.state);
     const [loadingaudio,setLoadingAudio] = useState(false)
+    const appState = useRef(AppState.currentState);
+    const [appStateVisible, setAppStateVisible] = useState(appState.current);
     const highlightMusicIcon = () =>{
         setLoadingAudio(true)
         setTimeout(() => {
             setLoadingAudio(false)
           }, 6000);
     }
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', nextAppState => {
+          if (
+            appState.current.match(/inactive|background/) &&
+            nextAppState === 'active'
+          ) {
+            console.log('App has come to the foreground!');
+          }
+          else{
+            console.log("background")
+          }
+    
+          appState.current = nextAppState;
+          setAppStateVisible(appState.current);
+          //console.log('AppState', appState.current);
+        });
+    
+        return () => {
+          subscription.remove();
+        };
+      }, []);
     
     useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
         if (event.position > 100){
