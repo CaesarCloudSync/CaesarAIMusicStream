@@ -90,25 +90,11 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
                 <Text style={{color:"grey"}}>{album_track.artist}</Text>
                 </View>
                 </TouchableOpacity>
-                {
-                    songIsAvailable === true?
 
-                <TouchableOpacity onPress={() =>{storeasunavailable()}} style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
-                <AntDesign  name="checksquare" style={{fontSize:25,color:"green"}}/>
-
-                    
-                </TouchableOpacity>:
-                <TouchableOpacity onPress={() =>{storeasunavailable()}} style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
-                <Entypo  name="squared-cross" style={{fontSize:25,color:"red"}}/>
-
-                    
-                </TouchableOpacity>
-
-                }
 
 
                 <TouchableOpacity style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
-                <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white"}}/>
+                <MaterialIcons name="my-library-add" style={{fontSize:25,color:"green"}}/>
 
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{downloadsong()}}style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
