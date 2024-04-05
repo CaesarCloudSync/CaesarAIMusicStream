@@ -75,7 +75,6 @@ export default function Downloads() {
 
       <Playlist currentTrack={currentTrack} setCurrentTrack={setCurrentTrack} nextqueue={nextqueue} setNextQueue={setNextQueue}  seek={seek} setSeek={setSeek}/>
       {/*<Controls nextqueue={nextqueue} setSeek={setSeek} onShuffle={handleShuffle}/> */}
-      {netInfo.isInternetReachable === true && <ShowCurrentTrack />}
       <TrackProgress style={{flex:0.1}} seek={seek} setSeek={setSeek}/>
      
       <Footer styles={{flex:0.1}} nextqueue={nextqueue} currentTrack={currentTrack} isPlayerReady={isPlayerReady} ></Footer>
