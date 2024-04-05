@@ -10,6 +10,7 @@ import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
 import addSong from "./DownloadSong";
 import TrackPlayer from "react-native-track-player";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function TrackItem({album_track,setCurrentTrack,index}){
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const storeasunavailable = async () =>{
@@ -31,13 +32,36 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
 
     }
     const playnowsong = async () =>{
+        let cached_tracks =  await AsyncStorage.getItem(album_track.album_name)
+
         const queue = await TrackPlayer.getQueue();
         if (queue.length !== 0){
-        await TrackPlayer.skip(index)
-        }
+            if (queue[0].album_name === album_track.album_name){
+                
+                await TrackPlayer.skip(index)
+                await TrackPlayer.play()
 
-        
+            }
+            else{
+                // If it is cached and 
+                if (cached_tracks){
+                    await TrackPlayer.reset();
+
+                    await TrackPlayer.add(JSON.parse(cached_tracks));
+                    await TrackPlayer.skip(index)
+                    await TrackPlayer.play()
+                }
+                else{
+                    await TrackPlayer.reset();
+                    await TrackPlayer.skip(index)
+                    await TrackPlayer.play()
+                }
+
+            }
+        }
     }
+
+
         
     return(
         <View style={{flex:1}}>

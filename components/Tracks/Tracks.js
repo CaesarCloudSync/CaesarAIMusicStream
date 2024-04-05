@@ -58,10 +58,11 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const preloadallsongs = async () =>{
         let queue  = await TrackPlayer.getQueue();
         let cached_tracks = await AsyncStorage.getItem(album_tracks[0].album_name)
+
         if (cached_tracks){
-            await TrackPlayer.reset();
-            await TrackPlayer.add(JSON.parse(cached_tracks));
-            await TrackPlayer.play();
+
+ 
+            
 
 
         }

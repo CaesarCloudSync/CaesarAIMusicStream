@@ -10,6 +10,7 @@ import BottomModal from "./bottomModal";
 import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
@@ -17,20 +18,38 @@ export default function Search({seek, setSeek}){
     const [initialfeed,setInitialFeed] = useState([]);
     const [songs,setSongs] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
+    const createxpiration = async () =>{
+        const storageExpirationTimeInMinutes = 30; // in this case, we only want to keep the data for 30min
+        
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + storageExpirationTimeInMinutes); // add the expiration time to the current Date time
+        const expiryTimeInTimestamp = Math.floor(now.getTime() / 1000); // convert the expiry time in UNIX timestamp
+        const data = {
+          itemId: 4325, // example of data you need to store
+          expiryTime: expiryTimeInTimestamp
+        };
+        
+        // store the data with expiration time in there
+        await AsyncStorage.setItem(
+          "storageWithExpiry",
+          JSON.stringify(data)
+        );
+    }
+    
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
       };
     
-    const getinitialrnb = async () =>{
-        const access_token = await get_access_token();
+    const getinitialrnb = async (access_token) =>{
+       
         const headers = {Authorization: `Bearer ${access_token}`}
         const resp = await fetch('https://api.spotify.com/v1/recommendations?limit=50&seed_genres=r-n-b&seed_artists=2h93pZq0e7k5yf4dywlkpM,31W5EY0aAly4Qieq6OFu6I,2jku7tDXc6XoB6MO2hFuqg', {headers: headers})
         const feedresult = await resp.json()
 
         const result = feedresult.tracks.map((album) =>{return({"id":album.album.id,"name":album.album.name,"images":[{"url":album.album.images[0].url}],"artists":[{"name":album.album.artists[0].name}],"total_tracks":album.album.total_tracks,"release_date":album.album.release_date,"album_type":album.album.album_type})})
-  
-        setAccessToken(access_token)
+
         setInitialFeed(result)
+        await AsyncStorage.setItem("initial_search_rnb",JSON.stringify(result))
         
         //console.log(feedresult)
 
@@ -44,13 +63,49 @@ export default function Search({seek, setSeek}){
         setSongs(result)
         toggleModal()
     }
+    const getinitialrnbfeed = async () =>{
+
+        let savedData = await AsyncStorage.getItem(
+            "storageWithExpiry"
+          );
+        //console.log(savedData)
+
+        const currentTimestamp = Math.floor(Date.now() / 1000); // get current UNIX timestamp. Divide by 1000 to get seconds and round it down
+
+        // Remove the saved data if it expires.
+        // Check if expiryTime exists with the optional chaining operator `?`
+        // then, we check if the current ‘now’ time is still behind expiryTime
+        // if not, it means the storage data has expired and needs to be removed
+        if (currentTimestamp >= savedData?.expiryTime) {
+          await AsyncStorage.removeItem("storageWithExpiry");
+          await AsyncStorage.removeItem("initial_feed")
+          await AsyncStorage.removeItem("initial_rnb")
+          await AsyncStorage.removeItem("initial_hiphop")
+        
+   
+        }
+        const access_token = await get_access_token();
+          
+        setAccessToken(access_token)
+        await createxpiration()
+        let cache_initial = await AsyncStorage.getItem("initial_search_rnb")
+        if (!cache_initial){
+            await getinitialrnb(access_token)
+        }
+        else{
+            //console.log(cache_initial)
+            setInitialFeed(JSON.parse(cache_initial))
+        }
+    }
     useEffect(() =>{
         if (netInfo.isInternetReachable === true){
-            getinitialrnb()
+            getinitialrnbfeed()
         }
 
 
     },[netInfo])
+
+
     if (netInfo.isInternetReachable){
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
