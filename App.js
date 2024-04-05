@@ -72,7 +72,7 @@ useEffect(() => {
     <Route path="/search" element={<Search seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>
     <Route path="/tracks" element={<Tracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
-    <Route path="/downloads" element={<Downloads  />}></Route>
+    <Route  path="/downloads" element={<Downloads  />}></Route>
   
     </Routes>
     {/*The NativeRouter*/}

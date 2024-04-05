@@ -2,7 +2,7 @@ import { TouchableHighlight,Text,View,Image,TouchableOpacity } from "react-nativ
 import { useNavigate } from "react-router-native";
 import Entypo from "react-native-vector-icons/Entypo"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-export default function LibraryCard({album,index,setLibraryChanged}){
+export default function LibraryCard({album,index,setLibraryChanged,librarychanged}){
     const navigate = useNavigate();
     const getalbumtracks = async (route) =>{
         navigate(route, { state: album});
@@ -10,7 +10,12 @@ export default function LibraryCard({album,index,setLibraryChanged}){
     }
     const removefromlibrary = async () =>{
         await AsyncStorage.removeItem(`library:${album[0].album_name}`)
-        setLibraryChanged(true)
+        if (librarychanged === false){
+            setLibraryChanged(true)
+        }
+        else{
+            setLibraryChanged(false)
+        }
 
     }
     return(

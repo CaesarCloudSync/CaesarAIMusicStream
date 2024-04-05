@@ -16,6 +16,7 @@ import Slider from '@react-native-community/slider';
 import { get_access_token } from '../access_token/getaccesstoken';
 import { useNavigate } from 'react-router-native';
 import { setupPlayer } from '../../trackPlayerServices';
+
 export default function ShowCurrentTrack({searchscreen}) {
     //console.log("hi")
     const navigate = useNavigate()
@@ -40,7 +41,7 @@ export default function ShowCurrentTrack({searchscreen}) {
     
 
       },[])
-      const gotoalbumtracks = async () =>{
+      const getalbumtracks = async () =>{
         const access_token = await get_access_token()
         const headers = {Authorization: `Bearer ${access_token}`}
         //console.log(currentTrack)
@@ -52,13 +53,13 @@ export default function ShowCurrentTrack({searchscreen}) {
 
       }
 
-
+     
       if ( currentTrack !== null){
         return(
-          <TouchableOpacity onPress={() =>{gotoalbumtracks()}} style={{flexDirection:"row",backgroundColor:"#141212",margin:!searchscreen ? 5: 0,marginLeft:30}} >
+          <TouchableOpacity onPress={() =>{getalbumtracks()}} style={{flexDirection:"row",backgroundColor:"#141212",margin:!searchscreen ? 5: 0,marginLeft:30}} >
             {currentTrack.length !== 0 &&
             <View style={{flex:0.15}}>
-            <Image style={{width: 40, height: 40}} source={{uri:currentTrack.artwork}}></Image>
+            <Image style={{width: 40, height: 40}} source={{uri:typeof(currentTrack.artwork) === "string" ? currentTrack.artwork :currentTrack.artwork.uri}}></Image>
             
             </View>}
             <View style={{marginLeft:20}}>

@@ -115,17 +115,20 @@ export default function Search({seek, setSeek}){
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
             <View  style={{flex:0.18,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
-                <View style={{flex:1, margin: 12,padding: 10,}}>
-
+                <View style={{flex:1, margin: 12,padding: 10,flexDirection:"row"}}>
+                <View style={{backgroundColor:"white",justifyContent:"center",alignItems:"center",height:40,borderBottomLeftRadius:10,borderTopLeftRadius:10}}>
+                    <AntDesign name="search1" style={{color:"black",padding:10}}/>
+                </View>
                 <TextInput
                 onSubmitEditing={() =>{searchsongs()}}
                 placeholder="What song would you like to listen to?"
                 placeholderTextColor={'black'}
+         
                 style={ {
                     height: 40,
-                   
-                    borderWidth: 1,
-                    
+                    flex:1,
+                    borderBottomRightRadius:10,borderTopRightRadius:10,
+   
                     backgroundColor:"white",
                     color:"black"
                   }}

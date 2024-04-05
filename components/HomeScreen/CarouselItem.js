@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-native";
 import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
 export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type}){
     const navigate = useNavigate();
     function capitalizeFirstLetter(string) {
@@ -20,7 +22,6 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
 
     }
     const addtolibrary = async () =>{
-        Vibration.vibrate();
         const headers = {Authorization: `Bearer ${access_token}`}
         const resp = await fetch(`https://api.spotify.com/v1/albums/${spotifyid}`, {headers: headers})
         const feedresult = await resp.json()

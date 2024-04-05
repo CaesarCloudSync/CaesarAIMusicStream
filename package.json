@@ -23,6 +23,7 @@
     "react-native-elements": "^3.4.3",
     "react-native-file-access": "^2.5.2",
     "react-native-fs": "^2.20.0",
+    "react-native-haptic-feedback": "^2.2.0",
     "react-native-inappbrowser-reborn": "^3.7.0",
     "react-native-modal": "^13.0.1",
     "react-native-scoped-storage": "^1.9.3",

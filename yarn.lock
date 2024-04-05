@@ -6605,6 +6605,11 @@ react-native-gradle-plugin@^0.70.3:
   resolved "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.70.3.tgz"
   integrity sha512-oOanj84fJEXUg9FoEAQomA8ISG+DVIrTZ3qF7m69VQUJyOGYyDZmPqKcjvRku4KXlEH6hWO9i4ACLzNBh8gC0A==
 
+react-native-haptic-feedback@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/react-native-haptic-feedback/-/react-native-haptic-feedback-2.2.0.tgz"
+  integrity sha512-3tqJOjCguWhIrX0nkURn4yw6kXdsSDjjrvZCRjKXYGlL28hdQmoW2okAHduDTD9FWj9lA+lHgwFWgGs4aFNN7A==
+
 react-native-inappbrowser-reborn@^3.7.0:
   version "3.7.0"
   resolved "https://registry.npmjs.org/react-native-inappbrowser-reborn/-/react-native-inappbrowser-reborn-3.7.0.tgz"
@@ -6700,7 +6705,7 @@ react-native-ytpl@^1.0.3:
     react-native-url-polyfill "^1.3.0"
     rn-fetch-blob "^0.12.0"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.14.0, react-native@>=0.44, react-native@>=0.56, react-native@>=0.57, react-native@>=0.59, react-native@>=0.60.0-rc.2, react-native@>=0.65.0, react-native@0.70.5:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.14.0, react-native@>=0.44, react-native@>=0.56, react-native@>=0.57, react-native@>=0.59, react-native@>=0.60.0, react-native@>=0.60.0-rc.2, react-native@>=0.65.0, react-native@0.70.5:
   version "0.70.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.70.5.tgz"
   integrity sha512-5NZM80LC3L+TIgQX/09yiyy48S73wMgpIgN5cCv3XTMR394+KpDI3rBZGH4aIgWWuwijz31YYVF5504+9n2Zfw==

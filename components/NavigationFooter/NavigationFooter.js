@@ -4,7 +4,9 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { Link } from "react-router-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import TrackPlayer from 'react-native-track-player';
 export default function NavigationFooter({currentpage}){
+
     return(
         <View style={{flex:0.13,backgroundColor:"#141212"}}>
         <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
@@ -32,7 +34,7 @@ export default function NavigationFooter({currentpage}){
                         Search
                     </Text>
                 </View>:
-                 <Link underlayColor={"transparent"} to="/search" style={{backgroundColor:"transparent"}}>
+                 <Link  underlayColor={"transparent"} to="/search" style={{backgroundColor:"transparent"}}>
                     <View>
                 
                         <Icon name="search" style={{fontSize:30}}></Icon>
@@ -50,7 +52,7 @@ export default function NavigationFooter({currentpage}){
             </View>
         </View>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-            <Link underlayColor={"transparent"} to="/library">
+            <Link  underlayColor={"transparent"} to="/library">
                 <View>
                     <MaterialIcons name="library-music" style={{fontSize:30,color:currentpage=== "library" ? "white" :""}}></MaterialIcons>
                     
@@ -64,7 +66,7 @@ export default function NavigationFooter({currentpage}){
         </View>
 
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-            <Link underlayColor={"transparent"} to="/downloads">
+            <Link   underlayColor={"transparent"} to="/downloads">
                 <View>
                     <MaterialCommunityIcons name="download-multiple" style={{fontSize:30,color:currentpage=== "library" ? "white" :"",marginLeft:10}}/>
                     

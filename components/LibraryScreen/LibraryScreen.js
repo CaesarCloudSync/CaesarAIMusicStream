@@ -45,7 +45,7 @@ export default function LibraryScreen(){
             libraryalbums.map((albumitems,index) =>{ 
                 let album = JSON.parse(albumitems[1])
                 return(
-                    <LibraryCard key={index} album={album} index={index} setLibraryChanged={setLibraryChanged} />
+                    <LibraryCard key={index} album={album} index={index} librarychanged={librarychanged} setLibraryChanged={setLibraryChanged} />
                 )
             })
             
