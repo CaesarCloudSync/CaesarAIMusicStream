@@ -56,7 +56,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         return final_track_fin
     }
     const createxpiration = async () =>{
-        const storageExpirationTimeInMinutes = 360; // in this case, we only want to keep the data for 30min
+        const storageExpirationTimeInMinutes = 180; // in this case, we only want to keep the data for 30min
         console.log(storageExpirationTimeInMinutes)
         
         let dt= new Date()
