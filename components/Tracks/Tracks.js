@@ -94,7 +94,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
           await AsyncStorage.removeItem("songExpiry");
           let keys = await AsyncStorage.getAllKeys()
-          await AsyncStorage.multiRemove(keys.filter((key) =>{return(!key.includes("library:"))}))
+          await AsyncStorage.multiRemove(keys.filter((key) =>{return(!key.includes("library:")&& !key.includes("initial") && !key.includes("storageWithExpiry"))}))
           await TrackPlayer.reset()
 
         
