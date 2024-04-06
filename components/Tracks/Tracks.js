@@ -55,7 +55,57 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         setLoadingAudio(false)
         return final_track_fin
     }
+    const createxpiration = async () =>{
+        const storageExpirationTimeInMinutes = 360; // in this case, we only want to keep the data for 30min
+        console.log(storageExpirationTimeInMinutes)
+        
+        let dt= new Date()
+        dt = new Date(dt.getTime() + storageExpirationTimeInMinutes * 60 * 1000)
+    
+      
+    
+        // store the data with expiration time in there
+        await AsyncStorage.setItem(
+          "songExpiry",
+          dt.toISOString()
+        );
+    }
+    function parseISOString(s) {
+        var b = s.split(/\D+/);
+        return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+      }
     const preloadallsongs = async () =>{
+        let savedData = await AsyncStorage.getItem(
+            "songExpiry"
+          );
+         
+        //console.log(savedData)
+        
+        const currentTimestamp = new Date().toISOString()
+
+        // Remove the saved data if it expires.
+        // Check if expiryTime exists with the optional chaining operator `?`
+        // then, we check if the current ‘now’ time is still behind expiryTime
+        // if not, it means the storage data has expired and needs to be removed
+
+        if (savedData !== null){
+            //console.log(parseISOString(currentTimestamp),parseISOString(savedData))
+            //console.log(parseISOString(currentTimestamp) >= parseISOString(savedData))
+        if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
+          await AsyncStorage.removeItem("songExpiry");
+          let keys = await AsyncStorage.getAllKeys()
+          await AsyncStorage.multiRemove(keys.filter((key) =>{return(!key.includes("library:"))}))
+          await TrackPlayer.reset()
+
+        
+   
+        }
+        }
+
+
+        
+
+
         let queue  = await TrackPlayer.getQueue();
         let cached_tracks = await AsyncStorage.getItem(album_tracks[0].album_name)
 
@@ -72,6 +122,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             if (queue[0].album_id !== album_tracks[0].album_id ){
                 console.log("hi")
                 let final = await loadsongs()
+                await createxpiration()
                 await TrackPlayer.reset();
                 await TrackPlayer.add(final);
                 await TrackPlayer.play();
@@ -81,6 +132,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     
         }
         else if (queue.length === 0){
+            await createxpiration()
             let final = await loadsongs()
             await TrackPlayer.reset();
             await TrackPlayer.add(final)
