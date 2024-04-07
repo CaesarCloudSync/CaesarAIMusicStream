@@ -24,6 +24,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
     const [final_tracks,setFinalTracks] =useState([])
     const [hasNavigated,setHasNavigated] = useState([]);
+    const [preload,setPreload] = useState(false);
 
 
     const loadsongs = async() =>{
@@ -55,57 +56,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         setLoadingAudio(false)
         return final_track_fin
     }
-    const createxpiration = async () =>{
-        const storageExpirationTimeInMinutes = 180; // in this case, we only want to keep the data for 30min
-        console.log(storageExpirationTimeInMinutes)
-        
-        let dt= new Date()
-        dt = new Date(dt.getTime() + storageExpirationTimeInMinutes * 60 * 1000)
-    
-      
-    
-        // store the data with expiration time in there
-        await AsyncStorage.setItem(
-          "songExpiry",
-          dt.toISOString()
-        );
-    }
-    function parseISOString(s) {
-        var b = s.split(/\D+/);
-        return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
-      }
+
+
     const preloadallsongs = async () =>{
-        let savedData = await AsyncStorage.getItem(
-            "songExpiry"
-          );
-         
-        //console.log(savedData)
-        
-        const currentTimestamp = new Date().toISOString()
-
-        // Remove the saved data if it expires.
-        // Check if expiryTime exists with the optional chaining operator `?`
-        // then, we check if the current ‘now’ time is still behind expiryTime
-        // if not, it means the storage data has expired and needs to be removed
-
-        if (savedData !== null){
-            //console.log(parseISOString(currentTimestamp),parseISOString(savedData))
-            //console.log(parseISOString(currentTimestamp) >= parseISOString(savedData))
-        if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
-          await AsyncStorage.removeItem("songExpiry");
-          let keys = await AsyncStorage.getAllKeys()
-          await AsyncStorage.multiRemove(keys.filter((key) =>{return(!key.includes("library:")&& !key.includes("initial") && !key.includes("storageWithExpiry"))}))
-          await TrackPlayer.reset()
-
-        
-   
-        }
-        }
-
-
-        
-
-
         let queue  = await TrackPlayer.getQueue();
         let cached_tracks = await AsyncStorage.getItem(album_tracks[0].album_name)
 
@@ -122,7 +75,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             if (queue[0].album_id !== album_tracks[0].album_id ){
                 console.log("hi")
                 let final = await loadsongs()
-                await createxpiration()
+
                 await TrackPlayer.reset();
                 await TrackPlayer.add(final);
                 await TrackPlayer.play();
@@ -132,7 +85,6 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     
         }
         else if (queue.length === 0){
-            await createxpiration()
             let final = await loadsongs()
             await TrackPlayer.reset();
             await TrackPlayer.add(final)
@@ -143,35 +95,20 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
    
 
     }
+    const startpreload = async () =>{
+        await AsyncStorage.removeItem(album_tracks[0].album_name)
+        let final = await loadsongs()
+
+        await TrackPlayer.reset();
+        await TrackPlayer.add(final);
+        await TrackPlayer.play();
+    }
     useEffect(()=>{
         preloadallsongs()
     },[])
 
     
 
-    /*
-  
-    useEffect(() =>{
-        if (loadingaudio === false){
-            setTimeout(() => {
-                // IF the music is not playing after 3 seconds of playing, goes to the next song.
-                //console.log(isPlaying,"hi")
-                if (isPlaying === false){
-                    const idx = album_tracks.findIndex(({ name }) => name === currentTrack);
-                    if (idx+1 > album_tracks.length){
-                        getaudio(album_tracks[0],setCurrentTrack)
-                    }
-                    else{
-                        getaudio(album_tracks[idx+1],setCurrentTrack)
-                    }
-            
-                }
-              }, 3000);
-        }
-
-
-    },[loadingaudio])
-    */
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             <View style={{flexDirection:"row"}}>
@@ -185,10 +122,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
             
  
-            <View style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onLongPress={() =>{startpreload()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{width: 175, height: 175}} source={{uri:album_tracks[0].thumbnail}}></Image>
 
-            </View>
+            </TouchableOpacity>
 
             <View style={{flex:0.1,justifyContent:"center",alignItems:"center"}}>
                     <Text style={{color:"white",fontSize:20}}>{album_tracks[0].album_name}</Text>
