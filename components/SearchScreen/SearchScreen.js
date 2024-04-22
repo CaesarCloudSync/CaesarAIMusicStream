@@ -85,6 +85,10 @@ export default function Search({seek, setSeek}){
          
               }
         }
+        else{
+            await AsyncStorage.removeItem("storageWithExpiry");
+            await AsyncStorage.removeItem("initial_search_rnb")
+        }
 
         
         const access_token = await get_access_token();

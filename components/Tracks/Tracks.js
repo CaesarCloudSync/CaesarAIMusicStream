@@ -25,20 +25,34 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [final_tracks,setFinalTracks] =useState([])
     const [hasNavigated,setHasNavigated] = useState([]);
     const [preload,setPreload] = useState(false);
+    const [totalpromises,setTotalPromises] = useState(0);
+    const [completedpromises,setCompletedPromises] = useState(0);
 
 
     const loadsongs = async() =>{
         setLoadingAudio(true)
         await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+        let doneCount = 0;
         const promises = album_tracks.map(async(album_track) =>{
-            let streaming_link = await getstreaminglink(album_track)
-            //console.log(streaming_link)
-            return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail})
+            try{
+                let streaming_link = await getstreaminglink(album_track)
+                //console.log(streaming_link)
+                doneCount++; 
+                //console.log(doneCount)
+                setCompletedPromises(doneCount)
+                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail})
+            }
+            catch{
+                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail})
+            }
+
         })
+        setTotalPromises(promises.length)
           
         const final_tracks_prom = await Promise.all(promises)
         console.log("done")
         //console.log(album_tracks)
+        
         let album_order = album_tracks.map((value,index) =>{return({"order":index,"id":value.id})})
         function customSort(a, b) {
             //console.log(album_order)
@@ -107,8 +121,6 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         preloadallsongs()
     },[])
 
-    
-
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             <View style={{flexDirection:"row"}}>
@@ -116,7 +128,14 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <AntDesign name="arrowleft" style={{fontSize:30}}/>
             </TouchableOpacity>
             {loadingaudio === true &&
-            <FontAwesome5 name="music" style={{color:"blue",fontSize:20,flex:0.08,margin:10}}/>
+            <View >
+
+            
+            <View style={{width:50,height:3,backgroundColor:"white"}}>
+            <View style={{width:`${(completedpromises/totalpromises)*100}%`,height:3,backgroundColor:"blue"}}></View>
+            </View>
+            <Text style={{fontSize:10,justifyContent:"flex-end"}}>{completedpromises}/{totalpromises}</Text>
+            </View>
                       }
             </View>
 

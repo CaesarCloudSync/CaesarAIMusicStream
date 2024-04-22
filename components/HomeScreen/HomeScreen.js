@@ -96,7 +96,7 @@ function parseISOString(s) {
             "storageWithExpiry"
           );
          
-        //console.log(savedData)
+        console.log(savedData)
         
         const currentTimestamp = new Date().toISOString()
 
@@ -116,6 +116,12 @@ function parseISOString(s) {
         
    
         }
+        }
+        else{
+            await AsyncStorage.removeItem("storageWithExpiry");
+            await AsyncStorage.removeItem("initial_feed")
+            await AsyncStorage.removeItem("initial_rnb")
+            await AsyncStorage.removeItem("initial_hiphop")
         }
         
 
