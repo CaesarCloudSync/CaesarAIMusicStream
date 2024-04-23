@@ -6,7 +6,7 @@ import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
-export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type}){
+export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack}){
     const navigate = useNavigate();
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -16,7 +16,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         const headers = {Authorization: `Bearer ${access_token}`}
         const resp = await fetch(`https://api.spotify.com/v1/albums/${spotifyid}`, {headers: headers})
         const feedresult = await resp.json()
-        let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+        let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
         navigate(route, { state: album_tracks });
         //console.log(access_token)
 
@@ -25,7 +25,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         const headers = {Authorization: `Bearer ${access_token}`}
         const resp = await fetch(`https://api.spotify.com/v1/albums/${spotifyid}`, {headers: headers})
         const feedresult = await resp.json()
-        let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+        let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
         let library = await AsyncStorage.getItem(JSON.stringify(`library:${album_name}|${artist_name}`)) 
         if (!library){
             await AsyncStorage.setItem(`library:${album_name}|${artist_name}`,JSON.stringify(album_tracks))
@@ -87,7 +87,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
             <View style={{padding:10}}>
             </View>
             <Text style={{color:"white",flex:favouritecards ? 1 : 0.15}}>
-                {album_name} | {capitalizeFirstLetter(album_type)}
+                {toptrack !== undefined ? toptrack : album_name} | {capitalizeFirstLetter(album_type)}
             </Text>
         
             {favouritecards === false &&

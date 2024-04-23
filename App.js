@@ -17,7 +17,7 @@ import Tracks from './components/Tracks/Tracks';
 import { useCallback } from 'react';
 import { connectToDatabase,createTables } from "../SQLDB/SQLDB";
 import Downloads from './components/Downloads/Downloads';
-
+import ArtistProfile from './components/ArtistProfile/ArtistProfile';
 
 function App() { 
 
@@ -73,6 +73,7 @@ useEffect(() => {
     <Route path="/library" element={<LibraryScreen/>}></Route>
     <Route path="/tracks" element={<Tracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
     <Route  path="/downloads" element={<Downloads  />}></Route>
+    <Route  path="/artistprofile" element={<ArtistProfile />}></Route>
   
     </Routes>
     {/*The NativeRouter*/}

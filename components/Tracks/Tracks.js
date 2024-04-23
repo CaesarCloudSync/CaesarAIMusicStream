@@ -40,10 +40,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
                 doneCount++; 
                 //console.log(doneCount)
                 setCompletedPromises(doneCount)
-                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail})
+                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail})
             }
             catch{
-                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist:album_track.artist,artwork:album_track.thumbnail})
+                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail})
             }
 
         })
@@ -120,11 +120,14 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     useEffect(()=>{
         preloadallsongs()
     },[])
+    const navartistprofile = async () =>{
+        navigate("/artistprofile",{state:album_tracks})
+    }
 
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             <View style={{flexDirection:"row"}}>
-            <TouchableOpacity style={{flex:1}} onPress={() =>{navigate("/")}}>
+            <TouchableOpacity style={{flex:1}} onPress={() =>{navigate(-1)}}>
             <AntDesign name="arrowleft" style={{fontSize:30}}/>
             </TouchableOpacity>
             {loadingaudio === true &&
@@ -141,7 +144,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
             
  
-            <TouchableOpacity onLongPress={() =>{startpreload()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onPress={() =>{navartistprofile()}} onLongPress={() =>{startpreload()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{width: 175, height: 175}} source={{uri:album_tracks[0].thumbnail}}></Image>
 
             </TouchableOpacity>
