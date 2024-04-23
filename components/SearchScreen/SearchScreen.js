@@ -6,14 +6,15 @@ import { get_access_token } from "../access_token/getaccesstoken";
 import { FavouritePlaylists } from "../HomeScreen/FavouriteRenders";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import axios from "axios";
-import BottomModal from "./bottomModal";
 import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRef } from "react";
-import { NormModal } from "./NormModal";
+
 import { FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import { Directions } from 'react-native-gesture-handler';
+
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
@@ -24,7 +25,10 @@ export default function Search({seek, setSeek}){
     const [showModal, updateShowModal] = useState(false);
 
     const toggleModal = () => updateShowModal(state => !state);
-  
+    const fling = Gesture.Fling().direction(Directions.DOWN)
+    .onStart((e) => {
+      setSongs([])
+    });
     const createxpiration = async () =>{
         const storageExpirationTimeInMinutes = 60; // in this case, we only want to keep the data for 30min
         //console.log(storageExpirationTimeInMinutes)
@@ -165,9 +169,15 @@ export default function Search({seek, setSeek}){
             {/*Navigation Footer*/}
             <NavigationFooter currentpage={"search"}/>
             {songs.length !== 0 &&
-            <View style={{position:"absolute",height:550,width:"100%",backgroundColor:"#161616",bottom:0,borderTopLeftRadius:10,borderTopRightRadius:10,justifyContent:"center",alignItems:"center"}}>
-                <View style={{height:2,width:100,backgroundColor:"white",marginTop:20}}></View>
-                <Text style={{fontSize:30}}>CaesarAIMusic</Text>
+            <View style={{position:"absolute",height:550,width:"100%",backgroundColor:"#161616",bottom:0,borderTopLeftRadius:10,borderTopRightRadius:10}}>
+                <GestureDetector gesture={fling}>
+                <View style={{width:"100%",justifyContent:"center",alignItems:"center"}}>
+                <View style={{height:10,width:75,backgroundColor:"#d3d3d3",marginTop:20,borderRadius:10}}></View>
+                <Text style={{fontSize:25}}>CaesarAIMusic Search</Text>
+                </View>
+                
+                
+                </GestureDetector>
    
 
             <FavouriteSearchPlaylists access_token={access_token} favouritecards={true} playlists={songs}/> 
