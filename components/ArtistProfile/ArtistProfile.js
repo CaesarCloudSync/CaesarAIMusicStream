@@ -21,16 +21,7 @@ export default function ArtistProfile({seek, setSeek}){
     const [appears_on,setAppearsOn] = useState([]);
     const [top_tracks,setTopTracks] = useState([]);
     const [singles,setSingles] = useState([]);
-    const chunkcards = (arr) =>{
-        const chunkSize = 6;
-        const chunks = [];
-    
-        for (let i = 0; i < arr.length; i += chunkSize) {
-        const chunk = arr.slice(i, i + chunkSize);
-        chunks.push(chunk);
-        }
-        return chunks
-    }
+
     const get_artist_thumbnail = async (headers) =>{
         const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}`, {headers: headers})
         const feedresult = await resp.json();

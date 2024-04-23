@@ -93,10 +93,6 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
 
 
 
-                <TouchableOpacity style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
-                <MaterialIcons name="my-library-add" style={{fontSize:25,color:"green"}}/>
-
-                </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{downloadsong()}}style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
                 <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"white"}}/>
 

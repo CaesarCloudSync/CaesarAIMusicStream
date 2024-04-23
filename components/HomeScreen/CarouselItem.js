@@ -1,12 +1,14 @@
 import { View,Text,Image, TouchableOpacity,Vibration } from "react-native"
+import { useRef } from "react";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from "axios";
-import { useNavigate } from "react-router-native";
+import { useNavigate} from "react-router-native";
 import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack}){
+    
     const navigate = useNavigate();
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -33,12 +35,28 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         navigate("/library")
         
     }
-    /*
-    
-  */
+
     if (favouritecards !== true){
+        const lastTapTimeRef = useRef(null);
+        const handleTap = () => {
+            const now = new Date().getTime();
+            const DOUBLE_TAP_DELAY = 300; // Adjust as needed for your use case (in milliseconds)
+        
+            if (now - lastTapTimeRef.current < DOUBLE_TAP_DELAY) {
+              // Double tap detected
+              console.log('Double tap!');
+              // Perform 'like' action here
+            } else {
+              // Single tap detected
+              getalbumtracks("/tracks")
+    
+            }
+        
+            lastTapTimeRef.current = now;
+          };
+        
         return(
-            <TouchableHighlight onLongPress={()=>{addtolibrary()}} onPress={() =>{getalbumtracks("/tracks")}}>
+            <TouchableHighlight onLongPress={()=>{addtolibrary()}} onPress={() =>{handleTap()}}>
             <View style={{backgroundColor:"white",width:favouritecards === true ? 50 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
             
                 <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
@@ -78,8 +96,28 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         </TouchableHighlight>)
     }
     else{
+        const lastTapTimeRef = useRef(null);
+        const handleTap = () => {
+            
+            const now = new Date().getTime();
+            const DOUBLE_TAP_DELAY = 50; // Adjust as needed for your use case (in milliseconds)
+        
+            if (now - lastTapTimeRef.current < DOUBLE_TAP_DELAY) {
+              // Double tap detected
+              console.log('Double tap!');
+              getalbumtracks("/artistprofile")
+              // Perform 'like' action here
+            } else {
+              // Single tap detected
+              getalbumtracks("/tracks")
+    
+            }
+        
+            lastTapTimeRef.current = now;
+          };
+        
         return(
-        <TouchableHighlight onLongPress={()=>{addtolibrary()}}  onPress={() =>{getalbumtracks("/tracks")}} key={album_name}style={{backgroundColor:"#141212",width:100,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
+        <TouchableHighlight onLongPress={()=>{addtolibrary()}}  onPress={() =>{handleTap()}} key={album_name}style={{backgroundColor:"#141212",width:100,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
             <View style={{flex:favouritecards ? 0.5 : 1}}>
                 <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
