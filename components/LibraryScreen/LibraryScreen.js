@@ -39,19 +39,17 @@ export default function LibraryScreen(){
 
             </View>
             {/*Main Scroll Body*/}
-            <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
+  
             {libraryalbums.length > 0 && access_token !== ""  && 
             
-            libraryalbums.map((albumitems,index) =>{ 
-                let album = JSON.parse(albumitems[1])
-                return(
-                    <LibraryCard key={index} album={album} index={index} librarychanged={librarychanged} setLibraryChanged={setLibraryChanged} />
-                )
-            })
-            
-            }
 
-            </ScrollView>
+            <FlatList 
+            data={libraryalbums}
+            style={{flex:1,backgroundColor:"#141212"}}
+            renderItem={({item,index}) =><LibraryCard key={index} album={JSON.parse(item[1])} index={index} librarychanged={librarychanged} setLibraryChanged={setLibraryChanged} />}
+            />
+    }
+      
 
             <ShowCurrentTrack searchscreen={true}/>
             <TrackProgress/>

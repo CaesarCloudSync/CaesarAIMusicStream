@@ -21,10 +21,7 @@ export default function Search({seek, setSeek}){
     const [access_token,setAccessToken] = useState("");
     const [initialfeed,setInitialFeed] = useState([]);
     const [songs,setSongs] = useState([]);
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [showModal, updateShowModal] = useState(false);
 
-    const toggleModal = () => updateShowModal(state => !state);
     const fling = Gesture.Fling().direction(Directions.DOWN)
     .onStart((e) => {
       setSongs([])

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-native";
 import Entypo from "react-native-vector-icons/Entypo"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function LibraryCard({album,index,setLibraryChanged,librarychanged}){
+    console.log(album)
     const navigate = useNavigate();
     const getalbumtracks = async (route) =>{
         navigate(route, { state: album});
