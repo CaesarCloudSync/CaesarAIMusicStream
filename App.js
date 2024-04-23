@@ -18,7 +18,7 @@ import { useCallback } from 'react';
 import { connectToDatabase,createTables } from "../SQLDB/SQLDB";
 import Downloads from './components/Downloads/Downloads';
 import ArtistProfile from './components/ArtistProfile/ArtistProfile';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 function App() { 
 
  
@@ -64,6 +64,7 @@ useEffect(() => {
   }*/
   
   return (
+    <GestureHandlerRootView>
     <NativeRouter>
       
 
@@ -78,6 +79,7 @@ useEffect(() => {
     </Routes>
     {/*The NativeRouter*/}
   </NativeRouter>
+  </GestureHandlerRootView>
   );
 }
 

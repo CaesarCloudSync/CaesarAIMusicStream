@@ -1,4 +1,4 @@
-import { View,Text, ScrollView, FlatList,Image,TextInput} from "react-native";
+import { View,Text, ScrollView, FlatList,Image,TextInput, StatusBar,Pressable} from "react-native";
 import { useState,useEffect} from "react";
 import TrackProgress from "../TrackProgress/TrackProgress";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
@@ -11,6 +11,9 @@ import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRef } from "react";
+import { NormModal } from "./NormModal";
+import { FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
@@ -18,6 +21,10 @@ export default function Search({seek, setSeek}){
     const [initialfeed,setInitialFeed] = useState([]);
     const [songs,setSongs] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
+    const [showModal, updateShowModal] = useState(false);
+
+    const toggleModal = () => updateShowModal(state => !state);
+  
     const createxpiration = async () =>{
         const storageExpirationTimeInMinutes = 60; // in this case, we only want to keep the data for 30min
         //console.log(storageExpirationTimeInMinutes)
@@ -34,10 +41,7 @@ export default function Search({seek, setSeek}){
         );
     }
     
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-      };
-    
+
     const getinitialrnb = async (access_token) =>{
        
         const headers = {Authorization: `Bearer ${access_token}`}
@@ -59,7 +63,7 @@ export default function Search({seek, setSeek}){
         const feedresult = await resp.json()
         const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
         setSongs(result)
-        toggleModal()
+        //toggleModal()
     }
     function parseISOString(s) {
         var b = s.split(/\D+/);
@@ -160,7 +164,18 @@ export default function Search({seek, setSeek}){
                   
             {/*Navigation Footer*/}
             <NavigationFooter currentpage={"search"}/>
-            <BottomModal access_token={access_token} songs={songs} isModalVisible={isModalVisible} toggleModal={toggleModal} setModalVisible={setModalVisible} ></BottomModal>
+            {songs.length !== 0 &&
+            <View style={{position:"absolute",height:550,width:"100%",backgroundColor:"#161616",bottom:0,borderTopLeftRadius:10,borderTopRightRadius:10,justifyContent:"center",alignItems:"center"}}>
+                <View style={{height:2,width:100,backgroundColor:"white",marginTop:20}}></View>
+                <Text style={{fontSize:30}}>CaesarAIMusic</Text>
+   
+
+            <FavouriteSearchPlaylists access_token={access_token} favouritecards={true} playlists={songs}/> 
+
+
+
+            </View>}
+            
           
 
 
