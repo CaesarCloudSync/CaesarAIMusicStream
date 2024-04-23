@@ -5,12 +5,12 @@ import axios from "axios";
 import { useNavigate} from "react-router-native";
 import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Gesture,GestureDetector,GestureHandlerRootView } from "react-native-gesture-handler";
+import { Gesture,GestureDetector,GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
 
-export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack}){
+export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack,search}){
     const singleTap = Gesture.Tap().onEnd((_event,success) =>{
         if (success){
-            getalbumtracks("/tracks")
+            getalbumtracks(`/tracks`)
         }
     })
     const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
@@ -18,11 +18,13 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
             getalbumtracks("/artistprofile")
         }
     })
-    const longPress = Gesture.LongPress().onEnd((_event,success) =>{
-        if (success){
+    const longPress = Gesture.LongPress().onStart((_event,success) =>{
+        setTimeout(() =>{
+            console.log("jo")
             addtolibrary()
-        }
+        },300)
     })
+    
     // addtolibrary()
     const navigate = useNavigate();
     function capitalizeFirstLetter(string) {
@@ -50,6 +52,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         navigate("/library")
         
     }
+    if 
 
     if (favouritecards !== true){
         return(
