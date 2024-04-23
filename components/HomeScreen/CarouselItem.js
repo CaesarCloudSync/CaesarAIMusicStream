@@ -52,101 +52,146 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         navigate("/library")
         
     }
-    if 
-
-    if (favouritecards !== true){
-        return(
-    
-            <GestureHandlerRootView  style={{backgroundColor:"#141212",width:favouritecards === true ? 50 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
-            <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
-                <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
-                    <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
-                        <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
-                    </View>
-                    <View style={{padding:10}}>
-                    </View>
-                    <Text style={{color:"white"}}>
-                        {album_name} | {capitalizeFirstLetter(album_type)}
-                    </Text>
+    if (search === true){
+        return (
+            <TouchableHighlight onLongPress={()=>{addtolibrary()}}  onPress={() =>{getalbumtracks("/tracks")}} key={album_name}style={{backgroundColor:"#141212",width:100,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
+            <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
+                <View style={{flex:favouritecards ? 0.5 : 1}}>
+                    <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                </View>
+                <View style={{padding:10}}>
+                </View>
+                <Text style={{color:"white",flex:favouritecards ? 1 : 0.15}}>
+                    {album_name} | {capitalizeFirstLetter(album_type)}
+                </Text>
+            
+                {favouritecards === false &&
                     <Text>
-                        Artist: {artist_name}
-                    </Text>
-                    {favouritecards !== true&&
-                    <View>
-    
+                    Artist: {artist_name}
+                    </Text>}
+                    {favouritecards === false &&
+                <View>
+                                
                     <Text>
                         Total Tracks: {total_tracks}
                     </Text>
                     <Text>
                         Release Date: {release_date}
                     </Text>
-
-                        </View>}
-    
+                    <TouchableOpacity onPress={() =>{console.log("hi")}}>
+                    <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white",alignSelf:"flex-end"}}/>
+                    </TouchableOpacity>
+                    </View>
+                }
     
                 
     
     
-                </View>
-            
-                    
     
-        </GestureDetector>
-        </GestureHandlerRootView >
-)
+    
+    
+            </View>
+            
+        </TouchableHighlight>
+        )
     }
     else{
-
+        if (favouritecards !== true){
+            return(
         
-        return(
+                <GestureHandlerRootView  style={{backgroundColor:"#141212",width:favouritecards === true ? 50 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
+                <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
+                    <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
+                        <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
+                            <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                        </View>
+                        <View style={{padding:10}}>
+                        </View>
+                        <Text style={{color:"white"}}>
+                            {album_name} | {capitalizeFirstLetter(album_type)}
+                        </Text>
+                        <Text>
+                            Artist: {artist_name}
+                        </Text>
+                        {favouritecards !== true&&
+                        <View>
+        
+                        <Text>
+                            Total Tracks: {total_tracks}
+                        </Text>
+                        <Text>
+                            Release Date: {release_date}
+                        </Text>
     
-        <GestureHandlerRootView  key={album_name}style={{backgroundColor:"#141212",width:200,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
-       
-        <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
-        <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
-            <View style={{flex:favouritecards ? 0.5 : 1}}>
-                <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
-            </View>
-            <View style={{padding:10}}>
-            </View>
-            <Text style={{color:"white",flex:favouritecards ? 1 : 0.15}}>
-                {toptrack !== undefined ? toptrack : album_name} | {capitalizeFirstLetter(album_type)}
-            </Text>
+                            </View>}
         
-            {favouritecards === false &&
-                <Text>
-                Artist: {artist_name}
-                </Text>}
-                {favouritecards === false &&
-            <View>
-                            
-                <Text>
-                    Total Tracks: {total_tracks}
-                </Text>
-                <Text>
-                    Release Date: {release_date}
-                </Text>
-                <TouchableOpacity onPress={() =>{console.log("hi")}}>
-                <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white",alignSelf:"flex-end"}}/>
-                </TouchableOpacity>
-                </View>
-            }
-
+        
+                    
+        
+        
+                    </View>
+                
+                        
+        
+            </GestureDetector>
+            </GestureHandlerRootView >
+    )
+        }
+        else{
+    
             
-
-
-
-
-
-        </View>
-        </GestureDetector>
-       
-        </GestureHandlerRootView>
-
+            return(
+        
+            <GestureHandlerRootView  key={album_name}style={{backgroundColor:"#141212",width:200,height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
            
-)
-
+            <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
+            <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
+                <View style={{flex:favouritecards ? 0.5 : 1}}>
+                    <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                </View>
+                <View style={{padding:10}}>
+                </View>
+                <Text style={{color:"white",flex:favouritecards ? 1 : 0.15}}>
+                    {toptrack !== undefined ? toptrack : album_name} | {capitalizeFirstLetter(album_type)}
+                </Text>
+            
+                {favouritecards === false &&
+                    <Text>
+                    Artist: {artist_name}
+                    </Text>}
+                    {favouritecards === false &&
+                <View>
+                                
+                    <Text>
+                        Total Tracks: {total_tracks}
+                    </Text>
+                    <Text>
+                        Release Date: {release_date}
+                    </Text>
+                    <TouchableOpacity onPress={() =>{console.log("hi")}}>
+                    <MaterialIcons name="my-library-add" style={{fontSize:25,color:"white",alignSelf:"flex-end"}}/>
+                    </TouchableOpacity>
+                    </View>
+                }
+    
+                
+    
+    
+    
+    
+    
+            </View>
+            </GestureDetector>
+           
+            </GestureHandlerRootView>
+    
+               
+    )
+    
+        }
+    
     }
+
 
     
 }
