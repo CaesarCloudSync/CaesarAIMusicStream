@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { Button, FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
 import Modal from "react-native-modal";
-import { FavouritePlaylists } from "../HomeScreen/FavouriteRenders";
+import { FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
 
 export default function BottomModal({songs,toggleModal,isModalVisible,setModalVisible,access_token}) {
   //console.log(currentTrack)
@@ -41,7 +41,7 @@ export default function BottomModal({songs,toggleModal,isModalVisible,setModalVi
           <View style={styles.center}>
             <View style={styles.barIcon} />
             <Text style={styles.text}>CaesarAIMusic Search</Text>
-            <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={songs}/>
+            <FavouriteSearchPlaylists access_token={access_token} favouritecards={true} playlists={songs}/>
 
 
           </View>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    minHeight: 400,
+    height: 600,
     paddingBottom: 20,
   },
   center: {

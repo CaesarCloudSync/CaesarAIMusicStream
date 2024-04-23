@@ -1,5 +1,5 @@
 import CarouselItem from "./CarouselItem";
-import { View,Text,SafeAreaView,FlatList } from "react-native";
+import { View,Text,SafeAreaView,FlatList,ScrollView } from "react-native";
 
 export function FavouritePlaylists({favouritecards,playlists,access_token}){
     return(
@@ -18,6 +18,26 @@ export function FavouritePlaylists({favouritecards,playlists,access_token}){
 
         </View>
     </View>
+    )
+}
+
+export function FavouriteSearchPlaylists({favouritecards,playlists,access_token}){
+    return(
+        <ScrollView key={playlists[0].name} style={{marginTop:10}}>
+        <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+            
+                {playlists.map((album,index) =>{
+                    //console.log(album)
+                    return(
+
+                        <CarouselItem key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
+                    
+                    )
+                })}
+            
+
+        </View>
+    </ScrollView>
     )
 }
 
