@@ -14,13 +14,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Directions } from 'react-native-gesture-handler';
-
+import { FavouriteArtists } from "./FavoriteArtists";
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
     const [access_token,setAccessToken] = useState("");
     const [initialfeed,setInitialFeed] = useState([]);
     const [songs,setSongs] = useState([]);
+    const [artists,setArtists] = useState([]);
 
     const fling = Gesture.Fling().direction(Directions.DOWN)
     .onStart((e) => {
@@ -62,8 +63,12 @@ export default function Search({seek, setSeek}){
         //console.log(text)
         const resp = await fetch(`https://api.spotify.com/v1/search?q=${text}&limit=50&type=artist,album,track`, {headers: headers})
         const feedresult = await resp.json()
+        const artists = feedresult.artists.items.map((artist) =>{console.log(artist.images);return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
         const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
         setSongs(result)
+        //console.log(artists)
+
+        setArtists(artists)
         //toggleModal()
     }
     function parseISOString(s) {
@@ -77,7 +82,7 @@ export default function Search({seek, setSeek}){
             "storageWithExpiry"
           );
          
-        console.log(savedData)
+        //console.log(savedData)
         
         const currentTimestamp = new Date().toISOString()
         //console.log(parseISOString(currentTimestamp),parseISOString(savedData))
@@ -165,7 +170,7 @@ export default function Search({seek, setSeek}){
                   
             {/*Navigation Footer*/}
             <NavigationFooter currentpage={"search"}/>
-            {songs.length !== 0 &&
+            {songs.length !== 0 && artists.length !== 0 &&
             <View style={{position:"absolute",height:550,width:"100%",backgroundColor:"#161616",bottom:0,borderTopLeftRadius:10,borderTopRightRadius:10}}>
                 <GestureDetector gesture={fling}>
                 <View style={{width:"100%",justifyContent:"center",alignItems:"center"}}>
@@ -176,8 +181,7 @@ export default function Search({seek, setSeek}){
                 
                 </GestureDetector>
    
-
-            <FavouriteSearchPlaylists access_token={access_token} favouritecards={true} playlists={songs}/> 
+            <FavouriteSearchPlaylists artists={artists} access_token={access_token} favouritecards={true} playlists={songs}/> 
 
 
 

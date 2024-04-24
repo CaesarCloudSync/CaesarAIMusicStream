@@ -1,6 +1,6 @@
 import CarouselItem from "./CarouselItem";
 import { View,Text,SafeAreaView,FlatList,ScrollView } from "react-native";
-
+import ArtistCarouselItem from "./ArtistCarouselItem";
 export function FavouritePlaylists({favouritecards,playlists,access_token}){
     return(
         <View key={playlists[0].name} style={{justifyContent: 'center',marginTop:10}}>
@@ -42,10 +42,28 @@ export function FavouriteTopTracksPlaylists({favouritecards,playlists,access_tok
     )
 }
 
-export function FavouriteSearchPlaylists({favouritecards,playlists,access_token}){
+
+export function FavouriteSearchPlaylists({favouritecards,playlists,access_token,artists}){
     return(
         <ScrollView key={playlists[0].name} style={{marginTop:10}}>
+            <Text style={{marginLeft:10,fontSize:16}}>Artists</Text>
+             <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+             {artists.slice(0,13).map((artist,index) =>{
+                        if (artist.images.length !== 0){
+                            return(
+                        
+                                <ArtistCarouselItem key={index} favouritecards={favouritecards} artist_id={artist.artist_id}thumbnail={artist.images[0].url} artist_name={artist.name} />
+                            
+                            )
+                        }
+
+
+                    })}
+             </View>
+        <Text style={{marginLeft:10,fontSize:16}}>Albums</Text>
         <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+            
+
             
                 {playlists.map((album,index) =>{
                     //console.log(album)
