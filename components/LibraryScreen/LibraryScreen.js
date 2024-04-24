@@ -71,10 +71,10 @@ export default function LibraryScreen(){
     }
       
 
-            <ShowCurrentTrack searchscreen={true}/>
-            <TrackProgress/>
+            {libraryalbums.length > 0 && access_token !== ""  && <ShowCurrentTrack searchscreen={true}/>}
+            {libraryalbums.length > 0 && access_token !== ""  &&  <TrackProgress/>}
             {/*Navigation Footer*/}
-            <NavigationFooter currentpage={"library"}/>
+            {libraryalbums.length > 0 && access_token !== ""  &&  <NavigationFooter currentpage={"library"}/>}
 
 
  
