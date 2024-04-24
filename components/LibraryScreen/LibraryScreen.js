@@ -74,7 +74,8 @@ export default function LibraryScreen(){
             {libraryalbums.length > 0 && access_token !== ""  && <ShowCurrentTrack searchscreen={true}/>}
             {libraryalbums.length > 0 && access_token !== ""  &&  <TrackProgress/>}
             {/*Navigation Footer*/}
-            {libraryalbums.length > 0 && access_token !== ""  &&  <NavigationFooter currentpage={"library"}/>}
+            {libraryalbums.length === 0 && <View style={{flex:1}}></View>} 
+           <NavigationFooter currentpage={"library"}/>
 
 
  

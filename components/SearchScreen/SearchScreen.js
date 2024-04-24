@@ -23,6 +23,8 @@ export default function Search({seek, setSeek}){
     const [initialfeed,setInitialFeed] = useState([]);
     const [songs,setSongs] = useState([]);
     const [artists,setArtists] = useState([]);
+    const [recent_artists,setRecentArtists] = useState([]);
+    const [recent_removed,setRecentRemoved] = useState(false)
 
     const fling = Gesture.Fling().direction(Directions.DOWN)
     .onStart((e) => {
@@ -119,7 +121,8 @@ export default function Search({seek, setSeek}){
     const get_recent_artists = async () =>{
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("artist:"))}))
-        console.log(items)
+        //console.log(items)
+        setRecentArtists(items)
     }
     useEffect(() =>{
         if (netInfo.isInternetReachable === true){
@@ -129,6 +132,9 @@ export default function Search({seek, setSeek}){
 
 
     },[netInfo])
+    useEffect(()=>{
+        get_recent_artists()
+    },[recent_removed])
 
 
     if (netInfo.isInternetReachable){
@@ -165,7 +171,30 @@ export default function Search({seek, setSeek}){
             </View>
             {/*Main Scroll Body*/}
             <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
-            {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={initialfeed}/>}
+            
+            {recent_artists.length > 0 && access_token !== ""  && <View style={{width:"100%"}}>
+                <Text style={{marginLeft:10}}>Recent Artists</Text>
+                <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+                {recent_artists.map((artisttuple,index) =>{
+                            let artistitems = JSON.parse(artisttuple[1])
+                                return(
+                            
+                                    <ArtistCarouselItem key={index} favouritecards={true} artist_id={artistitems.artist_id}thumbnail={artistitems.thumbnail} artist_name={artistitems.artist_name} recent_removed={recent_removed} setRecentRemoved={setRecentRemoved} />
+                                
+                                )
+                            
+
+
+                        })}
+                </View>
+
+            </View>}
+                
+            {initialfeed.length > 0 && access_token !== ""  && 
+            <View>
+            <Text  style={{marginLeft:10}}>Latest Albums</Text>
+            <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={initialfeed}/>
+            </View>}
 
             </ScrollView>
             <ShowCurrentTrack searchscreen={true}/>
