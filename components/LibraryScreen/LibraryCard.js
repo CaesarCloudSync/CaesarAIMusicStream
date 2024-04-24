@@ -2,8 +2,21 @@ import { TouchableHighlight,Text,View,Image,TouchableOpacity } from "react-nativ
 import { useNavigate } from "react-router-native";
 import Entypo from "react-native-vector-icons/Entypo"
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
+
 export default function LibraryCard({album,index,setLibraryChanged,librarychanged}){
     //console.log(album)
+    const singleTap = Gesture.Tap().onEnd((_event,success) =>{
+        if (success){
+            getalbumtracks(`/tracks`)
+        }
+    })
+    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
+        if (success){
+            getalbumtracks("/artistprofile")
+        }
+    })
+
     const navigate = useNavigate();
     const getalbumtracks = async (route) =>{
         navigate(route, { state: album});
@@ -21,17 +34,26 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
 
     }
     return(
-        <TouchableHighlight onPress={() =>{getalbumtracks("/tracks")}} key={index}style={{backgroundColor:"#141212",height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
-        <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:3}}>
-            <View style={{flex:2.0 }}>
-                <Image style={{width: '100%', height: '100%'}} source={{uri:album[0].thumbnail}}></Image>
-            </View>
-            <View style={{padding:10}}>
-            </View>
-            <Text style={{color:"white",flex:10}}>
-                {album[0].album_name} | {album[0].artist}
+        <View key={index}style={{backgroundColor:"#141212",height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212",flexDirection:"row",}}>
+            
+        <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
+            <GestureDetector  gesture={Gesture.Exclusive(doubleTap,singleTap)}>
+            <View style={{flexDirection:"row",flex:1}}>
+            <Image style={{width: 50, height: 50}} source={{uri:album[0].thumbnail}}></Image>
+            <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
+                    {album[0].album_name} | {album[0].artist}
             </Text>
-            <TouchableOpacity onPress={() =>{removefromlibrary()}} style={{flex:4,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
+  
+            
+
+            </View>
+            </GestureDetector>
+
+
+
+
+        </View>
+        <TouchableOpacity onPress={() =>{removefromlibrary()}} style={{width:100,height:100,alignItems:"flex-end",marginRight:20,marginTop:10}}>
                 <Entypo  name="squared-cross" style={{fontSize:25,color:"white"}}/>
 
                     
@@ -41,11 +63,44 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
             
 
 
-
-
-
-        </View>
-        
-    </TouchableHighlight>
+       
+    </View>
     )
 }
+
+/*
+
+                <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
+                    <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
+                        <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
+                            <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                        </View>
+                        <View style={{padding:10}}>
+                        </View>
+                        <Text style={{color:"white"}}>
+                            {album[0].album_name} | {album[0].artist}
+                        </Text>
+                        <Text>
+                            Artist: {artist_name}
+                        </Text>
+                        {favouritecards !== true&&
+                        <View>
+        
+                        <Text>
+                            Total Tracks: {total_tracks}
+                        </Text>
+                        <Text>
+                            Release Date: {release_date}
+                        </Text>
+    
+                            </View>}
+        
+        
+                    
+        
+        
+                    </View>
+                
+                        
+        
+            </GestureDetector>*/

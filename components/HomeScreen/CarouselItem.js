@@ -20,7 +20,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
     })
     const longPress = Gesture.LongPress().onStart((_event,success) =>{
         setTimeout(() =>{
-            console.log("jo")
+            //console.log("jo")
             addtolibrary()
         },300)
     })
