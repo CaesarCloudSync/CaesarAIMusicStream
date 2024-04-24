@@ -9,7 +9,10 @@ import { get_access_token } from "../access_token/getaccesstoken";
 
 import { TouchableHighlight } from "react-native";
 import LibraryCard from "./LibraryCard";
+import { TextInput } from "react-native-gesture-handler";
+import AntDesign from "react-native-vector-icons/AntDesign"
 export default function LibraryScreen(){
+    const [userInput,setUserInput] = useState("");
     const [libraryalbums,setLibraryItems] = useState([]);
     const [librarychanged,setLibraryChanged] = useState(false)
     const [access_token,setAccessToken] = useState("");
@@ -19,12 +22,24 @@ export default function LibraryScreen(){
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("library:"))}))
         setLibraryItems(items)
-        //console.log(items)
     }
 
     useEffect(() =>{
         getlibrary()
     },[librarychanged])
+    const filterData = (item,index) =>{
+        let album = JSON.parse(item[1])
+        if (userInput === ""){
+            return(<LibraryCard key={index} album={album} index={index} librarychanged={librarychanged} setLibraryChanged={setLibraryChanged} />)
+        }
+       
+        if (album[0].album_name.toLowerCase().includes(userInput.toLowerCase())  || album[0].artist.toLowerCase().includes(userInput.toLowerCase()) ){
+            return(
+                <LibraryCard key={index} album={album} index={index} librarychanged={librarychanged} setLibraryChanged={setLibraryChanged} />
+            )
+        } 
+
+    }
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
@@ -38,15 +53,20 @@ export default function LibraryScreen(){
                     </View>
 
             </View>
+            <View style={{flexDirection:"row",margin:10}}>
+            <AntDesign style={{position:"relative",top:18}} name="filter"/>
+            <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
+            </View>
             {/*Main Scroll Body*/}
   
             {libraryalbums.length > 0 && access_token !== ""  && 
             
 
             <FlatList 
+
             data={libraryalbums}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><LibraryCard key={index} album={JSON.parse(item[1])} index={index} librarychanged={librarychanged} setLibraryChanged={setLibraryChanged} />}
+            renderItem={({item,index}) =>filterData(item,index)}
             />
     }
       
