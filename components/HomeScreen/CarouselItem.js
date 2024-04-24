@@ -7,7 +7,7 @@ import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 
-export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack,search}){
+export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack}){
     const singleTap = Gesture.Tap().onEnd((_event,success) =>{
         if (success){
             getalbumtracks(`/tracks`)

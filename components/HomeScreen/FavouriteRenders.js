@@ -27,11 +27,12 @@ export function FavouriteTopTracksPlaylists({favouritecards,playlists,access_tok
         <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
             
                 {playlists.map((track,index) =>{
-                    //console.log(album)
+                    
                     let album = track.album
+                
                     return(
 
-                        <CarouselItem key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
+                        <CarouselItem key={index} toptrack={track.name} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
                     
                     )
                 })}
