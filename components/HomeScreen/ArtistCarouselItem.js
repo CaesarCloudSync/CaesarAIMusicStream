@@ -43,12 +43,11 @@ export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favo
                 <View  style={{backgroundColor:"#141212",width:favouritecards === true ? 205 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
                 <GestureDetector gesture={Gesture.Exclusive(longPress,singleTap)}>
                     <View  key={artist_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
-                        <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
-                            <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                        <View style={{flex:favouritecards === true ? 0. : (favouritecards === false ? 1 : 1)}}>
+                            <Image style={{width: 60, height: '100%'}} source={{uri:thumbnail}}></Image>
                         </View>
-                        <View style={{padding:10}}>
-                        </View>
-                        <Text style={{color:"white"}}>
+   
+                        <Text style={{color:"white",marginLeft:20,width:100}}>
                             {artist_name}
                         </Text>
 
