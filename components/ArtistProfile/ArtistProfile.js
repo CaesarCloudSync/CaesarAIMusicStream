@@ -21,12 +21,14 @@ export default function ArtistProfile({seek, setSeek}){
     const [appears_on,setAppearsOn] = useState([]);
     const [top_tracks,setTopTracks] = useState([]);
     const [singles,setSingles] = useState([]);
+    const [artistname,setArtistName] = useState("");
 
     const get_artist_thumbnail = async (headers) =>{
         const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}`, {headers: headers})
         const feedresult = await resp.json();
         //console.log(feedresult)
         await AsyncStorage.setItem(`artist:${feedresult.name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id,"artist_name":feedresult.name,"thumbnail":feedresult.images[0].url}))
+        setArtistName(feedresult.name)
         setArtistThumbnail(feedresult.images[0].url)
     }
     const get_albums_compilations = async (headers) =>{
@@ -73,6 +75,7 @@ export default function ArtistProfile({seek, setSeek}){
     useEffect(()=>{
         getall()
     },[])
+    console.log(album_tracks[0])
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
@@ -89,7 +92,7 @@ export default function ArtistProfile({seek, setSeek}){
                     </TouchableOpacity>}
             
             <View style={{flex:0.1,justifyContent:"center",alignItems:"center"}}>
-                    <Text style={{color:"white",fontSize:20}}>{album_tracks[0].artist}</Text>
+                    <Text style={{color:"white",fontSize:20}}>{artistname}</Text>
             </View>
             {/*Main Scroll Body*/}
 
