@@ -4,7 +4,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from "axios";
 import { useNavigate} from "react-router-native";
 import { TouchableHighlight} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favouritecards}){
@@ -20,7 +19,7 @@ export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favo
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
     const navartistprofile = async () =>{
-        //await AsyncStorage.setItem(`artist:${artist_name}`,JSON.stringify({"artist_id":artist_id}))
+        
         
         navigate("/artistprofile",{state:[{"artist_id":artist_id}]})
     }

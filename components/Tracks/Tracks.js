@@ -121,6 +121,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         preloadallsongs()
     },[])
     const navartistprofile = async () =>{
+        //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
         navigate("/artistprofile",{state:album_tracks})
     }
 

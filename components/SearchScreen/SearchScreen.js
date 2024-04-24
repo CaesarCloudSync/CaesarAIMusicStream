@@ -14,7 +14,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Directions } from 'react-native-gesture-handler';
-import { FavouriteArtists } from "./FavoriteArtists";
+import ArtistCarouselItem from "../HomeScreen/ArtistCarouselItem";
+
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
@@ -115,9 +116,15 @@ export default function Search({seek, setSeek}){
             setInitialFeed(JSON.parse(cache_initial))
         }
     }
+    const get_recent_artists = async () =>{
+        let keys = await AsyncStorage.getAllKeys()
+        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("artist:"))}))
+        console.log(items)
+    }
     useEffect(() =>{
         if (netInfo.isInternetReachable === true){
             getinitialrnbfeed()
+            get_recent_artists()
         }
 
 

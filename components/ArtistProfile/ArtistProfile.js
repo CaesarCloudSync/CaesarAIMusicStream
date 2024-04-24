@@ -8,7 +8,7 @@ import TrackProgress from "../TrackProgress/TrackProgress";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { FavouritePlaylists,FavouriteTopTracksPlaylists} from "../HomeScreen/FavouriteRenders";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
-//import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ArtistProfile({seek, setSeek}){
     const [access_token,setAccessToken] = useState("")
@@ -26,6 +26,7 @@ export default function ArtistProfile({seek, setSeek}){
         const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}`, {headers: headers})
         const feedresult = await resp.json();
         //console.log(feedresult)
+        await AsyncStorage.setItem(`artist:${feedresult.name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id,"artist_name":feedresult.name,"thumbnail":feedresult.images[0].url}))
         setArtistThumbnail(feedresult.images[0].url)
     }
     const get_albums_compilations = async (headers) =>{
