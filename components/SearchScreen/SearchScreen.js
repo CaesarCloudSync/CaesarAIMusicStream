@@ -95,8 +95,6 @@ export default function Search({seek, setSeek}){
             if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
                 await AsyncStorage.removeItem("storageWithExpiry");
                 await AsyncStorage.removeItem("initial_search_rnb")
-                let keys = await AsyncStorage.getAllKeys()
-                await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("album-recent-load:"))}))
                 
       
          
@@ -105,8 +103,6 @@ export default function Search({seek, setSeek}){
         else{
             await AsyncStorage.removeItem("storageWithExpiry");
             await AsyncStorage.removeItem("initial_search_rnb")
-            let keys = await AsyncStorage.getAllKeys()
-            await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("album-recent-load:"))}))
         }
 
         

@@ -75,7 +75,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const preloadallsongs = async () =>{
         let queue  = await TrackPlayer.getQueue();
         let cached_tracks = await AsyncStorage.getItem(album_tracks[0].album_name)
-        console.log(album_tracks)
+        //console.log(album_tracks)
         if (cached_tracks){
 
  
@@ -110,9 +110,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     }
     const startpreload = async () =>{
-        //  favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}
-        let album_card = {"name":album_tracks[0].album_name,"id":album_tracks[0].album_id,"images":[{"url":album_tracks[0].thumbnail}],"artists":[{"name":album_tracks[0].artist}],"album_type":"ALBUM"}
-        await AsyncStorage.setItem(`album-recent-load:${album_tracks[0].artist}_${album_tracks[0].album_name}`,JSON.stringify(album_card)) 
+
         await AsyncStorage.removeItem(album_tracks[0].album_name)
         let final = await loadsongs()
 
