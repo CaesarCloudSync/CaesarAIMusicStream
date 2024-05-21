@@ -7,7 +7,7 @@ import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 
-export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack}){
+export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack,recentalbums,setRecentAlbums}){
     const singleTap = Gesture.Tap().onEnd((_event,success) =>{
         if (success){
             getalbumtracks(`/tracks`)
@@ -18,11 +18,18 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
             getalbumtracks("/artistprofile")
         }
     })
-    const longPress = Gesture.LongPress().onStart((_event,success) =>{
+    const longPress = Gesture.LongPress().onStart(async (_event,success) =>{
+        if (recentalbums){
+            await AsyncStorage.removeItem(`album-recent-load:${artist_name}_${album_name}`)
+            let leftoveralbums = recentalbums.filter(obj => {return((obj.name !== album_name))});
+            setRecentAlbums(leftoveralbums)
+        }
+        else{
         setTimeout(() =>{
             //console.log("jo")
             addtolibrary()
         },300)
+        }
     })
     
     // addtolibrary()

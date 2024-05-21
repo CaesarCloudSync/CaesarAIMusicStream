@@ -36,7 +36,7 @@ export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favo
         
         navigate("/artistprofile",{state:[{"artist_id":artist_id}]})
     }
-    console.log(artist_id)
+    //console.log(artist_id)
       
             return(
         

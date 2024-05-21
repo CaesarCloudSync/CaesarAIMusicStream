@@ -25,6 +25,7 @@ export default function Search({seek, setSeek}){
     const [artists,setArtists] = useState([]);
     const [recent_artists,setRecentArtists] = useState([]);
     const [recent_removed,setRecentRemoved] = useState(false)
+    const [recentalbums,setRecentAlbums] = useState([])
 
     const fling = Gesture.Fling().direction(Directions.DOWN)
     .onStart((e) => {
@@ -94,6 +95,9 @@ export default function Search({seek, setSeek}){
             if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
                 await AsyncStorage.removeItem("storageWithExpiry");
                 await AsyncStorage.removeItem("initial_search_rnb")
+                let keys = await AsyncStorage.getAllKeys()
+                await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("album-recent-load:"))}))
+                
       
          
               }
@@ -101,6 +105,8 @@ export default function Search({seek, setSeek}){
         else{
             await AsyncStorage.removeItem("storageWithExpiry");
             await AsyncStorage.removeItem("initial_search_rnb")
+            let keys = await AsyncStorage.getAllKeys()
+            await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("album-recent-load:"))}))
         }
 
         
@@ -115,6 +121,7 @@ export default function Search({seek, setSeek}){
         }
         else{
             //console.log(cache_initial)
+
             setInitialFeed(JSON.parse(cache_initial))
         }
     }
@@ -124,9 +131,19 @@ export default function Search({seek, setSeek}){
         //console.log(items)
         setRecentArtists(items)
     }
+    const get_recent_albums = async () =>{
+        let keys = await AsyncStorage.getAllKeys()
+        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("album-recent-load:"))}))
+ 
+        const albumsitems = items.map((item) =>{return(JSON.parse(item[1]))}).filter((item) =>{return(item !== null)})
+
+        setRecentAlbums(albumsitems)
+    }
     useEffect(() =>{
         if (netInfo.isInternetReachable === true){
+            
             getinitialrnbfeed()
+            get_recent_albums()
             get_recent_artists()
         }
 
@@ -134,10 +151,15 @@ export default function Search({seek, setSeek}){
     },[netInfo])
     useEffect(()=>{
         get_recent_artists()
+        
     },[recent_removed])
+    useEffect(()=>{
+        get_recent_albums()
+    },[recentalbums])
 
 
     if (netInfo.isInternetReachable){
+        //console.log(recentalbums)
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
@@ -171,7 +193,12 @@ export default function Search({seek, setSeek}){
             </View>
             {/*Main Scroll Body*/}
             <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
-            
+            {recentalbums.length > 0 && access_token !== ""  && 
+            <View>
+            <Text  style={{marginLeft:10}}>Recent Albums</Text>
+            <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={recentalbums} recentalbums={recentalbums} setRecentAlbums={setRecentAlbums}/>
+            </View>}
+
             {recent_artists.length > 0 && access_token !== ""  && <View style={{width:"100%"}}>
                 <Text style={{marginLeft:10}}>Recent Artists</Text>
                 <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>

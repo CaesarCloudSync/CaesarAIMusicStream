@@ -1,7 +1,7 @@
 import CarouselItem from "./CarouselItem";
 import { View,Text,SafeAreaView,FlatList,ScrollView } from "react-native";
 import ArtistCarouselItem from "./ArtistCarouselItem";
-export function FavouritePlaylists({favouritecards,playlists,access_token}){
+export function FavouritePlaylists({favouritecards,playlists,access_token,recentalbums,setRecentAlbums}){
     return(
         <View key={playlists[0].name} style={{justifyContent: 'center',marginTop:10}}>
         <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
@@ -10,7 +10,7 @@ export function FavouritePlaylists({favouritecards,playlists,access_token}){
                     //console.log(album)
                     return(
 
-                        <CarouselItem key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
+                        <CarouselItem key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type} recentalbums={recentalbums} setRecentAlbums={setRecentAlbums}/>
                     
                     )
                 })}

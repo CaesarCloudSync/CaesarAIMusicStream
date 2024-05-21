@@ -75,7 +75,7 @@ export default function ArtistProfile({seek, setSeek}){
     useEffect(()=>{
         getall()
     },[])
-    console.log(album_tracks[0])
+    //console.log(album_tracks[0])
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
