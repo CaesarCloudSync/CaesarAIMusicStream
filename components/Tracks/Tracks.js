@@ -12,6 +12,7 @@ import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import { getstreaminglink } from "./getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
+import { ImageManipulator } from 'expo';
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const location = useLocation();
     const navigate = useNavigate();
@@ -36,14 +37,14 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         const promises = album_tracks.map(async(album_track) =>{
             try{
                 let streaming_link = await getstreaminglink(album_track)
-                //console.log(streaming_link)
+                console.log(album_track)
                 doneCount++; 
                 //console.log(doneCount)
                 setCompletedPromises(doneCount)
-                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail})
+                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000})
             }
             catch{
-                return({album_id:album_track.album_id,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail})
+                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms/ 1000})
             }
 
         })
