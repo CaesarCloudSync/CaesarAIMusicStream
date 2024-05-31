@@ -19,6 +19,7 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
 import { Pressable } from "react-native";
 import { Image } from "react-native";
 import axios from "axios";
+import { get_access_token } from "../access_token/getaccesstoken";
 export default function CaesarSongSearch(){
     const [youtubeurl,setYouTubeURL] = useState("")
     const [selectedLanguage, setSelectedLanguage] = useState("album");
@@ -26,7 +27,8 @@ export default function CaesarSongSearch(){
     const searchbarstyles = {width:300,height:70}
     const [showSearch,setShowSearch] = useState(false);
     const [loading,setLoading] = useState(false)
-    const [progressmeessage,setProgressMessage] = useState("")
+    const [progressmeessage,setProgressMessage] = useState("");
+    const [redirlink,setRedirLink] = useState('https://youtube.com')
     const [downloading,setDownloading] = useState(false)
     function capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
@@ -41,7 +43,7 @@ export default function CaesarSongSearch(){
     async function openLink() {
       try {
         const isAvailable = await InAppBrowser.isAvailable()
-        const url = 'https://youtube.com'
+        const url = redirlink
         if (isAvailable) {
           InAppBrowser.open(url, {
             // iOS Properties
@@ -140,6 +142,48 @@ export default function CaesarSongSearch(){
           await addSong(url)
         })
       }
+      else if (youtubeurlnotm.includes("https://open.spotify.com/playlist")){
+        const access_token = await get_access_token();
+        const headers = {Authorization: `Bearer ${access_token}`}
+        const resp = await fetch(`https://api.spotify.com/v1/playlists/${youtubeurlnotm.split("/").slice(-1)[0]}`, {headers: headers})
+        const feedresult = await resp.json();
+        let playlist_name = feedresult["name"]
+
+        let tracks = feedresult.tracks.items.map((items) =>{return({"ytquery":`${items['track']['name'].replace("&","and")} ${items['track']['album']['name'].replace("&","and")} by ${items['track']['artists'][0]['name']}`,"track_name":items['track']['name'],"artist_name":items['track']['artists'][0]['name'],"album_name":items['track']['album']['name']})})
+        //console.log(tracks)
+        const promises = tracks.map( async (items) =>{
+          let query = items.ytquery
+          const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${query}&amount=50`)
+          let videos = response.data.result
+          let video_link = videos[0].link
+          await addSong(video_link)
+
+        })
+        await Promise.all(promises)
+
+        
+      }
+      else if (youtubeurlnotm.includes("https://open.spotify.com/album")){
+        const access_token = await get_access_token();
+        const headers = {Authorization: `Bearer ${access_token}`}
+        const resp = await fetch(`https://api.spotify.com/v1/albums/${youtubeurlnotm.split("/").slice(-1)[0]}`, {headers: headers})
+        const feedresult = await resp.json();
+        let album_name = feedresult["name"]
+        let tracks = feedresult.tracks.items.map((items) =>{
+          
+          return({"ytquery":`${items['name'].replace("&","and")} ${album_name} by ${items['artists'][0]['name']}`,"track_name":items['name'],"artist_name":items['artists'][0]['name'],"album_name":album_name})})
+
+        const promises = tracks.map( async (items) =>{
+          let query = items.ytquery
+          const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${query}&amount=50`)
+          let videos = response.data.result
+          
+          let video_link = videos[0].link
+          await addSong(video_link)
+
+        })
+        await Promise.all(promises)
+      }
       else{
 
       
@@ -168,7 +212,7 @@ export default function CaesarSongSearch(){
         <View>
         <SearchBar
         containerStyle={searchbarstyles}
-        placeholder="Enter Youtube URL:"
+        placeholder={redirlink.includes("youtube") ? "Enter Youtube URL:":"Enter Spotify URL:"}
         onChangeText={setYouTubeURL}
         value={youtubeurl}/>
           
@@ -178,12 +222,19 @@ export default function CaesarSongSearch(){
 
             {downloading === false ?
             <View style={{display:"flex",flexDirection:"row"}}>
-             <Pressable style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center",backgroundColor:"#2188dd",height:40,borderBottomLeftRadius:5}} onPress={addSongs}>
+             <Pressable style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center",backgroundColor:redirlink.includes("youtube") ? "red":"black",height:40,borderBottomLeftRadius:5}} onPress={addSongs}>
               <Text style={{color:"white"}}>Download</Text>
               </Pressable>
-              <Pressable onPress={() =>{openLink()}} >
-            <Image  style={{position:"relative",top:0.3,backgroundColor:"red",height:40}} source={require("../../assets/Youtube_logo.png")}></Image>
-            </Pressable></View>:
+              <View  >
+            {redirlink.includes("youtube") ? 
+                        <Pressable onLongPress={() =>{setRedirLink("https://open.spotify.com")}} onPress={() =>{openLink()}} style={{backgroundColor:"red",width:40,justifyContent:"center",alignItems:"center"}}>
+                        <Image  style={{position:"relative",top:0.3,height:40}} source={require("../../assets/Youtube_logo.png")}></Image>
+                      </Pressable>:
+            <Pressable onLongPress={() =>{setRedirLink("https://youtube.com")}} onPress={() =>{openLink()}} style={{backgroundColor:"black",width:40,justifyContent:"center",alignItems:"center"}}>
+            <Image  style={{position:"relative",top:0.3,height:40,width:40}} source={require("../../assets/SpotifyLogo.png")}></Image>
+            </Pressable>}
+
+            </View></View>:
             <ActivityIndicator style={{marginTop:10}}></ActivityIndicator>}
 
             
