@@ -62,9 +62,11 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         setAddingToLibrary(true)
         const headers = {Authorization: `Bearer ${access_token}`}
         const resp = await fetch(`https://api.spotify.com/v1/albums/${spotifyid}`, {headers: headers})
-        const feedresult = await resp.json()
-        let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
         setAddingToLibrary(false)
+        const feedresult = await resp.json()
+        
+        let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+       
         let library = await AsyncStorage.getItem(JSON.stringify(`library:${album_name}|${artist_name}`)) 
         if (!library){
             await AsyncStorage.setItem(`library:${album_name}|${artist_name}`,JSON.stringify(album_tracks))
@@ -81,7 +83,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
             return(
         
                 <View  style={{backgroundColor:"#141212",width:favouritecards === true ? 50 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
-                <GestureDetector gesture={Gesture.Exclusive(flingleft,doubleTap,longPress,singleTap)}>
+                <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
                     <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
                         <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
                             <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
