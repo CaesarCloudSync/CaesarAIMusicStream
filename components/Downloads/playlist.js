@@ -151,9 +151,9 @@ export default function Playlist(props) {
   
     return(
       <View style={{flex:1.2}}>
-        
-        <View style={styles.playlist}>
-          <Button title='Change Songs' onPress={setupReset}></Button>
+        <TouchableOpacity style={{flex:0.10,justifyContent:"center",alignItems:"center",backgroundColor:"#764e2e",borderTopLeftRadius:5,borderTopRightRadius:5,borderBottomLeftRadius:2,borderBottomRightRadius:2}} onPress={setupReset}><Text >Change Songs</Text>
+        </TouchableOpacity>
+        <View style={styles.playlist}>  
           <FlatList
             data={queue}
           renderItem={({item, index}) =>  <PlaylistItem
