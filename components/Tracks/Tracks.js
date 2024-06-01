@@ -67,7 +67,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
        
         let final_track_fin = final_tracks_prom.sort(customSort);
         
-        await AsyncStorage.setItem(final_track_fin[0].album_name,JSON.stringify(final_track_fin))
+        await AsyncStorage.setItem(`album:${final_track_fin[0].album_name}`,JSON.stringify(final_track_fin))
         setLoadingAudio(false)
         return final_track_fin
     }
@@ -75,7 +75,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     const preloadallsongs = async () =>{
         let queue  = await TrackPlayer.getQueue();
-        let cached_tracks = await AsyncStorage.getItem(album_tracks[0].album_name)
+        let cached_tracks = await AsyncStorage.getItem(`album:${album_tracks[0].album_name}`)
         //console.log(album_tracks)
         if (cached_tracks){
 
@@ -112,7 +112,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     }
     const startpreload = async () =>{
 
-        await AsyncStorage.removeItem(album_tracks[0].album_name)
+        await AsyncStorage.removeItem(`album:${album_tracks[0].album_name}`)
         let final = await loadsongs()
 
         await TrackPlayer.reset();

@@ -68,7 +68,7 @@ const getinitialhiphop = async (access_token) =>{
 
 }
 const createxpiration = async () =>{
-    const storageExpirationTimeInMinutes = 60; // in this case, we only want to keep the data for 30min
+    const storageExpirationTimeInMinutes = 120; // in this case, we only want to keep the data for 30min
     console.log(storageExpirationTimeInMinutes)
     
     let dt= new Date()
@@ -113,6 +113,8 @@ function parseISOString(s) {
           await AsyncStorage.removeItem("initial_feed")
           await AsyncStorage.removeItem("initial_rnb")
           await AsyncStorage.removeItem("initial_hiphop")
+          let keys = await AsyncStorage.getAllKeys()
+          await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("album:"))}))
         
    
         }
@@ -122,6 +124,8 @@ function parseISOString(s) {
             await AsyncStorage.removeItem("initial_feed")
             await AsyncStorage.removeItem("initial_rnb")
             await AsyncStorage.removeItem("initial_hiphop")
+            let keys = await AsyncStorage.getAllKeys()
+            await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("album:"))}))
         }
         
 
