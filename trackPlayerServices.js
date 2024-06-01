@@ -40,10 +40,12 @@ export async function setupPlayer() {
         Capability.Pause,
         Capability.SkipToNext,
       ],
+      color:"#00000000",
+      icon: require('./assets/CaesarAILogoNotification2.png'),
       
       progressUpdateEventInterval: 2,
     });
-
+    
     isSetup = true;
   }
   finally {
