@@ -97,99 +97,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     },[progress])
 
-    const loadsongs = async() =>{
-        setLoadingAudio(true)
-        //await TrackPlayer.setRepeatMode(RepeatMode.Queue);
-        let doneCount = 0;
-        const promises = album_tracks.map(async(album_track) =>{
-            try{
-                let streaming_link = await getstreaminglink(album_track)
-                console.log(album_track)
-                doneCount++; 
-                //console.log(doneCount)
-                setCompletedPromises(doneCount)
-                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000,mediastatus:"online"})
-            }
-            catch{
-                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms/ 1000,mediastatus:"online"})
-            }
-
-        })
-        setTotalPromises(promises.length)
-          
-        const final_tracks_prom = await Promise.all(promises)
-        console.log("done")
-        //console.log(album_tracks)
-        
-        let album_order = album_tracks.map((value,index) =>{return({"order":index,"id":value.id})})
-        function customSort(a, b) {
-            //console.log(album_order)
-            const orderA = album_order.find(item => item.id === a.id).order;
-    
-            const orderB = album_order.find(item => item.id === b.id).order;
-        
-            return orderA - orderB;
-        }
-
-       
-        let final_track_fin = final_tracks_prom.sort(customSort);
-        
-        await AsyncStorage.setItem(`album:${final_track_fin[0].album_name}`,JSON.stringify(final_track_fin))
-        setLoadingAudio(false)
-        return final_track_fin
-    }
 
 
-    const preloadallsongs = async () =>{
-        let queue  = await TrackPlayer.getQueue();
-        let cached_tracks = await AsyncStorage.getItem(`album:${album_tracks[0].album_name}`)
-        //console.log(album_tracks)
-        if (cached_tracks){
 
- 
-            
-
-
-        }
-        else{
-            if (queue.length !== 0) {
-                //console.log(queue[0].album_id !== album_tracks[0].album_id)
-            if (queue[0].album_id !== album_tracks[0].album_id ){
-                console.log("hi")
-                let final = await loadsongs()
-
-                await TrackPlayer.reset();
-                await TrackPlayer.add(final);
-                await TrackPlayer.play();
-                
-            }
-            //await TrackPlayer.seekTo(0)
-    
-        }
-        else if (queue.length === 0){
-            let final = await loadsongs()
-            await TrackPlayer.reset();
-            await TrackPlayer.add(final)
-            await TrackPlayer.play();
-        }
-        }
-        
-   
-
-    }
-    const startpreload = async () =>{
-
-        await AsyncStorage.removeItem(`album:${album_tracks[0].album_name}`)
-        let final = await loadsongs()
-
-        await TrackPlayer.reset();
-        await TrackPlayer.add(final);
-        await TrackPlayer.play();
-    }
-    useEffect(()=>{
- 
-        //preloadallsongs()
-    },[])
     const navartistprofile = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
         navigate("/artistprofile",{state:album_tracks})
@@ -215,7 +125,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
             
  
-            <TouchableOpacity onPress={() =>{navartistprofile()}} onLongPress={() =>{startpreload()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{width: 175, height: 175}} source={{uri:album_tracks[0].thumbnail}}></Image>
 
             </TouchableOpacity>
