@@ -34,8 +34,9 @@ export const autoplaynextsong = async () =>{
     //console.log(currentTrack.index,currentTrack)
     let player_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1 // This adds songs to player regardless of order in album. It just makes sure not to exceed the num of songs in album. The index of song would then be found in player then added to end or skipped to.
     //console.log("next",player_ind,num_of_tracks,)
-
-    let nextsong = album_tracks[player_ind]
+    const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
+    let next_ind_in_album = (currentTrackIndexInaAlbum +1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +1 
+    let nextsong = album_tracks[next_ind_in_album]
     await skipToTrack(nextsong,player_ind)
    
     //await TrackPlayer.setRepeatMode(RepeatMode.Off);
