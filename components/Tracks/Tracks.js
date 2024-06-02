@@ -96,6 +96,12 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         autonextsong()
 
     },[progress])
+    const setcurrentalbumtracks = async () =>{
+        await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks))
+    }
+    useEffect(() =>{
+        setcurrentalbumtracks()
+    },[])
 
 
 
@@ -138,7 +144,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             style={{flex:1,backgroundColor:"#141212"}}
             renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} />}
             />
-            <ShowCurrentTrack/>
+            <ShowCurrentTrack tracks={true}/>
             <TrackProgress  seek={seek} setSeek={setSeek}/>
   
             <NavigationFooter currentpage={"home"}/>
