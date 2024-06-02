@@ -121,7 +121,14 @@ export async function playbackService() {
 
   TrackPlayer.addEventListener(Event.RemoteNext, () => {
     console.log('Event.RemoteNext');
-    TrackPlayer.skipToNext();
+      
+    TrackPlayer.getCurrentTrack().then((currentTrackInd) =>{
+      TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
+        if (currentTrack.mediastatus !== "online"){
+          TrackPlayer.skipToNext();
+        }
+      })
+    })
   });
 
   TrackPlayer.addEventListener(Event.RemotePrevious, () => {
@@ -129,7 +136,6 @@ export async function playbackService() {
   
     TrackPlayer.getCurrentTrack().then((currentTrackInd) =>{
       TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
-        console.log("backfround",)
         if (currentTrack.mediastatus !== "online"){
           TrackPlayer.skipToPrevious();
         }
