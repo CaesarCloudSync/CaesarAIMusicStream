@@ -5,7 +5,8 @@ import TrackPlayer, {
   Event,
 } from 'react-native-track-player';
 //import { Dirs, FileSystem } from 'react-native-file-access';
-
+import { getstreaminglink } from './components/Tracks/getstreamlinks';
+import { autoplaynextsong,autoplayprevioussong } from './components/controls/controls';
 // ...
 import * as ScopedStorage from 'react-native-scoped-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -102,7 +103,34 @@ export async function addTracks() {
   await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 };
 
+
 export async function playbackService() {
+  TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, async (progress) => {
+    console.log('Event.PlaybackProgressUpdated');
+    
+    let currentTrackInd = await TrackPlayer.getCurrentTrack();
+    let currentTrack = await TrackPlayer.getTrack(currentTrackInd);
+    if (currentTrack.mediastatus !== "online"){
+
+    }
+    else{
+      console.log(progress)
+      if (progress.duration !== 0){
+        console.log(progress,"hi")
+        if ((progress.duration - progress.position) < 3){
+          autoplaynextsong()
+          //await TrackPlayer.setRepeatMode(RepeatMode.Off);
+
+      
+        }
+      
+        }
+    }
+
+
+
+   
+  });
   TrackPlayer.addEventListener(Event.RemotePause, () => {
     console.log('Event.RemotePause');
     TrackPlayer.pause();
@@ -125,6 +153,9 @@ export async function playbackService() {
         if (currentTrack.mediastatus !== "online"){
           TrackPlayer.skipToNext();
         }
+        else{
+          autoplaynextsong()
+        }
       })
     })
   });
@@ -136,6 +167,9 @@ export async function playbackService() {
       TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
         if (currentTrack.mediastatus !== "online"){
           TrackPlayer.skipToPrevious();
+        }
+        else{
+          autoplayprevioussong()
         }
       })
     })
