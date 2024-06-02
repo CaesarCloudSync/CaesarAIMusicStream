@@ -13,8 +13,8 @@ import TrackPlayer,{RepeatMode} from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
 
-
-export default function TrackItem({album_track,setCurrentTrack,index}){
+import { skipToTrack } from "../controls/controls";
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks}){
  
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const storeasunavailable = async () =>{
@@ -36,14 +36,25 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
     }
     const playnowsong = async () =>{
         await TrackPlayer.setRepeatMode(RepeatMode.Off);
-        let cached_tracks =  await AsyncStorage.getItem(album_track.album_name)
-        let streaming_link = await getstreaminglink(album_track)
 
-        await TrackPlayer.reset();
-        await TrackPlayer.add([{index:index,album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000,mediastatus:"online"}]);
-        await TrackPlayer.add([{index:index,album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"dummy",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000,mediastatus:"online"}]);
-        await TrackPlayer.play();
+        let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+        console.log("current",currentTrackInd)
+        let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
+        if (currentTrack !== null){
+            let next_track_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1
+            console.log("next",next_track_ind,num_of_tracks)
+        
+            let nextsong = album_track
+            await skipToTrack(nextsong,next_track_ind)
+        }
+        else{
+            let next_track_ind = 0
+        
+            let nextsong = album_track
+            await skipToTrack(nextsong,next_track_ind)
+        }
 
+       
     }
 
 
