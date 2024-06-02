@@ -30,12 +30,6 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [totalpromises,setTotalPromises] = useState(0);
     const [completedpromises,setCompletedPromises] = useState(0);
 
-    const setcurrentalbumtracks = async () =>{
-        await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks))
-    }
-    useEffect(() =>{
-        setcurrentalbumtracks()
-    },[])
 
 
 
@@ -76,7 +70,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} />}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks}/>}
             />
             <ShowCurrentTrack tracks={true}/>
             <TrackProgress  seek={seek} setSeek={setSeek}/>

@@ -14,7 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
 
 import { skipToTrack } from "../controls/controls";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks}){
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks}){
  
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const storeasunavailable = async () =>{
@@ -36,6 +36,21 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     }
     const playnowsong = async () =>{
         await TrackPlayer.setRepeatMode(RepeatMode.Off);
+        const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
+        //console.log(stored_album_tracks)
+        if (stored_album_tracks){
+            const album_tracks_stored = JSON.parse(stored_album_tracks)
+            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks))
+            //console.log(album_tracks_stored[0].album_name,album_tracks[0].name)
+            if (album_tracks_stored[0].album_name !== album_tracks[0].album_name){
+                
+                await TrackPlayer.reset();
+            }
+
+        }
+        else{
+            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks))
+        }
 
         let currentTrackInd = await  TrackPlayer.getCurrentTrack()
         console.log("current",currentTrackInd)
@@ -51,6 +66,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             let next_track_ind = 0
         
             let nextsong = album_track
+            
             await skipToTrack(nextsong,next_track_ind)
         }
 
