@@ -39,6 +39,8 @@ export async function setupPlayer() {
         Capability.Play,
         Capability.Pause,
         Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.SeekTo,
       ],
       color:"#00000000",
       icon: require('./assets/CaesarAILogoNotification2.png'),

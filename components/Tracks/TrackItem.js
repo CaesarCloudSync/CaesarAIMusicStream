@@ -41,6 +41,7 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
 
         await TrackPlayer.reset();
         await TrackPlayer.add([{index:index,album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000}]);
+        await TrackPlayer.add([{index:index,album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"dummy",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000}]);
         await TrackPlayer.play();
 
     }
