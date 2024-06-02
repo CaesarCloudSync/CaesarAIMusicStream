@@ -3,15 +3,19 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import AntDesign from "react-native-vector-icons/AntDesign"
 import { getaudio } from "./getstreamlinks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getTableNames } from "../SQLDB/SQLDB";
 import Entypo from "react-native-vector-icons/Entypo"
 import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
 import addSong from "./DownloadSong";
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer,{RepeatMode} from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getstreaminglink } from "./getstreamlinks";
+
+
 export default function TrackItem({album_track,setCurrentTrack,index}){
+ 
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const storeasunavailable = async () =>{
         if (songIsAvailable === true){
@@ -31,48 +35,16 @@ export default function TrackItem({album_track,setCurrentTrack,index}){
 
     }
     const playnowsong = async () =>{
+        await TrackPlayer.setRepeatMode(RepeatMode.Off);
         let cached_tracks =  await AsyncStorage.getItem(album_track.album_name)
+        let streaming_link = await getstreaminglink(album_track)
 
-        const queue = await TrackPlayer.getQueue();
-        if (queue.length !== 0){
-            if (queue[0].album_name === album_track.album_name){
-                
-                await TrackPlayer.skip(index)
-                await TrackPlayer.play()
+        await TrackPlayer.reset();
+        await TrackPlayer.add([{index:index,album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000}]);
+        await TrackPlayer.play();
 
-            }
-            else{
-                // If it is cached and 
-                if (cached_tracks){
-                    await TrackPlayer.reset();
-
-                    await TrackPlayer.add(JSON.parse(cached_tracks));
-                    await TrackPlayer.skip(index)
-                    await TrackPlayer.play()
-                }
-                else{
-                    await TrackPlayer.reset();
-                    await TrackPlayer.skip(index)
-                    await TrackPlayer.play()
-                }
-
-            }
-        }
-        else{
-            if (cached_tracks){
-                await TrackPlayer.reset();
-
-                await TrackPlayer.add(JSON.parse(cached_tracks));
-                await TrackPlayer.skip(index)
-                await TrackPlayer.play()
-            }
-            else{
-                await TrackPlayer.reset();
-                await TrackPlayer.skip(index)
-                await TrackPlayer.play()
-            }
-        }
     }
+
 
 
         

@@ -16,7 +16,7 @@ export const addTrack = async (streaming_link,album_track) =>{
     await TrackPlayer.reset()
     await TrackPlayer.seekTo(0)
     await TrackPlayer.add(track);
-    await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+    //await TrackPlayer.setRepeatMode(RepeatMode.Queue);
     await TrackPlayer.play()
 }
 export const getyoutubelink  = async (album_track,download=false) =>{

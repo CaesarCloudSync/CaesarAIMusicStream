@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { ImageManipulator } from 'expo';
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
+    const progress = useProgress();
     const location = useLocation();
     const navigate = useNavigate();
     const { position, duration } = useProgress(200);
@@ -28,11 +29,41 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [preload,setPreload] = useState(false);
     const [totalpromises,setTotalPromises] = useState(0);
     const [completedpromises,setCompletedPromises] = useState(0);
+    const autonextsong = async () =>{
+        if (progress.duration !== 0){
+        //console.log(,index)
+        if ((progress.duration - progress.position) < 1){
+            let num_of_tracks = album_tracks.length
+            //console.log(num_of_tracks)
+            let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+            console.log("current",currentTrackInd)
+            let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
+            console.log(currentTrack)
+            let next_track_ind = (currentTrack.index+ 1) > num_of_tracks ? 0 : currentTrack.index+ 1
+            console.log("next",next_track_ind)
 
+            let nextsong = album_tracks[next_track_ind]
+            if (currentTrack.title !== nextsong.name){
+            let streaming_link = await getstreaminglink(nextsong)
+            await TrackPlayer.reset();
+            await TrackPlayer.add([{index:next_track_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:nextsong.thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:nextsong.thumbnail,duration:nextsong.duration_ms / 1000}]);
+            await TrackPlayer.play();
+        }
+
+        }
+    }
+
+
+
+    }
+    useEffect(() =>{
+        autonextsong()
+
+    },[progress])
 
     const loadsongs = async() =>{
         setLoadingAudio(true)
-        await TrackPlayer.setRepeatMode(RepeatMode.Queue);
+        //await TrackPlayer.setRepeatMode(RepeatMode.Queue);
         let doneCount = 0;
         const promises = album_tracks.map(async(album_track) =>{
             try{
@@ -120,7 +151,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         await TrackPlayer.play();
     }
     useEffect(()=>{
-        preloadallsongs()
+ 
+        //preloadallsongs()
     },[])
     const navartistprofile = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
@@ -158,7 +190,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} />}
             />
             <ShowCurrentTrack/>
             <TrackProgress  seek={seek} setSeek={setSeek}/>
