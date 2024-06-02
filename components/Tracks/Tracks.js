@@ -52,6 +52,28 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
 
     }
+    const autoplayprevioussong = async () =>{
+
+        let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+        console.log("current",currentTrackInd)
+        let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
+        console.log(currentTrack.index)
+        let next_track_ind = (currentTrack.index- 1) <  0 ? 0 : currentTrack.index-  1
+        console.log("next",next_track_ind)
+
+        let nextsong = album_tracks[next_track_ind]
+       
+        //await TrackPlayer.setRepeatMode(RepeatMode.Off);
+        let streaming_link = await getstreaminglink(nextsong)
+        await TrackPlayer.reset();
+        await TrackPlayer.add([{index:next_track_ind,album_iFd:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:nextsong.thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:nextsong.thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
+        await TrackPlayer.add([{index:next_track_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:nextsong.thumbnail,isActive:true,id:nextsong.id,url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:nextsong.thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
+        await TrackPlayer.play();
+    
+
+
+
+    }
     const autonextsong = async () =>{
         if (progress.duration !== 0){
         //console.log(,index)
@@ -65,6 +87,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     useTrackPlayerEvents([Event.RemoteNext],(event) => {
         autoplaynextsong()
+      });
+      useTrackPlayerEvents([Event.RemotePrevious],(event) => {
+        autoplayprevioussong()
       });
     
     useEffect(() =>{
@@ -83,10 +108,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
                 doneCount++; 
                 //console.log(doneCount)
                 setCompletedPromises(doneCount)
-                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000})
+                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:streaming_link,title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms / 1000,mediastatus:"online"})
             }
             catch{
-                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms/ 1000})
+                return({album_id:album_track.album_id,album:album_track.album_name,album_name:album_track.album_name,thumbnail:album_track.thumbnail,isActive:true,id:album_track.id,url:"error",title:album_track.name,artist_id:album_track.artist_id,artist:album_track.artist,artwork:album_track.thumbnail,duration:album_track.duration_ms/ 1000,mediastatus:"online"})
             }
 
         })

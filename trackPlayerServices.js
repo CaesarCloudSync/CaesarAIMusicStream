@@ -126,7 +126,17 @@ export async function playbackService() {
 
   TrackPlayer.addEventListener(Event.RemotePrevious, () => {
     console.log('Event.RemotePrevious');
-    TrackPlayer.skipToPrevious();
+  
+    TrackPlayer.getCurrentTrack().then((currentTrackInd) =>{
+      TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
+        console.log("backfround",)
+        if (currentTrack.mediastatus !== "online"){
+          TrackPlayer.skipToPrevious();
+        }
+      })
+    })
+
+    //
   });
   TrackPlayer.addEventListener(Event.PlaybackTrackChanged,() => {
   })
