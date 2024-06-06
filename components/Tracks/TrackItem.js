@@ -12,11 +12,13 @@ import addSong from "./DownloadSong";
 import TrackPlayer,{RepeatMode} from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
+import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gesture-handler";
 
 import { skipToTrack } from "../controls/controls";
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks}){
- 
+    const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
+    const [addingqueue,setAddingQueue] = useState(false);
     const storeasunavailable = async () =>{
         if (songIsAvailable === true){
             setSongIsAvailable(false)
@@ -29,6 +31,34 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             setSongIsAvailable(true)
         }
     }
+
+    function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    const flingleft = Gesture.Fling()
+    .direction(Directions.LEFT )
+    .onEnd(async (event) => {
+        setAddingQueue(true)
+        const queue = await AsyncStorage.getItem("queue")
+        if (!queue){
+        await AsyncStorage.setItem("queue",JSON.stringify([album_tracks[index]]))
+        }
+        else{
+       
+            let queue_json = JSON.parse(queue)
+            queue_json.push(album_tracks[index])
+
+            await AsyncStorage.setItem("queue",JSON.stringify(queue_json))
+        }
+        setAddedToQueue(true)
+        await timeout(1200);
+        setAddingQueue(false)
+
+        //addtolibrary()
+        /*setTimeout(() =>{
+            //console.log("jo")
+            
+        },300) */  })
     const downloadsong = async () =>{
         const youtube_link = await getyoutubelink(album_track,download=true);
         await addSong(youtube_link)
@@ -77,7 +107,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
         
     return(
-        <View style={{flex:1}}>
+        <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{flex:1}}>
             <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
                 <TouchableOpacity onPress={() =>{playnowsong()}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
                 <Image style={{width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
@@ -93,15 +123,25 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
 
 
-                <TouchableOpacity onPress={()=>{downloadsong()}}style={{flex:0.1,width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}>
-                <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"white"}}/>
 
+                <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
+                    <TouchableOpacity onPress={()=>{downloadsong()}}>
+                        <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"white",marginRight:15}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() =>{}}>
+                        <MaterialIcons name="playlist-add" size={24} color="white" />
+                    </TouchableOpacity>
                     
-                </TouchableOpacity>
+                    {addingqueue === true &&
+                    <View style={{width:35,height:25,backgroundColor:"green"}}>
+
+                    </View>}
+                </View>
+
                 
             </View>
 
-        </View>
+        </GestureDetector>
     )
     
 }

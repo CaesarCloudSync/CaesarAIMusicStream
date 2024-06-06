@@ -37,8 +37,30 @@ export const autoplaynextsong = async () =>{
     const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
     let next_ind_in_album = (currentTrackIndexInaAlbum +1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +1 
     let nextsong = album_tracks[next_ind_in_album]
-    await skipToTrack(nextsong,player_ind)
-   
+    
+    const newqueue = await AsyncStorage.getItem("queue")
+    if (newqueue){
+        let queue_json = JSON.parse(newqueue)
+        let nextsongqueue = queue_json[0]
+        console.log("ho")
+         console.log(queue_json)
+
+        await skipToTrack(nextsongqueue,player_ind)
+
+       
+        queue_json.shift()
+        if (queue_json.length !== 0){
+        await AsyncStorage.setItem("queue",JSON.stringify(queue_json))
+        }
+        else{
+            await AsyncStorage.removeItem("queue")
+        }
+
+    }
+    else{
+        await skipToTrack(nextsong,player_ind)
+    }
+    console.log(newqueue)
     //await TrackPlayer.setRepeatMode(RepeatMode.Off);
 
     //await TrackPlayer.reset();
