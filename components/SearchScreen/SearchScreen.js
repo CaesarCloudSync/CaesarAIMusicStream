@@ -15,6 +15,7 @@ import { FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Directions } from 'react-native-gesture-handler';
 import ArtistCarouselItem from "../HomeScreen/ArtistCarouselItem";
+import ShowQueue from "../ShowQueue/showqueue";
 
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
@@ -221,6 +222,8 @@ export default function Search({seek, setSeek}){
 
             </ScrollView>
             <ShowCurrentTrack searchscreen={true}/>
+            <ShowQueue/>
+
             {/*Song Progress Tracker */}
             <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
                 <TrackProgress seek={seek} setSeek={setSeek}/>

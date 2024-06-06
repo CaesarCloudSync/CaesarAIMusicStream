@@ -11,6 +11,7 @@ import { TouchableHighlight } from "react-native";
 import LibraryCard from "./LibraryCard";
 import { TextInput } from "react-native-gesture-handler";
 import AntDesign from "react-native-vector-icons/AntDesign"
+import ShowQueue from "../ShowQueue/showqueue";
 export default function LibraryScreen(){
     const [userInput,setUserInput] = useState("");
     const [libraryalbums,setLibraryItems] = useState([]);
@@ -72,6 +73,7 @@ export default function LibraryScreen(){
       
 
             {libraryalbums.length > 0 && access_token !== ""  && <ShowCurrentTrack searchscreen={true}/>}
+            {libraryalbums.length > 0 && access_token !== "" && <ShowQueue/>}
             {libraryalbums.length > 0 && access_token !== ""  &&  <TrackProgress/>}
             {/*Navigation Footer*/}
             {libraryalbums.length === 0 && <View style={{flex:1}}></View>} 

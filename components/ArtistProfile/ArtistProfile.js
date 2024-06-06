@@ -9,7 +9,7 @@ import { get_access_token } from "../access_token/getaccesstoken";
 import { FavouritePlaylists,FavouriteTopTracksPlaylists} from "../HomeScreen/FavouriteRenders";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import ShowQueue from "../ShowQueue/showqueue";
 export default function ArtistProfile({seek, setSeek}){
     const [access_token,setAccessToken] = useState("")
     const location = useLocation();
@@ -139,6 +139,8 @@ export default function ArtistProfile({seek, setSeek}){
             </ScrollView>
                   
             <ShowCurrentTrack/>
+            <ShowQueue/>
+
 
             
                             

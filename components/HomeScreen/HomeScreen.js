@@ -11,6 +11,7 @@ import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { json } from "react-router-native";
+import ShowQueue from "../ShowQueue/showqueue";
 export default function Home({seek, setSeek}){
     const netInfo = useNetInfo();
     const [initialfeed,setInitialFeed] = useState([]);
@@ -229,6 +230,7 @@ function parseISOString(s) {
                         {/*Song Progress Tracker */}
        
                 <ShowCurrentTrack/>
+                <ShowQueue/>
 
             
             {/*Song Progress Tracker */}

@@ -12,6 +12,7 @@ import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import { getstreaminglink } from "./getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
+import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
@@ -73,6 +74,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks}/>}
             />
             <ShowCurrentTrack tracks={true}/>
+            <ShowQueue/>
+
             <TrackProgress  seek={seek} setSeek={setSeek}/>
   
             <NavigationFooter currentpage={"home"}/>
