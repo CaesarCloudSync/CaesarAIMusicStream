@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 import { useState } from "react";
 
-export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist}){
+export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist,handleModal}){
     const [playliststate,setPlaylistState] = useState(playlist)
     //console.log(album)
 
@@ -30,7 +30,9 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
             const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
             const num_of_tracks = playlist_tracks.length
             await AsyncStorage.setItem(`playlist:${playliststate.playlist_name}`,JSON.stringify({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks}))
+            await AsyncStorage.setItem(`playlist-track-order:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
             setPlaylistState({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks})
+            handleModal()
             //navigate("/playlists")
     
         
@@ -41,6 +43,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
         await AsyncStorage.removeItem(`playlist:${playliststate.playlist_name}`)
         let keys = await AsyncStorage.getAllKeys()
         await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes(`playlist-track:${playliststate.playlist_name}`))})) 
+        await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes(`playlist-track-order:${playliststate.playlist_name}`))})) 
         if (playlistchanged === false){
             setPlaylistChanged(true)
         }

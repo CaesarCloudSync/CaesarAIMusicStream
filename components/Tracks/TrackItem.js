@@ -130,6 +130,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
       
         await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":playlist_details.playlist_thumbnail,"playlist_size":playlist_details.playlist_size -1}))
         await AsyncStorage.removeItem(`playlist-track:${playlist_details.playlist_name}-${album_track.name}`)
+        await AsyncStorage.removeItem(`playlist-track-order:${playlist_details.playlist_name}-${album_track.name}`)
         if (playlisttrackremoved === false){
             setPlaylistTrackRemoved(true)
         }

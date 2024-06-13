@@ -71,8 +71,22 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist_details.playlist_name}`))}))
         const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track-order:${playlist_details.playlist_name}`))}))
+        const playlist_tracks_order = items_order.map((item) =>{return(JSON.parse(item[1]))})
+        //console.log(playlist_tracks_order)
+        function customSort(a, b) {
+            //console.log(album_order)
+            const orderA = playlist_tracks_order.find(item => item.name === a.name).order;
+    
+            const orderB = playlist_tracks_order.find(item => item.name === b.name).order;
+        
+            return orderA - orderB;
+        }
+
+       
+        playlist_tracks.sort(customSort);
+        //console.log(final_track_fin)
         setAlbumTracks(playlist_tracks)
-        console.log(playlist_tracks)
         let playlist_detts = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`)
 
         setPlaylistDetails(playlist_details)
