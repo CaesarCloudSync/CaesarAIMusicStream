@@ -67,7 +67,7 @@ export default function NavigationFooter({currentpage}){
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
             <Link  underlayColor={"transparent"} to="/library">
                 <View>
-                    <MaterialIcons name="library-music" style={{fontSize:30,color:currentpage=== "library" ? "white" :""}}></MaterialIcons>
+                    <MaterialIcons name="my-library-books" style={{fontSize:30,color:currentpage=== "library" ? "white" :""}}></MaterialIcons>
                     
                         <Text style={{fontSize:10,color:currentpage=== "library" ? "white" :""}}>
                             Library
@@ -77,6 +77,20 @@ export default function NavigationFooter({currentpage}){
                 </View>
             </Link>
         </View>
+        <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+            <Link  underlayColor={"transparent"} to="/playlists">
+                <View>
+                    <MaterialIcons name="library-music" style={{fontSize:30,color:currentpage=== "playlists" ? "white" :""}}></MaterialIcons>
+                    
+                        <Text style={{fontSize:10,color:currentpage=== "playlists" ? "white" :""}}>
+                            Playlists
+                        </Text>
+                
+
+                </View>
+            </Link>
+        </View>
+        
 
 
 

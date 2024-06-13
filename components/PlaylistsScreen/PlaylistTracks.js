@@ -1,7 +1,7 @@
 import { useEffect, useState,useCallback,useRef } from "react"
 import { View,Text, FlatList,Image, TouchableOpacity,AppState} from "react-native"
 import { useLocation,useNavigate } from "react-router-native"
-import TrackItem from "./TrackItem";
+import TrackItem from "../Tracks/TrackItem"
 import AntDesign from "react-native-vector-icons/AntDesign"
 import { getaudio } from "./getstreamlinks";
 import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress,RepeatMode} from "react-native-track-player";
@@ -9,14 +9,13 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";
 import { usePlaybackState } from 'react-native-track-player';
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
-import { getstreaminglink } from "./getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import ShowQueue from "../ShowQueue/showqueue";
-import { ImageManipulator } from 'expo';
-import { Modal } from "./playlistmodal";
+
+import { Modal } from "../Tracks/playlistmodal"
 import { Button } from "react-native-elements";
-export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
+export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
     const location = useLocation();
     const navigate = useNavigate();
@@ -24,7 +23,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
-    const [album_tracks,setAlbumTracks] = useState(location.state);
+    console.log(location.state)
+    const [playlist_details,setPlaylistDetails] = useState(location.state.playlist_details)
+    const [album_tracks,setAlbumTracks] = useState(location.state.playlist_tracks);
     const [loadingaudio,setLoadingAudio] = useState(false)
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
@@ -77,12 +78,13 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             
  
             <TouchableOpacity onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
-                <Image style={{width: 175, height: 175}} source={{uri:album_tracks[0].thumbnail}}></Image>
+                <Image style={{width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
 
             </TouchableOpacity>
 
             <View style={{flex:0.1,justifyContent:"center",alignItems:"center"}}>
-                    <Text style={{color:"white",fontSize:20}}>{album_tracks[0].album_name}</Text>
+                    <Text style={{color:"white",fontSize:20}}>{playlist_details.playlist_name}</Text>
+                    <Text style={{color:"grey",fontSize:15}}>{playlist_details.playlist_size} Tracks</Text>
             </View>
             <FlatList 
             data={album_tracks}

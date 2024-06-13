@@ -15,9 +15,10 @@ import { getstreaminglink } from "./getstreamlinks";
 import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gesture-handler";
 
 import { skipToTrack } from "../controls/controls";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks}){
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal}){
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
+
     const [addingqueue,setAddingQueue] = useState(false);
     const storeasunavailable = async () =>{
         if (songIsAvailable === true){
@@ -102,6 +103,10 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
        
     }
+    const showplaylistoptions = async ()=>{
+        setTrackForPlaylist(album_track)
+        handleModal()
+    }
 
 
 
@@ -128,7 +133,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                     <TouchableOpacity onPress={()=>{downloadsong()}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"white",marginRight:15}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() =>{}}>
+                    <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
                         <MaterialIcons name="playlist-add" size={24} color="white" />
                     </TouchableOpacity>
                     
