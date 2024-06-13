@@ -18,6 +18,7 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("playlist:"))}))
         const playlistitems = items.map((item) =>{return(JSON.parse(item[1]))})
+        console.log("playlist",playlistitems)
         setPlaylists(playlistitems)
     }
 

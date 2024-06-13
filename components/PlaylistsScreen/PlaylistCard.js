@@ -7,7 +7,7 @@ import { useState } from "react";
 
 export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist,handleModal}){
     const [playliststate,setPlaylistState] = useState(playlist)
-    //console.log(album)
+    console.log(playliststate)
 
 
 
@@ -31,8 +31,14 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
             const num_of_tracks = playlist_tracks.length
             await AsyncStorage.setItem(`playlist:${playliststate.playlist_name}`,JSON.stringify({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks}))
             await AsyncStorage.setItem(`playlist-track-order:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
-            setPlaylistState({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks})
+            setPlaylistState({...playliststate,"playlist_size":num_of_tracks})
             handleModal()
+            if (playlistchanged === false){
+                setPlaylistChanged(true)
+            }
+            else{
+                setPlaylistChanged(false)
+            }
             //navigate("/playlists")
     
         

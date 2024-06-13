@@ -6585,6 +6585,23 @@ react-native-codegen@^0.70.6:
     jscodeshift "^0.14.0"
     nullthrows "^1.1.1"
 
+react-native-compressor@^1.8.24:
+  version "1.8.24"
+  resolved "https://registry.npmjs.org/react-native-compressor/-/react-native-compressor-1.8.24.tgz"
+  integrity sha512-PdwOBdnyBnpOag1FRX9ks4cb0GiMLKFU9HSaFTHdb/uw6fVIrnCHpELASeliOxlabWb5rOyVPbc58QpGIfZQIQ==
+
+react-native-device-info@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.npmjs.org/react-native-device-info/-/react-native-device-info-11.1.0.tgz"
+  integrity sha512-hzXJSObJdezEz0hF7MAJ3tGeoesuQWenXXt9mrQR9Mjb8kXpZ09rqSsZ/quNpJdZpQ3rYiFa3/0GFG5KNn9PBg==
+
+react-native-document-picker@^9.3.0:
+  version "9.3.0"
+  resolved "https://registry.npmjs.org/react-native-document-picker/-/react-native-document-picker-9.3.0.tgz"
+  integrity sha512-X/j0xKn8cObckpHTNwE/hW9WzBiP6oKx820FYu1Nat43QnnHmmT6uozFgAUDcJfxmZGcEdLlbv0lNhnyRXJyyA==
+  dependencies:
+    invariant "^2.2.4"
+
 react-native-elements@^3.4.3:
   version "3.4.3"
   resolved "https://registry.npmjs.org/react-native-elements/-/react-native-elements-3.4.3.tgz"
@@ -6633,6 +6650,11 @@ react-native-haptic-feedback@^2.2.0:
   resolved "https://registry.npmjs.org/react-native-haptic-feedback/-/react-native-haptic-feedback-2.2.0.tgz"
   integrity sha512-3tqJOjCguWhIrX0nkURn4yw6kXdsSDjjrvZCRjKXYGlL28hdQmoW2okAHduDTD9FWj9lA+lHgwFWgGs4aFNN7A==
 
+react-native-image-crop-picker@^0.41.1:
+  version "0.41.1"
+  resolved "https://registry.npmjs.org/react-native-image-crop-picker/-/react-native-image-crop-picker-0.41.1.tgz"
+  integrity sha512-2O2+DeQcZABlhhyMTYUIGCJwpyUnkJwutJbQwETSQ5uwtKsmsmhM1X91bwf6XG1+c1U3kVrtTxHMakc62HPBXQ==
+
 react-native-inappbrowser-reborn@^3.7.0:
   version "3.7.0"
   resolved "https://registry.npmjs.org/react-native-inappbrowser-reborn/-/react-native-inappbrowser-reborn-3.7.0.tgz"
@@ -6653,6 +6675,11 @@ react-native-path@0.0.5:
   version "0.0.5"
   resolved "https://registry.npmjs.org/react-native-path/-/react-native-path-0.0.5.tgz"
   integrity sha512-WJr256xBquk7X2O83QYWKqgLg43Zg3SrgjPc/kr0gCD2LoXA+2L72BW4cmstH12GbGeutqs/eXk3jgDQ2iCSvQ==
+
+react-native-permissions@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.npmjs.org/react-native-permissions/-/react-native-permissions-4.1.5.tgz"
+  integrity sha512-r6VMRacASmtRHS+GZ+5HQCp9p9kiE+UU9magHOZCXZLTJitdTuVHWZRrb4v4oqZGU+zAp3mZhTQftuMMv+WLUg==
 
 react-native-ratings@8.0.4:
   version "8.0.4"
@@ -6728,7 +6755,7 @@ react-native-ytpl@^1.0.3:
     react-native-url-polyfill "^1.3.0"
     rn-fetch-blob "^0.12.0"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.14.0, react-native@>=0.44, react-native@>=0.56, react-native@>=0.57, react-native@>=0.59, react-native@>=0.60.0, react-native@>=0.60.0-rc.2, react-native@>=0.65.0, react-native@0.70.5:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.14.0, react-native@>=0.40.0, react-native@>=0.44, react-native@>=0.56, react-native@>=0.57, react-native@>=0.59, react-native@>=0.60.0, react-native@>=0.60.0-rc.2, react-native@>=0.65.0, react-native@>=0.70.0, react-native@0.70.5:
   version "0.70.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.70.5.tgz"
   integrity sha512-5NZM80LC3L+TIgQX/09yiyy48S73wMgpIgN5cCv3XTMR394+KpDI3rBZGH4aIgWWuwijz31YYVF5504+9n2Zfw==
@@ -6808,7 +6835,7 @@ react-test-renderer@18.1.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.22.0"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", react@^18.1.0, react@>=16, react@>=16.8, react@>=16.8.6, react@>=17.0.0, react@18.1.0:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", react@^18.1.0, react@>=16, react@>=16.8, react@>=16.8.6, react@>=17.0.0, react@>=18.1.0, react@18.1.0:
   version "18.1.0"
   resolved "https://registry.npmjs.org/react/-/react-18.1.0.tgz"
   integrity sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==

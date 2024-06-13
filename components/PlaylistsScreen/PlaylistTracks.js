@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import ShowQueue from "../ShowQueue/showqueue";
 
-
+import { requestGalleryWithPermission } from "../Picker/pickerhelper"
 import Feather from "react-native-vector-icons/Feather"
 import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
@@ -94,6 +94,11 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     useEffect(() =>{
         getplaylist()
     },[playlisttrackremoved])
+    const setthumbnailimage = async () =>{
+        const response = await requestGalleryWithPermission();
+        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":response["uri"],"playlist_size":playlist_details.playlist_size}))
+        setPlaylistDetails({...playlist_details,playlist_thumbnail: response["uri"]})
+    }
 
     return(
         <View  style={{flex:1,backgroundColor:"#141212"}}>
@@ -116,7 +121,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
             
  
-            <TouchableOpacity onPress={() =>{}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onLongPress={() =>{setthumbnailimage()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
 
             </TouchableOpacity>
