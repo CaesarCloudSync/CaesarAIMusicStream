@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-native";
 import Entypo from "react-native-vector-icons/Entypo"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
+import { useState } from "react";
 
 export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist}){
+    const [playliststate,setPlaylistState] = useState(playlist)
     //console.log(album)
 
 
@@ -13,26 +15,32 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
     const getalbumtracks = async (route) =>{
         console.log(playlist)
         let keys = await AsyncStorage.getAllKeys()
-        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist.playlist_name}`))}))
+        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playliststate.playlist_name}`))}))
         const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
         console.log(playlist_tracks)
         navigate(route, { state: {playlist_details:playlist,playlist_tracks:playlist_tracks}});
 
     }
     const addtracktoplaylist = async () =>{
-        
-            await AsyncStorage.setItem(`playlist:${playlist.playlist_name}`,JSON.stringify({"playlist_name":playlist.playlist_name,"playlist_thumbnail":playlist.playlist_thumbnail,"playlist_size":playlist.playlist_size + 1}))
-            await AsyncStorage.setItem(`playlist-track:${playlist.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
-            navigate("/playlists")
+
+         
+            await AsyncStorage.setItem(`playlist-track:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
+            let keys = await AsyncStorage.getAllKeys()
+            const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playliststate.playlist_name}`))}))
+            const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+            const num_of_tracks = playlist_tracks.length
+            await AsyncStorage.setItem(`playlist:${playliststate.playlist_name}`,JSON.stringify({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks}))
+            setPlaylistState({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks})
+            //navigate("/playlists")
     
         
     }
     const removeplaylist = async () =>{
         //console.log( await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("playlist:"))})))
         // {"playlist_name": "Jam", "playlist_size": 1, "playlist_thumbnail": "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8"} 
-        await AsyncStorage.removeItem(`playlist:${playlist.playlist_name}`)
+        await AsyncStorage.removeItem(`playlist:${playliststate.playlist_name}`)
         let keys = await AsyncStorage.getAllKeys()
-        await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist.playlist_name}`))})) 
+        await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes(`playlist-track:${playliststate.playlist_name}`))})) 
         if (playlistchanged === false){
             setPlaylistChanged(true)
         }
@@ -47,9 +55,9 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
             <TouchableOpacity onLongPress={() =>{removeplaylist()}} style={{flexDirection:"row",flex:1}} onPress={() =>{  if (!trackforplaylist){getalbumtracks(`/playlist-tracks`)}else{addtracktoplaylist()}}}>
             <View style={{flexDirection:"row",flex:1}}>
-            <Image style={{width: 50, height: 50}} source={{uri:playlist.playlist_thumbnail}}></Image>
+            <Image style={{width: 50, height: 50}} source={{uri:playliststate.playlist_thumbnail}}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
-                    {playlist.playlist_name} | {playlist.playlist_size} Tracks
+                    {playliststate.playlist_name} | {playliststate.playlist_size} Tracks
             </Text>
   
             
