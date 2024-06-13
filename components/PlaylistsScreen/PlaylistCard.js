@@ -4,13 +4,9 @@ import Entypo from "react-native-vector-icons/Entypo"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 
-export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged}){
+export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist}){
     //console.log(album)
-    const singleTap = Gesture.Tap().onEnd((_event,success) =>{
-        if (success){
-            getalbumtracks(`/playlist-tracks`)
-        }
-    })
+
 
 
     const navigate = useNavigate();
@@ -23,8 +19,16 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
         navigate(route, { state: {playlist_details:playlist,playlist_tracks:playlist_tracks}});
 
     }
-    const removefromlibrary = async () =>{
-        //console.log( await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("library:"))})))
+    const addtracktoplaylist = async () =>{
+        
+            await AsyncStorage.setItem(`playlist:${playlist.playlist_name}`,JSON.stringify({"playlist_name":playlist.playlist_name,"playlist_thumbnail":playlist.playlist_thumbnail,"playlist_size":playlist.playlist_size + 1}))
+            await AsyncStorage.setItem(`playlist-track:${playlist.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
+            navigate("/playlists")
+    
+        
+    }
+    const removefromplaylist = async () =>{
+        //console.log( await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("playlist:"))})))
         // {"playlist_name": "Jam", "playlist_size": 1, "playlist_thumbnail": "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8"} 
         await AsyncStorage.removeItem(`playlist:${playlist.playlist_name}`)
         let keys = await AsyncStorage.getAllKeys()
@@ -41,7 +45,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
         <View key={index}style={{backgroundColor:"#141212",height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212",flexDirection:"row",}}>
             
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
-            <GestureDetector  gesture={Gesture.Exclusive(singleTap)}>
+            <TouchableOpacity onLongPress={() =>{removefromplaylist()}} style={{flexDirection:"row",flex:1}} onPress={() =>{  if (!trackforplaylist){getalbumtracks(`/playlist-tracks`)}else{addtracktoplaylist()}}}>
             <View style={{flexDirection:"row",flex:1}}>
             <Image style={{width: 50, height: 50}} source={{uri:playlist.playlist_thumbnail}}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
@@ -51,17 +55,13 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
             
 
             </View>
-            </GestureDetector>
+            </TouchableOpacity>
 
 
 
 
         </View>
-        <TouchableOpacity onPress={() =>{removefromlibrary()}} style={{width:100,height:100,alignItems:"flex-end",marginRight:20,marginTop:10}}>
-                <Entypo  name="squared-cross" style={{fontSize:25,color:"white"}}/>
 
-                    
-                </TouchableOpacity>
 
 
             

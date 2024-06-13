@@ -14,8 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
-import { Modal } from "./playlistmodal";
-import { Button } from "react-native-elements";
+import PlaylistModal from "../PlaylistModal/playlistmodal";
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
     const location = useLocation();
@@ -34,18 +33,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [totalpromises,setTotalPromises] = useState(0);
     const [completedpromises,setCompletedPromises] = useState(0);
     const [isModalVisible, setIsModalVisible] = useState(false);
-
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
-
-
-    const createplaylist = async () =>{
-        console.log(trackforplaylist)
-        await AsyncStorage.setItem(`playlist:${trackforplaylist.name}`,JSON.stringify({"playlist_name":trackforplaylist.name,"playlist_thumbnail":trackforplaylist.thumbnail,"playlist_size":1}))
-        await AsyncStorage.setItem(`playlist-track:${trackforplaylist.name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
-        navigate("/playlists")
-
-    }
 
     const navartistprofile = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
@@ -95,19 +84,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <TrackProgress  seek={seek} setSeek={setSeek}/>
   
             <NavigationFooter currentpage={"home"}/>
-            <Modal isVisible={isModalVisible}>
-            <Modal.Container>
-
-                <Modal.Body>
-                    <TouchableOpacity onPress={() =>{createplaylist()}} style={{height:60,justifyContent:"center",borderWidth:1,borderColor:"white",borderRadius:5,padding:5}}>
-                    <   Text style={{"color":"white"}}>+ New Playlist</Text>
-                    </TouchableOpacity>
-                </Modal.Body>
-                <Modal.Footer>
-                <Button title="I agree" onPress={handleModal} />
-                </Modal.Footer>
-            </Modal.Container>
-</Modal>
+            <PlaylistModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} trackforplaylist={trackforplaylist}/>
         </View>
     )
 
