@@ -116,7 +116,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
             
  
-            <TouchableOpacity onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onPress={() =>{}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
 
             </TouchableOpacity>
