@@ -15,7 +15,9 @@ import { getstreaminglink } from "./getstreamlinks";
 import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gesture-handler";
 
 import { skipToTrack } from "../controls/controls";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal}){
+import { useNavigate } from "react-router-native";
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved}){
+    const navigate = useNavigate()
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
 
@@ -107,6 +109,18 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         setTrackForPlaylist(album_track)
         handleModal()
     }
+    const removetrackfromplaylist = async () =>{
+      
+        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":playlist_details.playlist_thumbnail,"playlist_size":playlist_details.playlist_size -1}))
+        await AsyncStorage.removeItem(`playlist-track:${playlist_details.playlist_name}-${album_track.name}`)
+        if (playlisttrackremoved === false){
+            setPlaylistTrackRemoved(true)
+        }
+        else{
+            setPlaylistTrackRemoved(false)
+        }
+
+    }
 
 
 
@@ -114,7 +128,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     return(
         <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{flex:1}}>
             <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
-                <TouchableOpacity onPress={() =>{playnowsong()}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
+                <TouchableOpacity onLongPress={() =>{if(playlist_details){removetrackfromplaylist()}}} onPress={() =>{playnowsong()}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
                 <Image style={{width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
 
                 <View style={{padding:6}}>

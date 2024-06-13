@@ -39,7 +39,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isTyping,setIsTyping] = useState(false);
     const [userinput,setUserInput] = useState("");
-
+    const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
     
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
@@ -67,9 +67,19 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         setEditingPlaylistName(false);
 
     }
+    const getplaylist = async () =>{
+        let keys = await AsyncStorage.getAllKeys()
+        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist_details.playlist_name}`))}))
+        const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+        setAlbumTracks(playlist_tracks)
+        console.log(playlist_tracks)
+        let playlist_detts = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`)
+
+        setPlaylistDetails(playlist_details)
+    }
     useEffect(() =>{
-        //
-    },[isModalVisible])
+        getplaylist()
+    },[playlisttrackremoved])
 
     return(
         <View  style={{flex:1,backgroundColor:"#141212"}}>
@@ -115,7 +125,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />}
             />
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>

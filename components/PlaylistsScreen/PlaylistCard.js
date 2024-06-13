@@ -27,7 +27,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
     
         
     }
-    const removefromplaylist = async () =>{
+    const removeplaylist = async () =>{
         //console.log( await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("playlist:"))})))
         // {"playlist_name": "Jam", "playlist_size": 1, "playlist_thumbnail": "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8"} 
         await AsyncStorage.removeItem(`playlist:${playlist.playlist_name}`)
@@ -45,7 +45,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
         <View key={index}style={{backgroundColor:"#141212",height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212",flexDirection:"row",}}>
             
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
-            <TouchableOpacity onLongPress={() =>{removefromplaylist()}} style={{flexDirection:"row",flex:1}} onPress={() =>{  if (!trackforplaylist){getalbumtracks(`/playlist-tracks`)}else{addtracktoplaylist()}}}>
+            <TouchableOpacity onLongPress={() =>{removeplaylist()}} style={{flexDirection:"row",flex:1}} onPress={() =>{  if (!trackforplaylist){getalbumtracks(`/playlist-tracks`)}else{addtracktoplaylist()}}}>
             <View style={{flexDirection:"row",flex:1}}>
             <Image style={{width: 50, height: 50}} source={{uri:playlist.playlist_thumbnail}}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>

@@ -5,8 +5,10 @@ import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text,FlatList } from "react-native";
 import PlaylistCard from "../PlaylistsScreen/PlaylistCard";
+import { useNavigate } from "react-router-native";
 export default function PlaylistModal({isModalVisible,setIsModalVisible,trackforplaylist}){
     const [playlists,setPlaylists] = useState();
+    const navigate = useNavigate()
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
     const [playlistchanged,setPlaylistChanged] = useState(false)
     const getplaylist = async () =>{
