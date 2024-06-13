@@ -20,6 +20,23 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const navigate = useNavigate()
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
+    const navartistprofileplaylist = async () =>{
+        //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
+        navigate("/artistprofile",{state:[album_track]})
+    }
+    const singleTap = Gesture.Tap().onEnd((_event,success) =>{
+        if (success){
+            playnowsong()
+        }
+    })
+    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
+        if (success){
+            if(playlist_details){navartistprofileplaylist()}
+        }
+    })
+    const longPress = Gesture.LongPress().onStart(async (_event,success) =>{
+        if(playlist_details){removetrackfromplaylist()}
+    })
 
     const [addingqueue,setAddingQueue] = useState(false);
     const storeasunavailable = async () =>{
@@ -128,7 +145,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     return(
         <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{flex:1}}>
             <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
-                <TouchableOpacity onLongPress={() =>{if(playlist_details){removetrackfromplaylist()}}} onPress={() =>{playnowsong()}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
+                <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
+                    <TouchableOpacity style={{flex:1,flexDirection:"row",alignItems:"center"}}>
                 <Image style={{width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
 
                 <View style={{padding:6}}>
@@ -139,6 +157,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                 <Text style={{color:"grey"}}>{album_track.artist}</Text>
                 </View>
                 </TouchableOpacity>
+                </GestureDetector>
 
 
 
