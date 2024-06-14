@@ -8,6 +8,7 @@ import PlaylistCard from "../PlaylistsScreen/PlaylistCard";
 import { useNavigate } from "react-router-native";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import { TextInput,View } from "react-native";
+import Entypo from "react-native-vector-icons/Entypo";
 export default function PlaylistModal({isModalVisible,setIsModalVisible,trackforplaylist}){
     const [playlists,setPlaylists] = useState([]);
     const [userInput,setUserInput] = useState("");
@@ -58,7 +59,10 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
             <Modal.Body>
                 <View style={{flexDirection:"row",margin:10}}>
                 <AntDesign style={{position:"relative",top:18}} name="filter"/>
-                <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
+                <TextInput style={{width:"93%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
+                <TouchableOpacity onPress={() =>{handleModal()}} style={{top:10}} >
+                    <Entypo name="cross" size={20}></Entypo>
+                </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={() =>{createplaylist()}} style={{height:60,justifyContent:"center",borderWidth:1,borderColor:"white",borderRadius:5,padding:5}}>
                 <   Text style={{"color":"white"}}>+ New Playlist</Text>
