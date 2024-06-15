@@ -40,6 +40,28 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
         navigate("/artistprofile",{state:album_tracks})
     }
+    const storeplaylist = async () =>{
+        console.log("playlist",album_tracks)
+        if ("playlist_name" in album_tracks[0]){   
+            console.log("playlistname")
+            const promisestore = album_tracks.map(async (playlist_track) =>{
+                                 
+            await AsyncStorage.setItem(`playlist-track:${playlist_track.playlist_name}-${playlist_track.name}`,JSON.stringify(playlist_track))
+            })
+            await Promise.all(promisestore)
+    
+            let keys = await AsyncStorage.getAllKeys()
+            const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${album_tracks[0].playlist_name}`))}))
+            const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+            let num_of_tracks = playlist_tracks.length
+            await AsyncStorage.setItem(`playlist:${album_tracks[0].playlist_name}`,JSON.stringify({"playlist_name":album_tracks[0].playlist_name,"playlist_thumbnail":album_tracks[0].playlist_thumbnail,"playlist_size":num_of_tracks}))
+            const promiseorder = album_tracks.map(async (playlist_track,ind) =>{
+                await AsyncStorage.setItem(`playlist-track-order:${playlist_track.playlist_name}-${playlist_track.name}`,JSON.stringify({"name":playlist_track.name,"order":ind}))
+            })
+            await Promise.all(promiseorder)
+            navigate("/playlists")
+        }
+    }
     useEffect(() =>{
         //
     },[isModalVisible])
@@ -65,7 +87,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
             
  
-            <TouchableOpacity onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onLongPress={() =>{storeplaylist()}} onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_thumbnail : album_tracks[0].thumbnail}}></Image>
 
             </TouchableOpacity>
