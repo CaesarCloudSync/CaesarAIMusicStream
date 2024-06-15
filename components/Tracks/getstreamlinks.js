@@ -28,7 +28,7 @@ export const getyoutubelink  = async (album_track,download=false) =>{
 }
 export const getstreaminglink =async (album_track) =>{
     const video_link = await getyoutubelink(album_track,download=false);
-    const response = await axios.get(`https://caesaraimusicstreamyt-qqbn26mgpa-uc.a.run.app/getaudio?url=${video_link}`)
+    const response = await axios.get(`https://caesaraimusicstreamyt-qqbn26mgpa-nw.a.run.app/getaudio?url=${video_link}`)
     let songurl = response.data.streaming_url
     
     return songurl
