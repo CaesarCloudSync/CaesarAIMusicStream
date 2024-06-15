@@ -31,7 +31,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
       let isSetup = await setupPlayer();
       const currentTrackIndex = await TrackPlayer.getCurrentTrack()
       const currentTrack = await TrackPlayer.getTrack(currentTrackIndex)
-      console.log(currentTrack,"crrentTrack")
+      //console.log(currentTrack,"crrentTrack")
 
       setCurrentTrack(currentTrack)
 

@@ -18,6 +18,7 @@ import Feather from "react-native-vector-icons/Feather"
 import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
 export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
+
     const progress = useProgress();
     const location = useLocation();
     const navigate = useNavigate();
@@ -39,11 +40,23 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isTyping,setIsTyping] = useState(false);
     const [userinput,setUserInput] = useState("");
+    const [filteruserinput,setFilterInput] = useState("");
     const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
-    
+    const[isfilterTyping,setIsFilterTyping] =useState(false)
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
+    const filterData = (item,index) =>{
+        if (filteruserinput === ""){
+            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />)
+        }
+       
+        if (item.name.toLowerCase().includes(filteruserinput.toLowerCase())  || item.artist.toLowerCase().includes(filteruserinput.toLowerCase()) ){
+            return(
+                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />
+            )
+        } 
 
+    }
 
 
     const navartistprofile = async () =>{
@@ -129,12 +142,12 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
             
  
-            <TouchableOpacity onLongPress={() =>{setthumbnailimage()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onLongPress={() =>{setthumbnailimage()}} style={{justifyContent:"center",alignItems:"center",flex:0.5}}>
                 <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
 
             </TouchableOpacity>
 
-            <View style={{flex:editingplaylistname === false ? 0.1:isTyping ?0.5: 0.2,justifyContent:"center",alignItems:"center"}}>
+            <View style={{flex:editingplaylistname === false ? isfilterTyping ? 0.9 : 0.1:isTyping ?0.5: 0.2,justifyContent:"center",alignItems:"center"}}>
                     <View style={{flexDirection:"row"}}>
                         {editingplaylistname === false ?
                         <Text style={{color:"white",fontSize:20}}>{playlist_details.playlist_name}</Text>:
@@ -149,10 +162,14 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
                     </View>
                     <Text style={{color:"grey",fontSize:15}}>{playlist_details.playlist_size} Tracks</Text>
             </View>
+            <View style={{flexDirection:"row"}}>
+            <AntDesign style={{position:"relative",top:18}} name="filter"/>
+            <TextInput style={{width:"100%"}} placeholder="Enter Here" onEndEditing={() =>{setIsFilterTyping(false)}} onTouchStart={() =>{setIsFilterTyping(true)}} onChangeText={(text) =>{setFilterInput(text);}}/>
+            </View>
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />}
+            renderItem={({item,index}) =>filterData(item,index)}
             />
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>
