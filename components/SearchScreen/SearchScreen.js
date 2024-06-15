@@ -225,10 +225,7 @@ export default function Search({seek, setSeek}){
             <ShowQueue/>
 
             {/*Song Progress Tracker */}
-            <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
-                <TrackProgress seek={seek} setSeek={setSeek}/>
-
-            </View>
+            <TrackProgress seek={seek} setSeek={setSeek}/>
                   
             {/*Navigation Footer*/}
             <NavigationFooter currentpage={"search"}/>
