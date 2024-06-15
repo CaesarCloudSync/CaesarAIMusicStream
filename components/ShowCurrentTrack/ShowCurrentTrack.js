@@ -31,7 +31,8 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
       let isSetup = await setupPlayer();
       const currentTrackIndex = await TrackPlayer.getCurrentTrack()
       const currentTrack = await TrackPlayer.getTrack(currentTrackIndex)
-      console.log(currentTrack)
+      console.log(currentTrack,"crrentTrack")
+
       setCurrentTrack(currentTrack)
 
     }
@@ -59,7 +60,17 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
 
       },[])
       const getalbumtracks = async () =>{
-   
+        if ("playlist_name" in currentTrack){
+          const access_token = await get_access_token()
+          const headers = {Authorization: `Bearer ${access_token}`}
+          const resp = await fetch(`https://api.spotify.com/v1/playlists/${currentTrack.playlist_id}`, {headers: headers})
+          const feedresult = await resp.json()
+          //console.log(feedresult.tracks.items[0])
+          let album_tracks = feedresult.tracks.items.map((trackitem) =>{let track = trackitem.track;return({"playlist_thumbnail":currentTrack.playlist_thumbnail,"playlist_id":feedresult.id,"playlist_name":currentTrack.playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+          navigate("/tracks", { state: album_tracks });
+
+        }
+        else{
         const access_token = await get_access_token()
         const headers = {Authorization: `Bearer ${access_token}`}
         //console.log(currentTrack)
@@ -68,6 +79,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
     
         let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":currentTrack.album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":currentTrack.thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
         navigate("/tracks", { state: album_tracks });
+      }
 
       }
 

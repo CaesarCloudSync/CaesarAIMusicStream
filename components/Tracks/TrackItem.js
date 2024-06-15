@@ -110,13 +110,14 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             console.log("next",next_track_ind,num_of_tracks)
         
             let nextsong = album_track
+    
             await skipToTrack(nextsong,next_track_ind)
         }
         else{
             let next_track_ind = 0
         
             let nextsong = album_track
-            
+
             await skipToTrack(nextsong,next_track_ind)
         }
 
