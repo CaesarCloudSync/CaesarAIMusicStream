@@ -189,7 +189,7 @@ export default function Search({seek, setSeek}){
 
             </View>
             {/*Main Scroll Body*/}
-            <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
+            <ScrollView removeClippedSubviews={true} style={{flex:1,backgroundColor:"#141212"}}>
             {recentalbums.length > 0 && access_token !== ""  && 
             <View>
             <Text  style={{marginLeft:10}}>Recent Albums</Text>

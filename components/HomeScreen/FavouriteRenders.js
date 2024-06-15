@@ -46,7 +46,7 @@ export function FavouriteTopTracksPlaylists({favouritecards,playlists,access_tok
 
 export function FavouriteSearchPlaylists({favouritecards,playlists,access_token,artists}){
     return(
-        <ScrollView key={playlists[0].name} style={{marginTop:10}}>
+        <ScrollView removeClippedSubviews={true} key={playlists[0].name} style={{marginTop:10}}>
             <Text style={{marginLeft:10,fontSize:16}}>Artists</Text>
              <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
              {artists.slice(0,13).map((artist,index) =>{
