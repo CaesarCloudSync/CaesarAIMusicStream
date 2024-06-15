@@ -76,7 +76,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
           <TouchableOpacity onPress={() =>{getalbumtracks()}} style={{flexDirection:"row",backgroundColor:"#141212",margin:!searchscreen ? 5: 0,marginLeft:30}} >
             {currentTrack.length !== 0 &&
             <View style={{flex:0.15}}>
-            <Image style={{width: 40, height: 40}} source={{uri:typeof(currentTrack.artwork) === "string" ? currentTrack.artwork :currentTrack.artwork.uri}}></Image>
+            <Image style={{borderRadius:5,width: 40, height: 40}} source={{uri:typeof(currentTrack.artwork) === "string" ? currentTrack.artwork :currentTrack.artwork.uri}}></Image>
             
             </View>}
             <View style={{marginLeft:20}}>

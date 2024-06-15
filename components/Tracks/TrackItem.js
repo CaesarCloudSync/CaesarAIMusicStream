@@ -148,7 +148,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
                 <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
                     <TouchableOpacity style={{flex:1,flexDirection:"row",alignItems:"center"}}>
-                <Image style={{width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
+                <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
 
                 <View style={{padding:6}}>
 

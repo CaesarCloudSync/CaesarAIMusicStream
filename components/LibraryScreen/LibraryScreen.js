@@ -50,7 +50,7 @@ export default function LibraryScreen(){
                     
                     </View>
                     <View style={{flex:0.13,margin:10}}>
-                    <Image style={{width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
+                    <Image style={{borderRadius:5,width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
                     </View>
 
             </View>

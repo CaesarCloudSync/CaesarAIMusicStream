@@ -130,7 +130,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
             
  
             <TouchableOpacity onLongPress={() =>{setthumbnailimage()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
-                <Image style={{width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
+                <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
 
             </TouchableOpacity>
 

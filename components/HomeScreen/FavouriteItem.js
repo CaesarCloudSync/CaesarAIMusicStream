@@ -8,7 +8,7 @@ export default function FavouriteItem({favouritecards,album}){
         <View  key={album.name}style={{backgroundColor:"#141212",width:100,height:favouritecards ? 50 : 300,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212"}}>
         <View   style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "center":"flex-start",alignItems:favouritecards === true ? "center": "stretch",flex:1}}>
             <View style={{flex:favouritecards ? 0.5 : 1}}>
-                <Image style={{width: '100%', height: '100%'}} source={{uri:album.images[0].url}}></Image>
+                <Image style={{borderRadius:5,width: '100%', height: '100%'}} source={{uri:album.images[0].url}}></Image>
             </View>
             <View style={{padding:10}}>
             </View>

@@ -39,7 +39,7 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
             <GestureDetector  gesture={Gesture.Exclusive(doubleTap,singleTap)}>
             <View style={{flexDirection:"row",flex:1}}>
-            <Image style={{width: 50, height: 50}} source={{uri:album[0].thumbnail}}></Image>
+            <Image style={{borderRadius:5,width: 50, height: 50}} source={{uri:album[0].thumbnail}}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
                     {album[0].album_name} | {album[0].artist}
             </Text>
@@ -73,7 +73,7 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
                 <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
                     <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
                         <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
-                            <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                            <Image style={{borderRadius:5,width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
                         </View>
                         <View style={{padding:10}}>
                         </View>

@@ -84,7 +84,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
                 return(
 
             <TouchableOpacity onLongPress={() =>{removefromqueue(item)}} onPress={() =>{playnextqueue(item)}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
-            <Image style={{width: 60, height: 60}} source={{uri:item.thumbnail}}></Image>
+            <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:item.thumbnail}}></Image>
 
             <View style={{padding:6}}>
 

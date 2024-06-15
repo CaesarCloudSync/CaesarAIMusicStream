@@ -64,7 +64,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
             <TouchableOpacity onLongPress={() =>{removeplaylist()}} style={{flexDirection:"row",flex:1}} onPress={() =>{  if (!trackforplaylist){getalbumtracks(`/playlist-tracks`)}else{addtracktoplaylist()}}}>
             <View style={{flexDirection:"row",flex:1}}>
-            <Image style={{width: 50, height: 50}} source={{uri:playliststate.playlist_thumbnail}}></Image>
+            <Image style={{borderRadius:5,width: 50, height: 50}} source={{uri:playliststate.playlist_thumbnail}}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
                     {playliststate.playlist_name} | {playliststate.playlist_size} Tracks
             </Text>
@@ -94,7 +94,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
                 <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)}>
                     <View  key={album_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
                         <View style={{flex:favouritecards === true ? 0.5 : (favouritecards === false ? 1 : 1)}}>
-                            <Image style={{width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                            <Image style={{borderRadius:5,width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
                         </View>
                         <View style={{padding:10}}>
                         </View>

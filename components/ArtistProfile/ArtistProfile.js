@@ -87,7 +87,7 @@ export default function ArtistProfile({seek, setSeek}){
             </View>
             {artistThumbnail !== ""&&
                         <TouchableOpacity style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
-                        <Image style={{width: 175, height: 175}} source={{uri:artistThumbnail}}></Image>
+                        <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:artistThumbnail}}></Image>
         
                     </TouchableOpacity>}
             

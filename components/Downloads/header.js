@@ -34,7 +34,7 @@ export default function Header(props) {
     //console.log(info)
     return(
       <View style={{justifyContent:"center",alignItems:"center",backgroundColor:"#141212",flex:0.67}}>
-          <Image style={{position:"relative",top:30,width: 120,height:imagedim}} source={require("../../assets/CaesarAILogo.png")}></Image>
+          <Image style={{borderRadius:5,position:"relative",top:30,width: 120,height:imagedim}} source={require("../../assets/CaesarAILogo.png")}></Image>
           {info !== null &&
           <View style={{flex:1}}>
           <Text style={styles.songTitle}>{info.title}</Text>

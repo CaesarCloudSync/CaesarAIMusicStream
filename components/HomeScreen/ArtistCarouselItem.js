@@ -44,7 +44,7 @@ export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favo
                 <GestureDetector gesture={Gesture.Exclusive(longPress,singleTap)}>
                     <View  key={artist_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
                         <View style={{flex:favouritecards === true ? 0. : (favouritecards === false ? 1 : 1)}}>
-                            <Image style={{width: 60, height: '100%'}} source={{uri:thumbnail}}></Image>
+                            <Image style={{borderRadius:5,width: 60, height: '100%'}} source={{uri:thumbnail}}></Image>
                         </View>
    
                         <Text style={{color:"white",marginLeft:20,width:100}}>

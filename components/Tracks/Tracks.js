@@ -66,7 +66,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             
  
             <TouchableOpacity onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
-                <Image style={{width: 175, height: 175}} source={{uri:album_tracks[0].thumbnail}}></Image>
+                <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:album_tracks[0].thumbnail}}></Image>
 
             </TouchableOpacity>
 
