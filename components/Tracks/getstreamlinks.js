@@ -28,14 +28,9 @@ export const getyoutubelink  = async (album_track,download=false) =>{
 }
 export const getstreaminglink =async (album_track) =>{
     const video_link = await getyoutubelink(album_track,download=false);
-    const id = ytdl.getVideoID(video_link);
-    //console.log(id)
-    const info = await ytdl.getInfo(id);
-    //console.log(info)
-    let audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
-
-    const format = ytdl.chooseFormat(audioFormats, {quality: 'highest'});
-    let songurl = format.url
+    const response = await axios.get(`https://caesaraimusicstreamyt-qqbn26mgpa-uc.a.run.app/getaudio?url=${video_link}`)
+    let songurl = response.data.streaming_url
+    
     return songurl
 }
 export  const getaudio = async (album_track,setCurrentTrack) =>{
