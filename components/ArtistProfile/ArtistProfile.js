@@ -6,7 +6,7 @@ import { useLocation,useNavigate } from "react-router-native"
 import TrackProgress from "../TrackProgress/TrackProgress";
 //import FavouriteItem from "./FavouriteItem";
 import { get_access_token } from "../access_token/getaccesstoken";
-import { FavouritePlaylists,FavouriteTopTracksPlaylists} from "../HomeScreen/FavouriteRenders";
+import { FavouriteAlbums,FavouriteTopTracksAlbums} from "../HomeScreen/FavouriteRenders";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ShowQueue from "../ShowQueue/showqueue";
@@ -101,33 +101,33 @@ export default function ArtistProfile({seek, setSeek}){
                     <Text style={{color:"white",fontSize:20}}>Albums</Text>
             </View>
             }
-            {all_album_tracks.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={all_album_tracks}/>}
+            {all_album_tracks.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={all_album_tracks}/>}
 
             {top_tracks.length > 0 && access_token !== ""  &&<View style={{flex:0.1,justifyContent:"flex-start",alignItems:"flex-start",marginLeft:20}}>
                     <Text style={{color:"white",fontSize:20}}>Top Tracks</Text>
             </View>
             }
-            {top_tracks.length > 0 && access_token !== ""  && <FavouriteTopTracksPlaylists access_token={access_token} favouritecards={true} playlists={top_tracks} />}             
+            {top_tracks.length > 0 && access_token !== ""  && <FavouriteTopTracksAlbums access_token={access_token} favouritecards={true} playlists={top_tracks} />}             
             
             {singles.length > 0 && access_token !== ""  &&<View style={{flex:0.1,justifyContent:"flex-start",alignItems:"flex-start",marginLeft:20}}>
                     <Text style={{color:"white",fontSize:20}}>Singles</Text>
             </View>
             }
-            {singles.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={singles}/>}
+            {singles.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={singles}/>}
 
             {compilations.length > 0 && access_token !== ""  &&                    
             <View style={{flex:0.1,justifyContent:"flex-start",alignItems:"flex-start",marginLeft:20}}>
                     <Text style={{color:"white",fontSize:20}}>Compilations</Text>
             </View>
             }
-            {compilations.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={compilations}/>}
+            {compilations.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={compilations}/>}
             
             {appears_on.length > 0 && access_token !== ""  &&                    
             <View style={{flex:0.1,justifyContent:"flex-start",alignItems:"flex-start",marginLeft:20}}>
                     <Text style={{color:"white",fontSize:20}}>Appears On</Text>
             </View>
             }
-            {appears_on.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={appears_on}/>}
+            {appears_on.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={appears_on}/>}
                                         
    
 
@@ -165,13 +165,13 @@ export default function ArtistProfile({seek, setSeek}){
 
         /*
                         
-                        {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
+                        {initialfeed.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
                         {initialfeed.length > 0 && access_token !== ""  &&
                         <View style={{flex:1}}>
                             <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest Playlists</Text>
                         </View>
                         }
-                        {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={false} playlists={initialfeed.slice(8,)}/>}
+                        {initialfeed.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={false} playlists={initialfeed.slice(8,)}/>}
         
                         {initialfeed.length > 0 && access_token !== ""  && 
                         <View style={{flex:1}}>

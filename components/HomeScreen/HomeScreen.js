@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import TrackProgress from "../TrackProgress/TrackProgress";
 import FavouriteItem from "./FavouriteItem";
 import { get_access_token } from "../access_token/getaccesstoken";
-import {FavouritePlaylists,FavouriteRecommendations} from "./FavouriteRenders";
+import {FavouriteAlbums,FavouriteRecommendations} from "./FavouriteRenders";
 import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -188,13 +188,13 @@ function parseISOString(s) {
             {/*Main Scroll Body*/}
             <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
                 {/* Favourite Playlists */}
-                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
+                {initialfeed.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
                 {initialfeed.length > 0 && access_token !== ""  &&
                 <View style={{flex:1}}>
                     <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest Playlists</Text>
                 </View>
                 }
-                {initialfeed.length > 0 && access_token !== ""  && <FavouritePlaylists access_token={access_token} favouritecards={false} playlists={initialfeed.slice(8,)}/>}
+                {initialfeed.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={false} playlists={initialfeed.slice(8,)}/>}
 
                 {initialfeed.length > 0 && access_token !== ""  && 
                 <View style={{flex:1}}>

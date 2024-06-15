@@ -1,0 +1,802 @@
+{
+    "playlists": {
+      "href": "https://api.spotify.com/v1/search?query=a+boogie&type=playlist&locale=en-GB%2Cen-US%3Bq%3D0.9%2Cen%3Bq%3D0.8&offset=0&limit=20",
+      "items": [
+        {
+          "collaborative": false,
+          "description": "New music every Monday",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/1aRFSyo3MLyw5xjb5JxkV5"
+          },
+          "href": "https://api.spotify.com/v1/playlists/1aRFSyo3MLyw5xjb5JxkV5",
+          "id": "1aRFSyo3MLyw5xjb5JxkV5",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb18b00a46ab0ab03dbeb79b18",
+              "width": null
+            }
+          ],
+          "name": "BEST OF A BOOGIE🔥",
+          "owner": {
+            "display_name": "Miguel85",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/mialga03"
+            },
+            "href": "https://api.spotify.com/v1/users/mialga03",
+            "id": "mialga03",
+            "type": "user",
+            "uri": "spotify:user:mialga03"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "ODMsMGVkN2I3YTE5OTYxOTg3MjNjNTc1YjU5NDgxYjY0Y2VmNjZmODQ5ZQ==",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/1aRFSyo3MLyw5xjb5JxkV5/tracks",
+            "total": 49
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:1aRFSyo3MLyw5xjb5JxkV5"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/60KyALJyGpPoxiPWfIozmk"
+          },
+          "href": "https://api.spotify.com/v1/playlists/60KyALJyGpPoxiPWfIozmk",
+          "id": "60KyALJyGpPoxiPWfIozmk",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://mosaic.scdn.co/640/ab67616d0000b2739b863653a4fc89689f9f8e1cab67616d0000b273a732ec9878c2f5d516f3f1f6ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://mosaic.scdn.co/300/ab67616d0000b2739b863653a4fc89689f9f8e1cab67616d0000b273a732ec9878c2f5d516f3f1f6ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 300
+            },
+            {
+              "height": 60,
+              "url": "https://mosaic.scdn.co/60/ab67616d0000b2739b863653a4fc89689f9f8e1cab67616d0000b273a732ec9878c2f5d516f3f1f6ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 60
+            }
+          ],
+          "name": "A Boogie bangers",
+          "owner": {
+            "display_name": "Oliver F",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/t45ux4kw4ryyxeu82c6o5kf88"
+            },
+            "href": "https://api.spotify.com/v1/users/t45ux4kw4ryyxeu82c6o5kf88",
+            "id": "t45ux4kw4ryyxeu82c6o5kf88",
+            "type": "user",
+            "uri": "spotify:user:t45ux4kw4ryyxeu82c6o5kf88"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTE4LGNkOGJkYTgzNDM1ODU5NDQ2ZTgzOTg3YTJiMzczMzA0YmMwMWZlNTI=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/60KyALJyGpPoxiPWfIozmk/tracks",
+            "total": 89
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:60KyALJyGpPoxiPWfIozmk"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/3EnFAtHFZLbpNklzHvcCgS"
+          },
+          "href": "https://api.spotify.com/v1/playlists/3EnFAtHFZLbpNklzHvcCgS",
+          "id": "3EnFAtHFZLbpNklzHvcCgS",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://mosaic.scdn.co/640/ab67616d0000b2731072a34d8c8d75e9b2545d8aab67616d0000b2734ec868f10b6379bcb83e855aab67616d0000b273a5c7151899ae5da4f4382d54ab67616d0000b273b9fe16b21ea333150c0f50f6",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://mosaic.scdn.co/300/ab67616d0000b2731072a34d8c8d75e9b2545d8aab67616d0000b2734ec868f10b6379bcb83e855aab67616d0000b273a5c7151899ae5da4f4382d54ab67616d0000b273b9fe16b21ea333150c0f50f6",
+              "width": 300
+            },
+            {
+              "height": 60,
+              "url": "https://mosaic.scdn.co/60/ab67616d0000b2731072a34d8c8d75e9b2545d8aab67616d0000b2734ec868f10b6379bcb83e855aab67616d0000b273a5c7151899ae5da4f4382d54ab67616d0000b273b9fe16b21ea333150c0f50f6",
+              "width": 60
+            }
+          ],
+          "name": "New Amari A Boogie",
+          "owner": {
+            "display_name": "Stiner999",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/8ggak7hhzf9is9w88flk9ifr1"
+            },
+            "href": "https://api.spotify.com/v1/users/8ggak7hhzf9is9w88flk9ifr1",
+            "id": "8ggak7hhzf9is9w88flk9ifr1",
+            "type": "user",
+            "uri": "spotify:user:8ggak7hhzf9is9w88flk9ifr1"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "NDcsN2VlMmEyNDAyYWExYWE3Y2UwNmMyOGZlZjBkM2VmZWVjNjcyNGNkYQ==",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/3EnFAtHFZLbpNklzHvcCgS/tracks",
+            "total": 69
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:3EnFAtHFZLbpNklzHvcCgS"
+        },
+        {
+          "collaborative": false,
+          "description": "Get ready for the Better Off Alone tour with A Boogie's setlist!  <a href=\"https://www.songkick.com/artists/8869819-a-boogie-wit-da-hoodie\">Track new A Boogie tour dates now on Songkick</a>.",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/3CDoHCP0Ly39jQwKsxwqx9"
+          },
+          "href": "https://api.spotify.com/v1/playlists/3CDoHCP0Ly39jQwKsxwqx9",
+          "id": "3CDoHCP0Ly39jQwKsxwqx9",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb09e630f33b5ee915f0983b81",
+              "width": null
+            }
+          ],
+          "name": "A Boogie Wit da Hoodie - Better Off Alone Tour Setlist 2024",
+          "owner": {
+            "display_name": "Songkick",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/songkick"
+            },
+            "href": "https://api.spotify.com/v1/users/songkick",
+            "id": "songkick",
+            "type": "user",
+            "uri": "spotify:user:songkick"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "NzgsNDg4ZWE5ZWE5YWRmYTQxNWMyMWE3M2ZhYmYwZGZiZDI2YTA5ZjJmNg==",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/3CDoHCP0Ly39jQwKsxwqx9/tracks",
+            "total": 26
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:3CDoHCP0Ly39jQwKsxwqx9"
+        },
+        {
+          "collaborative": false,
+          "description": "This is A Boogie Wit da Hoodie. The essential tracks, all in one playlist.",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO1KBxkc"
+          },
+          "href": "https://api.spotify.com/v1/playlists/37i9dQZF1DZ06evO1KBxkc",
+          "id": "37i9dQZF1DZ06evO1KBxkc",
+          "images": [
+            {
+              "height": null,
+              "url": "https://thisis-images.spotifycdn.com/37i9dQZF1DZ06evO1KBxkc-large.jpg",
+              "width": null
+            }
+          ],
+          "name": "This Is A Boogie Wit da Hoodie",
+          "owner": {
+            "display_name": "Spotify",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/spotify"
+            },
+            "href": "https://api.spotify.com/v1/users/spotify",
+            "id": "spotify",
+            "type": "user",
+            "uri": "spotify:user:spotify"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTcxODIzNjgwMCwwMDAwMDAwMDJmNWEzZTczMDdhMjA3ZDI0NDQ5MzA3MDI3MjliM2Vi",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/37i9dQZF1DZ06evO1KBxkc/tracks",
+            "total": 50
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:37i9dQZF1DZ06evO1KBxkc"
+        },
+        {
+          "collaborative": false,
+          "description": "A playlist filled with Artist’s best songs. @annarusborg",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/0oFVwZ2Vnf30VUMivRruKg"
+          },
+          "href": "https://api.spotify.com/v1/playlists/0oFVwZ2Vnf30VUMivRruKg",
+          "id": "0oFVwZ2Vnf30VUMivRruKg",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb2d36e68164e0f51930be9612",
+              "width": null
+            }
+          ],
+          "name": "💙A Boogie Wit da Hoodie's best shit",
+          "owner": {
+            "display_name": "Anna Rusborg",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/anna%2Crusborg"
+            },
+            "href": "https://api.spotify.com/v1/users/anna%2Crusborg",
+            "id": "anna,rusborg",
+            "type": "user",
+            "uri": "spotify:user:anna%2Crusborg"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTI1LDVjMWE5MDVjMDE5MDI0M2E4ZmIwNzY2ZDg3Mjg1NzQ3NDIzMjIxMjI=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/0oFVwZ2Vnf30VUMivRruKg/tracks",
+            "total": 105
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:0oFVwZ2Vnf30VUMivRruKg"
+        },
+        {
+          "collaborative": false,
+          "description": "BETTER OFF ALONE OUT NOW 🖤",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/3IxmBubJt1uZaY39NHDpZA"
+          },
+          "href": "https://api.spotify.com/v1/playlists/3IxmBubJt1uZaY39NHDpZA",
+          "id": "3IxmBubJt1uZaY39NHDpZA",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb931347cb21499877107642f6",
+              "width": null
+            }
+          ],
+          "name": "A Boogie Wit da Hoodie - Better Off Alone",
+          "owner": {
+            "display_name": "Topsify Radio",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/ty5kkq44cnlzzvtwwob36mx4g"
+            },
+            "href": "https://api.spotify.com/v1/users/ty5kkq44cnlzzvtwwob36mx4g",
+            "id": "ty5kkq44cnlzzvtwwob36mx4g",
+            "type": "user",
+            "uri": "spotify:user:ty5kkq44cnlzzvtwwob36mx4g"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MzA1LDdlMjU1ZTkwMDI5NWIzZGQ0MWFkMmYwNGU5NDdlNDIzMTE0M2NjNGY=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/3IxmBubJt1uZaY39NHDpZA/tracks",
+            "total": 111
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:3IxmBubJt1uZaY39NHDpZA"
+        },
+        {
+          "collaborative": false,
+          "description": "<a href=spotify:playlist:37i9dQZF1EIZpwNTLXbnhE>Bryson Tiller</a>, <a href=spotify:playlist:37i9dQZF1EIVgDN7CdYNNQ>Trippie Redd</a> and <a href=spotify:playlist:37i9dQZF1EIZdd6v2TrO2y>Juice WRLD</a>",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/37i9dQZF1EIZNaotAOEzxf"
+          },
+          "href": "https://api.spotify.com/v1/playlists/37i9dQZF1EIZNaotAOEzxf",
+          "id": "37i9dQZF1EIZNaotAOEzxf",
+          "images": [
+            {
+              "height": null,
+              "url": "https://seed-mix-image.spotifycdn.com/v6/img/artist/31W5EY0aAly4Qieq6OFu6I/en-GB/large",
+              "width": null
+            }
+          ],
+          "name": "A Boogie Wit da Hoodie Mix",
+          "owner": {
+            "display_name": "Spotify",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/spotify"
+            },
+            "href": "https://api.spotify.com/v1/users/spotify",
+            "id": "spotify",
+            "type": "user",
+            "uri": "spotify:user:spotify"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MCwwMDAwMDAwMDZjMDkxYTM5YWVjOTc5MDc5ODQ4YTcwN2NmZDg0Y2Iw",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/37i9dQZF1EIZNaotAOEzxf/tracks",
+            "total": 50
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:37i9dQZF1EIZNaotAOEzxf"
+        },
+        {
+          "collaborative": false,
+          "description": "All My Life, Lil Durk J. Cole",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/0Wp2VEqRaX2ffqMKrpj18d"
+          },
+          "href": "https://api.spotify.com/v1/playlists/0Wp2VEqRaX2ffqMKrpj18d",
+          "id": "0Wp2VEqRaX2ffqMKrpj18d",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000bebb52f01f16ed9783748852a83c",
+              "width": null
+            }
+          ],
+          "name": "wild thots - a boogie",
+          "owner": {
+            "display_name": "Aheed",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/60tjl0wuuojbh5fwh9sw5zoa6"
+            },
+            "href": "https://api.spotify.com/v1/users/60tjl0wuuojbh5fwh9sw5zoa6",
+            "id": "60tjl0wuuojbh5fwh9sw5zoa6",
+            "type": "user",
+            "uri": "spotify:user:60tjl0wuuojbh5fwh9sw5zoa6"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTQzLDY3YzY2YWJiMTQwYjU1Zjc3NmFkNzEzNzMzN2NmOTg3YjY5NDA3NDk=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/0Wp2VEqRaX2ffqMKrpj18d/tracks",
+            "total": 84
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:0Wp2VEqRaX2ffqMKrpj18d"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/4xif0xrM2Q5214nEAgtEC9"
+          },
+          "href": "https://api.spotify.com/v1/playlists/4xif0xrM2Q5214nEAgtEC9",
+          "id": "4xif0xrM2Q5214nEAgtEC9",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://mosaic.scdn.co/640/ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273cf33b6ed36ef4f8138a1b43eab67616d0000b273dc442a1ba4b74732acfbeba4ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://mosaic.scdn.co/300/ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273cf33b6ed36ef4f8138a1b43eab67616d0000b273dc442a1ba4b74732acfbeba4ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 300
+            },
+            {
+              "height": 60,
+              "url": "https://mosaic.scdn.co/60/ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273cf33b6ed36ef4f8138a1b43eab67616d0000b273dc442a1ba4b74732acfbeba4ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 60
+            }
+          ],
+          "name": "A Boogie 🎒🐐",
+          "owner": {
+            "display_name": "Xhonatan Kadi",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/22rzul5qmzad73oiu35h6x7ei"
+            },
+            "href": "https://api.spotify.com/v1/users/22rzul5qmzad73oiu35h6x7ei",
+            "id": "22rzul5qmzad73oiu35h6x7ei",
+            "type": "user",
+            "uri": "spotify:user:22rzul5qmzad73oiu35h6x7ei"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "NDE3LDg0ZTg4YjE4NjVhNGM2ZTNmOTBhYzA1Y2IxNzAxNmY1NGEwMTI3NGM=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/4xif0xrM2Q5214nEAgtEC9/tracks",
+            "total": 267
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:4xif0xrM2Q5214nEAgtEC9"
+        },
+        {
+          "collaborative": false,
+          "description": "With PnB Rock, J.I the Prince of N.Y, Lil Tjay and more",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/37i9dQZF1E4tTXCCD0xAG2"
+          },
+          "href": "https://api.spotify.com/v1/playlists/37i9dQZF1E4tTXCCD0xAG2",
+          "id": "37i9dQZF1E4tTXCCD0xAG2",
+          "images": [
+            {
+              "height": null,
+              "url": "https://seeded-session-images.scdn.co/v2/img/540/r/artist/31W5EY0aAly4Qieq6OFu6I/en-GB",
+              "width": null
+            }
+          ],
+          "name": "A Boogie Wit da Hoodie Radio",
+          "owner": {
+            "display_name": "Spotify",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/spotify"
+            },
+            "href": "https://api.spotify.com/v1/users/spotify",
+            "id": "spotify",
+            "type": "user",
+            "uri": "spotify:user:spotify"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTcxODQ1NTI0MywwMDAwMDAwMDg3NWVkNWMxZTc0Yjk4ZDNjYmI5ZGI5MWQyMmIzOTEz",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/37i9dQZF1E4tTXCCD0xAG2/tracks",
+            "total": 50
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:37i9dQZF1E4tTXCCD0xAG2"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/6lxfEMgzzqAu7parE1SuOM"
+          },
+          "href": "https://api.spotify.com/v1/playlists/6lxfEMgzzqAu7parE1SuOM",
+          "id": "6lxfEMgzzqAu7parE1SuOM",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://mosaic.scdn.co/640/ab67616d0000b27370b38587cbc5de120e353426ab67616d0000b273a5be5c8d2a4a29b608ad4851ab67616d0000b273a7b0bf8db17d79e5e340ea33ab67616d0000b273c64cf36006814bdce8fa0d51",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://mosaic.scdn.co/300/ab67616d0000b27370b38587cbc5de120e353426ab67616d0000b273a5be5c8d2a4a29b608ad4851ab67616d0000b273a7b0bf8db17d79e5e340ea33ab67616d0000b273c64cf36006814bdce8fa0d51",
+              "width": 300
+            },
+            {
+              "height": 60,
+              "url": "https://mosaic.scdn.co/60/ab67616d0000b27370b38587cbc5de120e353426ab67616d0000b273a5be5c8d2a4a29b608ad4851ab67616d0000b273a7b0bf8db17d79e5e340ea33ab67616d0000b273c64cf36006814bdce8fa0d51",
+              "width": 60
+            }
+          ],
+          "name": "DBE Bangers 💊💉",
+          "owner": {
+            "display_name": "Andrew",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/andrewalexandrou15"
+            },
+            "href": "https://api.spotify.com/v1/users/andrewalexandrou15",
+            "id": "andrewalexandrou15",
+            "type": "user",
+            "uri": "spotify:user:andrewalexandrou15"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTE5LDg3NDM3M2FkMjlkNDE4N2Y1YjQyZGJlOWRkM2U5OWY0MjE0ZWI0NzI=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/6lxfEMgzzqAu7parE1SuOM/tracks",
+            "total": 82
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:6lxfEMgzzqAu7parE1SuOM"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/4TZfirvR3FUZnnryiVkjXc"
+          },
+          "href": "https://api.spotify.com/v1/playlists/4TZfirvR3FUZnnryiVkjXc",
+          "id": "4TZfirvR3FUZnnryiVkjXc",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb658130863fdfa10830532da4",
+              "width": null
+            }
+          ],
+          "name": "wild thots- A Boogie Wit Da Hoodie",
+          "owner": {
+            "display_name": "rojada is cool",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/31lt4jqjtkk2dhujd7kuyap5ysce"
+            },
+            "href": "https://api.spotify.com/v1/users/31lt4jqjtkk2dhujd7kuyap5ysce",
+            "id": "31lt4jqjtkk2dhujd7kuyap5ysce",
+            "type": "user",
+            "uri": "spotify:user:31lt4jqjtkk2dhujd7kuyap5ysce"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTI3LDI1YTQ3ZjkyY2U1OTY5ZmJkZTAyOTU2YWY2ZWI0N2RlZjM2ZTMwZmM=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/4TZfirvR3FUZnnryiVkjXc/tracks",
+            "total": 204
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:4TZfirvR3FUZnnryiVkjXc"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/6PMsN6EPOvZb69S96t4JPz"
+          },
+          "href": "https://api.spotify.com/v1/playlists/6PMsN6EPOvZb69S96t4JPz",
+          "id": "6PMsN6EPOvZb69S96t4JPz",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://mosaic.scdn.co/640/ab67616d0000b2734ec868f10b6379bcb83e855aab67616d0000b27359e749d5e7ccc0aa7f73d7b6ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://mosaic.scdn.co/300/ab67616d0000b2734ec868f10b6379bcb83e855aab67616d0000b27359e749d5e7ccc0aa7f73d7b6ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 300
+            },
+            {
+              "height": 60,
+              "url": "https://mosaic.scdn.co/60/ab67616d0000b2734ec868f10b6379bcb83e855aab67616d0000b27359e749d5e7ccc0aa7f73d7b6ab67616d0000b273cdba7ee22968991250725ce1ab67616d0000b273f2baf6d743ae26f97777f026",
+              "width": 60
+            }
+          ],
+          "name": "🚗",
+          "owner": {
+            "display_name": "ValentinaHanna",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/grdsmcryksthxulm6ee3oz5k7"
+            },
+            "href": "https://api.spotify.com/v1/users/grdsmcryksthxulm6ee3oz5k7",
+            "id": "grdsmcryksthxulm6ee3oz5k7",
+            "type": "user",
+            "uri": "spotify:user:grdsmcryksthxulm6ee3oz5k7"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MzcxLGM5ZmQxOTJiODI1YTQwMDBjN2UzNDRiYzQ1YmZhOWM4ZWFkYmE5NTA=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/6PMsN6EPOvZb69S96t4JPz/tracks",
+            "total": 214
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:6PMsN6EPOvZb69S96t4JPz"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/1MnOoxSx8vVjiCQYAGoqnM"
+          },
+          "href": "https://api.spotify.com/v1/playlists/1MnOoxSx8vVjiCQYAGoqnM",
+          "id": "1MnOoxSx8vVjiCQYAGoqnM",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb571a6a93b7bdf41b8adcc35b",
+              "width": null
+            }
+          ],
+          "name": "A BOOGIE SET LIST 24 AUS",
+          "owner": {
+            "display_name": "Arki.Fatouros",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/f43n3m7x6wxbirlmt54iv22ij"
+            },
+            "href": "https://api.spotify.com/v1/users/f43n3m7x6wxbirlmt54iv22ij",
+            "id": "f43n3m7x6wxbirlmt54iv22ij",
+            "type": "user",
+            "uri": "spotify:user:f43n3m7x6wxbirlmt54iv22ij"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "NSwyYTE2ZjAwY2I0MTc2N2QyYmMwYzNmNDJiNmM0YTg2YTRkMjQzYjRk",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/1MnOoxSx8vVjiCQYAGoqnM/tracks",
+            "total": 30
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:1MnOoxSx8vVjiCQYAGoqnM"
+        },
+        {
+          "collaborative": false,
+          "description": "Opening acts - day1 and youngnlipz - AUSTRALIA 2024 tour Updated April 2024 - confirmed a boogie wit da hoodie better off alone tour 2024 jungle drowning DTB interlude did me wrong look back at it still think about you ransom timeless swervin just like me my everything",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/1gr61GsNiSRdiIVzkUxSqz"
+          },
+          "href": "https://api.spotify.com/v1/playlists/1gr61GsNiSRdiIVzkUxSqz",
+          "id": "1gr61GsNiSRdiIVzkUxSqz",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb431f4d824f8f7dbea3bd204c",
+              "width": null
+            }
+          ],
+          "name": "A Boogie Setlist BOA TOUR Official",
+          "owner": {
+            "display_name": "jeyda",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/jeydaolca"
+            },
+            "href": "https://api.spotify.com/v1/users/jeydaolca",
+            "id": "jeydaolca",
+            "type": "user",
+            "uri": "spotify:user:jeydaolca"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MTYzLDk0MzVlMWMxMWZmMmNmNGZlMDAyM2YwZGYxOGRjNmM1OGMxMDQ3NjQ=",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/1gr61GsNiSRdiIVzkUxSqz/tracks",
+            "total": 23
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:1gr61GsNiSRdiIVzkUxSqz"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/4LpxZOUg4z2X2knVNTaQmL"
+          },
+          "href": "https://api.spotify.com/v1/playlists/4LpxZOUg4z2X2knVNTaQmL",
+          "id": "4LpxZOUg4z2X2knVNTaQmL",
+          "images": [
+            {
+              "height": null,
+              "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000bebb76cfce65dc20df6983a7a9a9",
+              "width": null
+            }
+          ],
+          "name": "A BOOGIE + NLE SETLIST ",
+          "owner": {
+            "display_name": "aylie",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/22ztcvzzkm4ttccy32f3tdhia"
+            },
+            "href": "https://api.spotify.com/v1/users/22ztcvzzkm4ttccy32f3tdhia",
+            "id": "22ztcvzzkm4ttccy32f3tdhia",
+            "type": "user",
+            "uri": "spotify:user:22ztcvzzkm4ttccy32f3tdhia"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "NTcsNWU4ZTVlMDEyYTkxZjhhNjFjYzk1YWJjNzc3M2QyN2FhMTY5Y2EyNw==",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/4LpxZOUg4z2X2knVNTaQmL/tracks",
+            "total": 53
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:4LpxZOUg4z2X2knVNTaQmL"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/37ezrRJAehgIuxO8gzQIF2"
+          },
+          "href": "https://api.spotify.com/v1/playlists/37ezrRJAehgIuxO8gzQIF2",
+          "id": "37ezrRJAehgIuxO8gzQIF2",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://mosaic.scdn.co/640/ab67616d0000b273078fbd1d8e7326a4dc0fd6e9ab67616d0000b27312121fe470bd172e63b9f13bab67616d0000b2731559978790d7553b9604ac12ab67616d0000b27383cedb58fbc9fb2a187fde6f",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://mosaic.scdn.co/300/ab67616d0000b273078fbd1d8e7326a4dc0fd6e9ab67616d0000b27312121fe470bd172e63b9f13bab67616d0000b2731559978790d7553b9604ac12ab67616d0000b27383cedb58fbc9fb2a187fde6f",
+              "width": 300
+            },
+            {
+              "height": 60,
+              "url": "https://mosaic.scdn.co/60/ab67616d0000b273078fbd1d8e7326a4dc0fd6e9ab67616d0000b27312121fe470bd172e63b9f13bab67616d0000b2731559978790d7553b9604ac12ab67616d0000b27383cedb58fbc9fb2a187fde6f",
+              "width": 60
+            }
+          ],
+          "name": "2016-2018 UK bangersssss🔥",
+          "owner": {
+            "display_name": "Umu",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/fhegu3o08y2fq3qmny95gdyxl"
+            },
+            "href": "https://api.spotify.com/v1/users/fhegu3o08y2fq3qmny95gdyxl",
+            "id": "fhegu3o08y2fq3qmny95gdyxl",
+            "type": "user",
+            "uri": "spotify:user:fhegu3o08y2fq3qmny95gdyxl"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "NzksYzA5YWI1NWFkMWVhMGNiYzQ3YTIxOWI0YjNjOGQ2NGRmNzg4ZmJiZg==",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/37ezrRJAehgIuxO8gzQIF2/tracks",
+            "total": 78
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:37ezrRJAehgIuxO8gzQIF2"
+        },
+        {
+          "collaborative": false,
+          "description": "",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/11JIyHjhW3bbfofEcTG4Ih"
+          },
+          "href": "https://api.spotify.com/v1/playlists/11JIyHjhW3bbfofEcTG4Ih",
+          "id": "11JIyHjhW3bbfofEcTG4Ih",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://mosaic.scdn.co/640/ab67616d0000b27370b38587cbc5de120e353426ab67616d0000b2739dbba76629b661d5753d7e20ab67616d0000b273c64cf36006814bdce8fa0d51ab67616d0000b273ca3c6923971cef4dbd3d19ec",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://mosaic.scdn.co/300/ab67616d0000b27370b38587cbc5de120e353426ab67616d0000b2739dbba76629b661d5753d7e20ab67616d0000b273c64cf36006814bdce8fa0d51ab67616d0000b273ca3c6923971cef4dbd3d19ec",
+              "width": 300
+            },
+            {
+              "height": 60,
+              "url": "https://mosaic.scdn.co/60/ab67616d0000b27370b38587cbc5de120e353426ab67616d0000b2739dbba76629b661d5753d7e20ab67616d0000b273c64cf36006814bdce8fa0d51ab67616d0000b273ca3c6923971cef4dbd3d19ec",
+              "width": 60
+            }
+          ],
+          "name": "D block playlist🐐",
+          "owner": {
+            "display_name": "Ellieeee",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/susan-460"
+            },
+            "href": "https://api.spotify.com/v1/users/susan-460",
+            "id": "susan-460",
+            "type": "user",
+            "uri": "spotify:user:susan-460"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "NTMsMzkyNWMzYzEyYmI3N2I3OWYyZTczYzhiYmY2ODY3MmM3ODViZmMzMg==",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/11JIyHjhW3bbfofEcTG4Ih/tracks",
+            "total": 42
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:11JIyHjhW3bbfofEcTG4Ih"
+        },
+        {
+          "collaborative": false,
+          "description": "<a href=spotify:playlist:37i9dQZF1EIZNaotAOEzxf>A Boogie Wit da Hoodie</a>, <a href=spotify:playlist:37i9dQZF1EIV8wSAewNc3V>J Hus</a> and <a href=spotify:playlist:37i9dQZF1EIVcLQLntCIgl>SL</a>",
+          "external_urls": {
+            "spotify": "https://open.spotify.com/playlist/37i9dQZF1EIUEhrxMv0BrX"
+          },
+          "href": "https://api.spotify.com/v1/playlists/37i9dQZF1EIUEhrxMv0BrX",
+          "id": "37i9dQZF1EIUEhrxMv0BrX",
+          "images": [
+            {
+              "height": null,
+              "url": "https://seed-mix-image.spotifycdn.com/v6/img/artist/5VadK1havLhK1OpKYsXv9y/en-GB/large",
+              "width": null
+            }
+          ],
+          "name": "D-Block Europe Mix",
+          "owner": {
+            "display_name": "Spotify",
+            "external_urls": {
+              "spotify": "https://open.spotify.com/user/spotify"
+            },
+            "href": "https://api.spotify.com/v1/users/spotify",
+            "id": "spotify",
+            "type": "user",
+            "uri": "spotify:user:spotify"
+          },
+          "primary_color": null,
+          "public": null,
+          "snapshot_id": "MCwwMDAwMDAwMGMxNzFhYjE5NzM5ZGE5NzZkYzQyOTFiNTJiMTRjOGFh",
+          "tracks": {
+            "href": "https://api.spotify.com/v1/playlists/37i9dQZF1EIUEhrxMv0BrX/tracks",
+            "total": 50
+          },
+          "type": "playlist",
+          "uri": "spotify:playlist:37i9dQZF1EIUEhrxMv0BrX"
+        }
+      ],
+      "limit": 20,
+      "next": "https://api.spotify.com/v1/search?query=a+boogie&type=playlist&locale=en-GB%2Cen-US%3Bq%3D0.9%2Cen%3Bq%3D0.8&offset=20&limit=20",
+      "offset": 0,
+      "previous": null,
+      "total": 822
+    }
+  }

@@ -31,7 +31,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
       let isSetup = await setupPlayer();
       const currentTrackIndex = await TrackPlayer.getCurrentTrack()
       const currentTrack = await TrackPlayer.getTrack(currentTrackIndex)
-      //console.log(currentTrack)
+      console.log(currentTrack)
       setCurrentTrack(currentTrack)
 
     }
@@ -59,6 +59,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
 
       },[])
       const getalbumtracks = async () =>{
+   
         const access_token = await get_access_token()
         const headers = {Authorization: `Bearer ${access_token}`}
         //console.log(currentTrack)

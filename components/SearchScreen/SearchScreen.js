@@ -3,7 +3,7 @@ import { useState,useEffect} from "react";
 import TrackProgress from "../TrackProgress/TrackProgress";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { get_access_token } from "../access_token/getaccesstoken";
-import { FavouritePlaylists } from "../HomeScreen/FavouriteRenders";
+import { FavouriteAlbums, FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import axios from "axios";
 import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,7 +11,7 @@ import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
+import { FavouriteSearchAlbums } from "../HomeScreen/FavouriteRenders";
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Directions } from 'react-native-gesture-handler';
 import ArtistCarouselItem from "../HomeScreen/ArtistCarouselItem";
@@ -26,7 +26,8 @@ export default function Search({seek, setSeek}){
     const [artists,setArtists] = useState([]);
     const [recent_artists,setRecentArtists] = useState([]);
     const [recent_removed,setRecentRemoved] = useState(false)
-    const [recentalbums,setRecentAlbums] = useState([])
+    const [recentalbums,setRecentAlbums] = useState([]);
+    const [playlists,setPlaylists] = useState([])
 
     const fling = Gesture.Fling().direction(Directions.DOWN)
     .onStart((e) => {
@@ -66,10 +67,13 @@ export default function Search({seek, setSeek}){
     const searchsongs = async () =>{
         const headers = {Authorization: `Bearer ${access_token}`}
         //console.log(text)
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=${text}&limit=50&type=artist,album,track`, {headers: headers})
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=${text}&limit=50&type=artist,album,track,playlist`, {headers: headers})
         const feedresult = await resp.json()
+
         const artists = feedresult.artists.items.map((artist) =>{console.log(artist.images);return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
         const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
+        const playlists = feedresult.playlists.items.map((playlist) =>{return({"id":playlist.id,"name":playlist.name,"images":[{"url":playlist.images[0].url}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
+        setPlaylists(playlists)
         setSongs(result)
         //console.log(artists)
 
@@ -193,7 +197,7 @@ export default function Search({seek, setSeek}){
             {recentalbums.length > 0 && access_token !== ""  && 
             <View>
             <Text  style={{marginLeft:10}}>Recent Albums</Text>
-            <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={recentalbums} recentalbums={recentalbums} setRecentAlbums={setRecentAlbums}/>
+            <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={recentalbums} recentalbums={recentalbums} setRecentAlbums={setRecentAlbums}/>
             </View>}
 
             {recent_artists.length > 0 && access_token !== ""  && <View style={{width:"100%"}}>
@@ -217,7 +221,7 @@ export default function Search({seek, setSeek}){
             {initialfeed.length > 0 && access_token !== ""  && 
             <View>
             <Text  style={{marginLeft:10}}>Latest Albums</Text>
-            <FavouritePlaylists access_token={access_token} favouritecards={true} playlists={initialfeed}/>
+            <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed}/>
             </View>}
 
             </ScrollView>
@@ -240,7 +244,7 @@ export default function Search({seek, setSeek}){
                 
                 </GestureDetector>
    
-            <FavouriteSearchPlaylists artists={artists} access_token={access_token} favouritecards={true} playlists={songs}/> 
+            <FavouriteSearchAlbums artists={artists} access_token={access_token} favouritecards={true} albums={songs} playlists={playlists}/> 
 
 
 
