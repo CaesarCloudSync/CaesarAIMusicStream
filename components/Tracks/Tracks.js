@@ -15,6 +15,7 @@ import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
 import PlaylistModal from "../PlaylistModal/playlistmodal";
+import { get_access_token } from "../access_token/getaccesstoken";
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
     const location = useLocation();
@@ -34,6 +35,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [completedpromises,setCompletedPromises] = useState(0);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
+    const [offset,setOffset] = useState(1)
 
 
     const navartistprofile = async () =>{
@@ -61,6 +63,26 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             await Promise.all(promiseorder)
             navigate("/playlists")
         }
+    }
+    const getextratracks = async () =>{
+        if (offset < 6){
+            const access_token = await get_access_token()
+            const headers = {Authorization: `Bearer ${access_token}`}
+            const resp = await fetch(`https://api.spotify.com/v1/playlists/${album_tracks[0].playlist_id}/tracks?offset=${offset * 100}`, {headers: headers})
+            const feedresult = await resp.json()
+            //console.log(feedresult.tracks.items[0])
+            feedresult.items.map((trackitem) =>{
+                let track = trackitem.track;
+                console.log(track)
+                album_tracks.push({"playlist_thumbnail":album_tracks[0].playlist_thumbnail,"playlist_id":album_tracks[0].playlist_id,"playlist_name":album_tracks[0].playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})
+                setAlbumTracks(album_tracks)
+            })
+            setOffset(offset +1)
+        }
+
+    
+      
+        //navigate(route, { state: album_tracks });
     }
     useEffect(() =>{
         //
@@ -99,6 +121,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
             renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}/>}
+            onEndReached={() =>{getextratracks()}}
             />
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>
