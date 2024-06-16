@@ -147,8 +147,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     return(
         <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{flex:1}}>
             <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
+            <TouchableOpacity style={{flex:1}} >
                 <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
-                    <TouchableOpacity style={{flex:1,flexDirection:"row",alignItems:"center"}}>
+                <View  style={{flex:1,flexDirection:"row",alignItems:"center"}}>
                 <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
 
                 <View style={{padding:6}}>
@@ -158,8 +159,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                 <Text style={{color:"white"}}>{album_track.name}</Text>
                 <Text style={{color:"grey"}}>{album_track.artist}</Text>
                 </View>
-                </TouchableOpacity>
+                </View>
                 </GestureDetector>
+                </TouchableOpacity>
 
 
 
