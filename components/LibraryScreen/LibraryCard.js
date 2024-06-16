@@ -16,6 +16,10 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
             getalbumtracks("/artistprofile")
         }
     })
+    const longPress = Gesture.LongPress().onStart(async (_event,success) =>{
+        await removefromlibrary()
+    })
+
 
     const navigate = useNavigate();
     const getalbumtracks = async (route) =>{
@@ -37,7 +41,7 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
         <View key={index}style={{backgroundColor:"#141212",height:50,borderRadius: 5,borderWidth: 3,flexBasis:"47%",margin:5,borderColor:"#141212",flexDirection:"row",}}>
             
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
-            <GestureDetector  gesture={Gesture.Exclusive(doubleTap,singleTap)}>
+            <GestureDetector  gesture={Gesture.Exclusive(longPress,doubleTap,singleTap)}>
             <View style={{flexDirection:"row",flex:1}}>
             <Image style={{borderRadius:5,width: 50, height: 50}} source={{uri:album[0].thumbnail}}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
@@ -53,11 +57,7 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
 
 
         </View>
-        <TouchableOpacity onPress={() =>{removefromlibrary()}} style={{width:100,height:100,alignItems:"flex-end",marginRight:20,marginTop:10}}>
-                <Entypo  name="squared-cross" style={{fontSize:25,color:"white"}}/>
 
-                    
-                </TouchableOpacity>
 
 
             
