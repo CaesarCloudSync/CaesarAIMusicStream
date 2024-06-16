@@ -1,4 +1,4 @@
-import { View,Text, ScrollView, FlatList,Image} from "react-native";
+import { View,Text, ScrollView, FlatList,Image, Button} from "react-native";
 
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
@@ -43,6 +43,22 @@ export default function PlaylistScreen({seek, setSeek}){
         } 
 
     }
+    const setplaylistnamesineachtrack = async () =>{
+        let keys = await AsyncStorage.getAllKeys()
+        console.log()
+        let playlists = keys.filter((key) =>{return(key.includes(`playlist:`))}).map((val)=>{return(val.split(":").slice(-1)[0])})
+        const promises = playlists.map(async (name)=>{
+            const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${name}`))}))
+            const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+            console.log(playlist_tracks)
+            let new_playlist_tracks = playlist_tracks.map((item) =>{item["playlist_name"] = name;return([ `playlist-track:${name}-${item.name}`,JSON.stringify(item)])})
+            await AsyncStorage.multiSet(new_playlist_tracks)
+        })
+        await Promise.all(promises)
+        console.log("done")
+        //const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${currentTrack.playlist_name}`))}))
+        //const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+    }
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
@@ -61,7 +77,6 @@ export default function PlaylistScreen({seek, setSeek}){
             <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
             </View>
             {/*Main Scroll Body*/}
-  
             {playlistalbums.length > 0 && access_token !== ""  && 
             
 

@@ -24,7 +24,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
     }
     const addtracktoplaylist = async () =>{
             trackforplaylist["playlist_local"] = "true"
-            trackforplaylist["playlist_name"] = trackforplaylist.name
+            trackforplaylist["playlist_name"] =playliststate.playlist_name
          
             await AsyncStorage.setItem(`playlist-track:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
             let keys = await AsyncStorage.getAllKeys()

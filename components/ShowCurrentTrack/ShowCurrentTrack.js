@@ -61,7 +61,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
       },[])
       const getalbumtracks = async () =>{
         console.log("currwent",currentTrack)
-        if ("playlist_name" in currentTrack){
+        if ("playlist_name" in currentTrack && "playlist_local" in currentTrack){
 
           let keys = await AsyncStorage.getAllKeys()
           const playlist_details = JSON.parse(await AsyncStorage.getItem(`playlist:${currentTrack.playlist_name}`))
@@ -70,16 +70,20 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
           console.log("current",playlist_tracks,playlist_details)
           navigate("/playlist-tracks", { state: {playlist_details:playlist_details,playlist_tracks:playlist_tracks}});
         }
+        else if (!("playlist_name" in currentTrack)){
+          const access_token = await get_access_token()
+          const headers = {Authorization: `Bearer ${access_token}`}
+          //console.log(currentTrack)
+          const resp = await fetch(`https://api.spotify.com/v1/albums/${currentTrack.album_id}`, {headers: headers})
+          const feedresult = await resp.json()
+      
+          let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":currentTrack.album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":currentTrack.thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+          navigate("/tracks", { state: album_tracks });
+
+        }
         else{
-        const access_token = await get_access_token()
-        const headers = {Authorization: `Bearer ${access_token}`}
-        //console.log(currentTrack)
-        const resp = await fetch(`https://api.spotify.com/v1/albums/${currentTrack.album_id}`, {headers: headers})
-        const feedresult = await resp.json()
-    
-        let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":currentTrack.album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":currentTrack.thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
-        navigate("/tracks", { state: album_tracks });
-      }
+
+        }
 
       }
 
