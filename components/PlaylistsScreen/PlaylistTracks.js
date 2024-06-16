@@ -17,6 +17,7 @@ import { requestGalleryWithPermission } from "../Picker/pickerhelper"
 import Feather from "react-native-vector-icons/Feather"
 import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
+import { DraxList, DraxProvider } from "react-native-drax"
 export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     const progress = useProgress();
@@ -47,12 +48,12 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
     const filterData = (item,index) =>{
         if (filteruserinput === ""){
-            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />)
+            return(<TrackItem useplaylist={true} index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />)
         }
        
         if (item.name.toLowerCase().includes(filteruserinput.toLowerCase())  || item.artist.toLowerCase().includes(filteruserinput.toLowerCase()) ){
             return(
-                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />
+                <TrackItem useplaylist={true} index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />
             )
         } 
 
@@ -167,11 +168,14 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
             <AntDesign style={{position:"relative",top:18}} name="filter"/>
             <TextInput style={{width:"100%"}} placeholder="Enter Here" onEndEditing={() =>{setIsFilterTyping(false)}} onTouchStart={() =>{setIsFilterTyping(true)}} onChangeText={(text) =>{setFilterInput(text);}}/>
             </View>
-            <FlatList 
+            <DraxProvider style={{flex:1,backgroundColor:"#141212"}} >
+            <DraxList
+        
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =>filterData(item,index)}
+            renderItemContent={({item,index}) =>filterData(item,index)}
             />
+            </DraxProvider>
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>
 

@@ -16,7 +16,8 @@ import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gestu
 
 import { skipToTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved}){
+import { DraxView } from "react-native-drax";
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,useplaylist}){
     const navigate = useNavigate()
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
@@ -140,48 +141,123 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         }
 
     }
+    const inserttrackorder = async (dragged_track,received_track) =>{
+        console.log("drop","insert into player and here playlist-track-order here",dragged_track,received_track)
+    }
+    if (useplaylist){
+        return(
+     
+    <DraxView
+        key={index}
+            style={{backgroundColor:"#141212"}}
+            onReceiveDragEnter={({ dragged: { payload } }) => {
+                console.log(`hello ${payload}`);
+            }}
+            onReceiveDragExit={({ dragged: { payload } }) => {
+                console.log(`goodbye ${payload}`);
+            }}
+            onReceiveDragDrop={({ dragged ,receiver}) => {
 
+                inserttrackorder(dragged.payload,receiver.payload)
+                
+            }}
+           
+            renderContent={() =>{
+                return(
+                    <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{flex:1,backgroundColor:"#141212"}}>
+                    <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
+                        <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
+                            <TouchableOpacity style={{flex:1,flexDirection:"row",alignItems:"center"}}>
+                        <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
+            
+                        <View style={{padding:6}}>
+            
+                        </View>
+                        <View style={{flex:1}}>
+                        <Text style={{color:"white"}}>{album_track.name}</Text>
+                        <Text style={{color:"grey"}}>{album_track.artist}</Text>
+                        </View>
+                        </TouchableOpacity>
+                        </GestureDetector>
+            
+            
+            
+            
+                        <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
+                            <TouchableOpacity onPress={()=>{downloadsong()}}>
+                                <MaterialCommunityIcons name="download-circle-outline"size={24} style={{color:"white",marginRight:15}}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
+                                <MaterialIcons name="playlist-add" size={24} color="white" />
+                            </TouchableOpacity>
+                            
+                            {addingqueue === true &&
+                            <View style={{width:35,height:25,backgroundColor:"green"}}>
+            
+                            </View>}
+                        </View>
+            
+                        
+                    </View>
+            
+                </GestureDetector>
+                )
+            }}
+            noHover={false}
+            payload={album_track}
+         
+        /> 
+
+
+    
+
+  
+        )
+    }
+    else{
+        return(
+            <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{flex:1}}>
+                <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
+                    <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
+                        <TouchableOpacity style={{flex:1,flexDirection:"row",alignItems:"center"}}>
+                    <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
+    
+                    <View style={{padding:6}}>
+    
+                    </View>
+                    <View style={{flex:1}}>
+                    <Text style={{color:"white"}}>{album_track.name}</Text>
+                    <Text style={{color:"grey"}}>{album_track.artist}</Text>
+                    </View>
+                    </TouchableOpacity>
+                    </GestureDetector>
+    
+    
+    
+    
+                    <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
+                        <TouchableOpacity onPress={()=>{downloadsong()}}>
+                            <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"white",marginRight:15}}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
+                            <MaterialIcons name="playlist-add" size={24} color="white" />
+                        </TouchableOpacity>
+                        
+                        {addingqueue === true &&
+                        <View style={{width:35,height:25,backgroundColor:"green"}}>
+    
+                        </View>}
+                    </View>
+    
+                    
+                </View>
+    
+            </GestureDetector>
+        )
+    }
 
 
         
-    return(
-        <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{flex:1}}>
-            <View style={{flex:1,flexDirection:"row",margin:10,alignItems:"center"}}>
-                <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
-                    <TouchableOpacity style={{flex:1,flexDirection:"row",alignItems:"center"}}>
-                <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
 
-                <View style={{padding:6}}>
-
-                </View>
-                <View style={{flex:1}}>
-                <Text style={{color:"white"}}>{album_track.name}</Text>
-                <Text style={{color:"grey"}}>{album_track.artist}</Text>
-                </View>
-                </TouchableOpacity>
-                </GestureDetector>
-
-
-
-
-                <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
-                    <TouchableOpacity onPress={()=>{downloadsong()}}>
-                        <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"white",marginRight:15}}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
-                        <MaterialIcons name="playlist-add" size={24} color="white" />
-                    </TouchableOpacity>
-                    
-                    {addingqueue === true &&
-                    <View style={{width:35,height:25,backgroundColor:"green"}}>
-
-                    </View>}
-                </View>
-
-                
-            </View>
-
-        </GestureDetector>
-    )
     
 }
