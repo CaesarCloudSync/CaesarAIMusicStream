@@ -74,8 +74,8 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         <View style={styles.modalContent}>
           <View style={styles.center}>
             <View style={[styles.barIcon,{alignSelf:"center"}]} />
-            <Text style={[styles.text,{alignSelf:"center"}]}>Queue</Text>
             <FlatList
+            style={{padding:15}}
             data={queue}
             ItemSeparatorComponent={() => (
                 <View style={{  height: 10 }} />
