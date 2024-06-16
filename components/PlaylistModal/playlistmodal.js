@@ -27,6 +27,8 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
         getplaylist()
     },[playlistchanged])
     const createplaylist = async () =>{
+        trackforplaylist["playlist_local"] = "true"
+        trackforplaylist["playlist_name"] = trackforplaylist.name
         await AsyncStorage.setItem(`playlist:${trackforplaylist.name}`,JSON.stringify({"playlist_name":trackforplaylist.name,"playlist_thumbnail":trackforplaylist.thumbnail,"playlist_size":1}))
         await AsyncStorage.setItem(`playlist-track:${trackforplaylist.name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
         await AsyncStorage.setItem(`playlist-track-order:${trackforplaylist.name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":0}))

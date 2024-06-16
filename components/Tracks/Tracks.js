@@ -40,9 +40,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
         navigate("/artistprofile",{state:album_tracks})
     }
-    const storeplaylist = async () =>{
+    const storeonlineplaylist = async () =>{
         console.log("playlist",album_tracks)
-        if ("playlist_name" in album_tracks[0]){   
+        if ("playlist_thumbnail" in album_tracks[0]){   
             console.log("playlistname")
             const promisestore = album_tracks.map(async (playlist_track) =>{
                                  
@@ -87,13 +87,13 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
             
  
-            <TouchableOpacity onLongPress={() =>{storeplaylist()}} onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
+            <TouchableOpacity onLongPress={() =>{storeonlineplaylist()}} onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_thumbnail : album_tracks[0].thumbnail}}></Image>
 
             </TouchableOpacity>
 
             <View style={{flex:0.1,justifyContent:"center",alignItems:"center"}}>
-                    <Text style={{color:"white",fontSize:20}}>{"playlist_name" in album_tracks[0] ? album_tracks[0].playlist_name : album_tracks[0].album_name}</Text>
+                    <Text style={{color:"white",fontSize:20}}>{"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_name : album_tracks[0].album_name}</Text>
             </View>
             <FlatList 
             data={album_tracks}

@@ -75,7 +75,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         // Amend playlist values
         await AsyncStorage.setItem(`playlist:${userinput}`,JSON.stringify({"playlist_name":userinput,"playlist_thumbnail":playlist_details.playlist_thumbnail,"playlist_size":playlist_details.playlist_size}))
         //await AsyncStorage.setItem(`playlist-track-order:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
-        let new_playlist_tracks = album_tracks.map((item) =>{return([ `playlist-track:${userinput}-${item.name}`,JSON.stringify(item)])})
+        let new_playlist_tracks = album_tracks.map((item) =>{item["playlist_name"] = userinput;return([ `playlist-track:${userinput}-${item.name}`,JSON.stringify(item)])})
         await AsyncStorage.multiSet(new_playlist_tracks)
         await AsyncStorage.multiRemove(album_tracks.map((item) =>{return(`playlist-track:${playlist_details.playlist_name}-${item.name}`)}))
 
@@ -85,6 +85,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         setPlaylistDetails(playlist_details)
         setIsTyping(false)
         setEditingPlaylistName(false);
+        await TrackPlayer.reset()
 
 
     }

@@ -4,6 +4,7 @@ import Entypo from "react-native-vector-icons/Entypo"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 import { useState } from "react";
+import TrackPlayer from "react-native-track-player";
 
 export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist,handleModal}){
     const [playliststate,setPlaylistState] = useState(playlist)
@@ -22,7 +23,8 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
 
     }
     const addtracktoplaylist = async () =>{
-
+            trackforplaylist["playlist_local"] = "true"
+            trackforplaylist["playlist_name"] = trackforplaylist.name
          
             await AsyncStorage.setItem(`playlist-track:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
             let keys = await AsyncStorage.getAllKeys()
@@ -39,6 +41,7 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
             else{
                 setPlaylistChanged(false)
             }
+           
             //navigate("/playlists")
     
         
