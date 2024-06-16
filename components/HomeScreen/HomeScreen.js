@@ -186,7 +186,7 @@ function parseISOString(s) {
 
             </View>
             {/*Main Scroll Body*/}
-            <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
+            <ScrollView removeClippedSubviews={true} style={{flex:1,backgroundColor:"#141212"}}>
                 {/* Favourite Playlists */}
                 {initialfeed.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
                 {initialfeed.length > 0 && access_token !== ""  &&

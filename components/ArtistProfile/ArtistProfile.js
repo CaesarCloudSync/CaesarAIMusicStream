@@ -96,7 +96,7 @@ export default function ArtistProfile({seek, setSeek}){
             </View>
             {/*Main Scroll Body*/}
 
-            <ScrollView style={{flex:1,backgroundColor:"#141212"}}>
+            <ScrollView removeClippedSubviews={true} style={{flex:1,backgroundColor:"#141212"}}>
             {all_album_tracks.length > 0 && access_token !== ""  &&<View style={{flex:0.1,justifyContent:"flex-start",alignItems:"flex-start",marginLeft:20}}>
                     <Text style={{color:"white",fontSize:20}}>Albums</Text>
             </View>
