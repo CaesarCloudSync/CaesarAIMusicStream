@@ -45,13 +45,13 @@ export default function PlaylistScreen({seek, setSeek}){
     }
     const setplaylistnamesineachtrack = async () =>{
         let keys = await AsyncStorage.getAllKeys()
-        console.log()
+  
         let playlists = keys.filter((key) =>{return(key.includes(`playlist:`))}).map((val)=>{return(val.split(":").slice(-1)[0])})
         const promises = playlists.map(async (name)=>{
             const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${name}`))}))
             const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
-            console.log(playlist_tracks)
-            let new_playlist_tracks = playlist_tracks.map((item) =>{item["playlist_name"] = name;return([ `playlist-track:${name}-${item.name}`,JSON.stringify(item)])})
+            let new_playlist_tracks = playlist_tracks.map((item) =>{item["playlist_local"] ="true";return([ `playlist-track:${name}-${item.name}`,JSON.stringify(item)])})
+            console.log(new_playlist_tracks[0])
             await AsyncStorage.multiSet(new_playlist_tracks)
         })
         await Promise.all(promises)
@@ -77,6 +77,7 @@ export default function PlaylistScreen({seek, setSeek}){
             <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
             </View>
             {/*Main Scroll Body*/}
+            <Button title="gello" onPress={() =>{setplaylistnamesineachtrack()}}></Button>
             {playlistalbums.length > 0 && access_token !== ""  && 
             
 

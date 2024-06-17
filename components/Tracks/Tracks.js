@@ -45,7 +45,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         if ("playlist_thumbnail" in album_tracks[0]){   
             console.log("playlistname")
             const promisestore = album_tracks.map(async (playlist_track) =>{
-                                 
+            playlist_track["playlist_local"] = "true"
             await AsyncStorage.setItem(`playlist-track:${playlist_track.playlist_name}-${playlist_track.name}`,JSON.stringify(playlist_track))
             })
             await Promise.all(promisestore)
