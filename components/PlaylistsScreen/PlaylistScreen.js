@@ -77,7 +77,6 @@ export default function PlaylistScreen({seek, setSeek}){
             <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
             </View>
             {/*Main Scroll Body*/}
-            <Button title="gello" onPress={() =>{setplaylistnamesineachtrack()}}></Button>
             {playlistalbums.length > 0 && access_token !== ""  && 
             
 
