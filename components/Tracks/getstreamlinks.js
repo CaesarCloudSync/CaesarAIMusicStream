@@ -24,17 +24,18 @@ export const getyoutubelink  = async (album_track,download=false) =>{
     const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`)
     let videos = response.data.result
     let video_link = download === true ? videos[0].link :videos[0].link //videos[1].link
-    return video_link
+    let title = videos[0].title
+    return [video_link,title]
 }
 export const getstreaminglink =async (album_track) =>{
-    const video_link = await getyoutubelink(album_track,download=false);
+    const [video_link,title] = await getyoutubelink(album_track,download=false);
     const response = await axios.get(`https://caesaraimusicstreamyt-qqbn26mgpa-nw.a.run.app/getaudio?url=${video_link}`)
     let songurl = response.data.streaming_url
     
-    return songurl
+    return [songurl,title]
 }
 export  const getaudio = async (album_track,setCurrentTrack) =>{
-        let streaming_link = await getstreaminglink(album_track)
+        let [streaming_link,title] = await getstreaminglink(album_track)
         //console.log(streaming_link)
        
                         
