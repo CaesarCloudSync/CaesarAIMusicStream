@@ -185,11 +185,15 @@ const pickImageFromGallery = async () => {
         Alert.alert('File Size Limit Exceeded', 'Please select a file up to 2 MB.');
       } else {
         // The picked document is available in the 'result' object
-
+        let filename = image?.filename || `image_${Date.now()}.${getFileExtension(imageCompressed?.path)}`
+        let file_path = "file://" + RNFS.DocumentDirectoryPath + "/" + filename
+        await RNFS.copyFile(imageCompressed?.path,file_path)
+      
+        //console.log("internal",file_path)
         return {
-          name: image?.filename || `image_${Date.now()}.${getFileExtension(imageCompressed?.path)}`,
+          name: filename,
           type: image?.mime,
-          uri: imageCompressed?.path,
+          uri: file_path,
           size: imageCompressed?.size,
         };
       }
