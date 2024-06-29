@@ -30,7 +30,7 @@ export default function PlaylistScreen({seek, setSeek}){
         getplaylist()
     },[playlistchanged])
     const filterData = (item,index) =>{
-        console.log(item,"hi")
+        //console.log(item,"hi")
         // {"playlist_name": "Jam", "playlist_size": 1, "playlist_thumbnail": "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8"} 
         if (userInput === ""){
             return(<PlaylistCard key={index} playlist={item} index={index} playlistchanged={playlistchanged} setPlaylistChanged={setPlaylistChanged} />)
@@ -58,6 +58,39 @@ export default function PlaylistScreen({seek, setSeek}){
         console.log("done")
         //const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${currentTrack.playlist_name}`))}))
         //const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+    }
+    const add_to_summer = async () =>{
+        /*const summer_songs_json = await AsyncStorage.getItem("summer_songs")
+        const summer_songs_unf = JSON.parse(summer_songs_json)
+        const summer_songs = summer_songs_unf.map((song) =>{return(song.name.replace(".mp3",""))})
+
+        //console.log(summer_songs)
+        let total = summer_songs.length
+        const promises = summer_songs.map(async (song_name,index) =>{
+
+            const headers = {Authorization: `Bearer ${access_token}`}
+            //console.log(text)
+            const resp = await fetch(`https://api.spotify.com/v1/search?q=${song_name}&limit=1&type=track`, {headers: headers})
+            const feedresult = await resp.json()
+            let song_data = feedresult.tracks.items[0]
+            //console.log(song_data)
+            let playlist_nake = "New Amari Summer"
+            let song_json = {"album_id": song_data.album.id,"artist":song_data.artists[0].name,"artist_id":song_data.artists[0].id,"duration_ms":song_data.duration_ms,"id":song_data.id,"name":song_data.name,"playlist_local": "true","playlist_name": "${playlist_nake}","thumbnail":song_data.album.images[0].url,"track_number": song_data.track_number}
+            
+    
+            await AsyncStorage.setItem(`playlist-track:${playlist_nake}-${song_data.name}`,JSON.stringify(song_json))
+            let keys = await AsyncStorage.getAllKeys()
+            const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist_nake}`))}))
+            const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+            await AsyncStorage.setItem(`playlist:${playlist_nake}`,JSON.stringify({"playlist_name":playlist_nake,"playlist_thumbnail":"file:///data/user/0/com.myorg.caesaraimusic/files/image_1719686373879.jpg","playlist_size":playlist_tracks.length}))
+            await AsyncStorage.setItem(`playlist-track-order:${playlist_nake}-${song_data.name}`,JSON.stringify({"name":song_data.name,"order":playlist_tracks.length}))
+            console.log(index,"/",total)
+        })  
+        await Promise.all(promises)*/
+        //await AsyncStorage.removeItem("summer_songs")
+        
+
+
     }
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>

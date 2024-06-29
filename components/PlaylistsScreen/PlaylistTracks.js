@@ -17,6 +17,7 @@ import { requestGalleryWithPermission } from "../Picker/pickerhelper"
 import Feather from "react-native-vector-icons/Feather"
 import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
+import { GestureDetector,Gesture } from "react-native-gesture-handler"
 export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     const progress = useProgress();
@@ -44,6 +45,24 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
     const[isfilterTyping,setIsFilterTyping] =useState(false)
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
+    const shuffletracks = async () =>{
+        const shuffled_tracks = album_tracks
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
+        //console.log(shuffled)
+        setAlbumTracks(shuffled_tracks)
+        
+    }
+    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
+        if (success){
+            //getalbumtracks("/artistprofile")
+            shuffletracks()
+        }
+    })
+    const longPress = Gesture.LongPress().onStart((_event,success) =>{
+        setthumbnailimage()
+    })
 
     const filterData = (item,index) =>{
         if (filteruserinput === ""){
@@ -142,10 +161,11 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
             </View>
 
             
- 
-            <TouchableOpacity onLongPress={() =>{setthumbnailimage()}} style={{justifyContent:"center",alignItems:"center",flex:0.5}}>
-                <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
+            <TouchableOpacity style={{justifyContent:"center",alignItems:"center",flex:0.5}}>
+                <GestureDetector gesture={Gesture.Exclusive(longPress,doubleTap)}  >
+                    <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:playlist_details.playlist_thumbnail}}></Image>
 
+                </GestureDetector>
             </TouchableOpacity>
 
             <View style={{flex:editingplaylistname === false ? isfilterTyping ? 0.9 : 0.1:isTyping ?0.5: 0.2,justifyContent:"center",alignItems:"center"}}>
