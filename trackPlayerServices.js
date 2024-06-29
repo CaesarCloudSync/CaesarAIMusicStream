@@ -96,6 +96,7 @@ export async function addTracks() {
       o.artwork = CaesarAIMusicLogo
       return o;
     })
+    //await AsyncStorage.setItem("summer_songs",JSON.stringify(alltracks))
     //console.log(alltracks)
 
 

@@ -52,6 +52,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         .map(({ value }) => value)
         //console.log(shuffled)
         setAlbumTracks(shuffled_tracks)
+        await TrackPlayer.reset();
         
     }
     const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
