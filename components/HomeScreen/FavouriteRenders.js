@@ -33,7 +33,7 @@ export function FavouriteTopTracksAlbums({favouritecards,playlists,access_token}
                 
                     return(
 
-                        <CarouselItem key={index} toptrack={track.name} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
+                        <CarouselItem key={index} toptrack={track.name} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type} single={true}/>
                     
                     )
                 })}
@@ -69,9 +69,23 @@ export function FavouriteSearchPlaylists({favouritecards,playlists,access_token}
 }
 
 
-export function FavouriteSearchAlbums({favouritecards,albums,access_token,artists,playlists}){
+export function FavouriteSearchAlbums({favouritecards,albums,access_token,artists,playlists,tracks}){
     return(
         <ScrollView removeClippedSubviews={true} key={albums[0].name} style={{marginTop:10}}>
+            <Text style={{marginLeft:10,fontSize:16}}>Tracks</Text>
+             <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+             {tracks.slice(0,13).map((track,index) =>{
+                    
+                    let album = track.album
+                
+                    return(
+
+                        <CarouselItem key={index} toptrack={track.name} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type} single={true}/>
+                    
+                    )
+                })}
+            
+             </View>
             <Text style={{marginLeft:10,fontSize:16}}>Artists</Text>
              <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
              {artists.slice(0,13).map((artist,index) =>{

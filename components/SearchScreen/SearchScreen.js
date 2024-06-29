@@ -16,7 +16,7 @@ import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Directions } from 'react-native-gesture-handler';
 import ArtistCarouselItem from "../HomeScreen/ArtistCarouselItem";
 import ShowQueue from "../ShowQueue/showqueue";
-
+import { FavouriteTopTracksAlbums } from "../HomeScreen/FavouriteRenders";
 export default function Search({seek, setSeek}){
     const netInfo = useNetInfo()
     const [text, onChangeText] = useState("")
@@ -27,7 +27,8 @@ export default function Search({seek, setSeek}){
     const [recent_artists,setRecentArtists] = useState([]);
     const [recent_removed,setRecentRemoved] = useState(false)
     const [recentalbums,setRecentAlbums] = useState([]);
-    const [playlists,setPlaylists] = useState([])
+    const [playlists,setPlaylists] = useState([]);
+    const [tracks,setTracks] = useState([]);
 
     const fling = Gesture.Fling().direction(Directions.DOWN)
     .onStart((e) => {
@@ -71,12 +72,13 @@ export default function Search({seek, setSeek}){
         const feedresult = await resp.json()
 
         const artists = feedresult.artists.items.map((artist) =>{console.log(artist.images);return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
+        const tracks = feedresult.tracks.items
         const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
         const playlists = feedresult.playlists.items.map((playlist) =>{return({"id":playlist.id,"name":playlist.name,"images":[{"url":playlist.images[0].url}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
         setPlaylists(playlists)
         setSongs(result)
         //console.log(artists)
-
+        setTracks(tracks)
         setArtists(artists)
         //toggleModal()
     }
@@ -194,6 +196,7 @@ export default function Search({seek, setSeek}){
             </View>
             {/*Main Scroll Body*/}
             <ScrollView removeClippedSubviews={true} style={{flex:1,backgroundColor:"#141212"}}>
+         
             {recentalbums.length > 0 && access_token !== ""  && 
             <View>
             <Text  style={{marginLeft:10}}>Recent Albums</Text>
@@ -243,8 +246,7 @@ export default function Search({seek, setSeek}){
                 
                 
                 </GestureDetector>
-   
-            <FavouriteSearchAlbums artists={artists} access_token={access_token} favouritecards={true} albums={songs} playlists={playlists}/> 
+            <FavouriteSearchAlbums artists={artists} access_token={access_token} favouritecards={true} albums={songs} playlists={playlists} tracks={tracks}/> 
 
 
 

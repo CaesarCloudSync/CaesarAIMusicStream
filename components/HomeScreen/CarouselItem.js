@@ -7,7 +7,7 @@ import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gesture-handler";
 
-export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack,recentalbums,setRecentAlbums}){
+export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack,recentalbums,setRecentAlbums,single}){
     const [addingtolibrary,setAddingToLibrary] = useState(false);
     const singleTap = Gesture.Tap().onEnd((_event,success) =>{
         if (success){
@@ -91,7 +91,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
                         <View style={{padding:10}}>
                         </View>
                         <Text style={{color:"white"}}>
-                            {album_name} | {capitalizeFirstLetter(album_type)}
+                            {album_name} | {single === true ? "SINGLE" : capitalizeFirstLetter(album_type)}
                         </Text>
                         <Text>
                             Artist: {artist_name}
@@ -135,7 +135,7 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
                 <View style={{padding:10}}>
                 </View>
                 <Text style={{color:"white",flex:favouritecards ? 1 : 0.15}}>
-                    {toptrack !== undefined ? toptrack : album_name} | {capitalizeFirstLetter(album_type)}
+                    {toptrack !== undefined ? toptrack : album_name} | {single === true ? "SINGLE" : capitalizeFirstLetter(album_type)}
                 </Text>
             
                 {favouritecards === false &&
