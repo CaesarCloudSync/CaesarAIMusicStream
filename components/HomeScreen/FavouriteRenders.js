@@ -86,6 +86,22 @@ export function FavouriteSearchAlbums({favouritecards,albums,access_token,artist
                 })}
             
              </View>
+             <Text style={{marginLeft:10,fontSize:16}}>Albums</Text>
+            <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+                
+
+                
+                    {albums.slice(0,17).map((album,index) =>{
+                        //console.log(album)
+                        return(
+
+                            <CarouselItem search={true} key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
+                        
+                        )
+                    })}
+                
+
+            </View>
             <Text style={{marginLeft:10,fontSize:16}}>Artists</Text>
              <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
              {artists.slice(0,13).map((artist,index) =>{
@@ -100,22 +116,7 @@ export function FavouriteSearchAlbums({favouritecards,albums,access_token,artist
 
                     })}
              </View>
-        <Text style={{marginLeft:10,fontSize:16}}>Albums</Text>
-        <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
-            
 
-            
-                {albums.map((album,index) =>{
-                    //console.log(album)
-                    return(
-
-                        <CarouselItem search={true} key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
-                    
-                    )
-                })}
-            
-
-        </View>
         <Text style={{marginLeft:10,fontSize:16}}>Playlists</Text>
         <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
             
