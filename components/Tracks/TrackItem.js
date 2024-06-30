@@ -61,7 +61,19 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         setAddingQueue(true)
         const queue = await AsyncStorage.getItem("queue")
         if (!queue){
+        let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+        let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
+        const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
+        if (stored_album_tracks){
+            const current_album_tracks = JSON.parse(stored_album_tracks)
+            const currentTrackIndexInaAlbum = current_album_tracks.findIndex(track => track.id == currentTrack.id)
+            let next_track_index =  currentTrackIndexInaAlbum+1 == current_album_tracks.length  ? 0 : currentTrackIndexInaAlbum+1
+            //console.log(album_tracks.length,next_track_index,currentTrackIndexInaAlbum+1,"hack")
+            await AsyncStorage.setItem("track_after_queue",JSON.stringify(next_track_index))
+        }
+
         await AsyncStorage.setItem("queue",JSON.stringify([album_tracks[index]]))
+        
         }
         else{
        
@@ -120,6 +132,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
             await skipToTrack(nextsong,next_track_ind)
         }
+
+        
 
        
     }
