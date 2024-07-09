@@ -12,7 +12,9 @@ import LibraryCard from "./LibraryCard";
 import { TextInput } from "react-native-gesture-handler";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import ShowQueue from "../ShowQueue/showqueue";
+import { useNetInfo } from "@react-native-community/netinfo";
 export default function LibraryScreen(){
+    const netInfo = useNetInfo();
     const [userInput,setUserInput] = useState("");
     const [libraryalbums,setLibraryItems] = useState([]);
     const [librarychanged,setLibraryChanged] = useState(false)
@@ -26,8 +28,10 @@ export default function LibraryScreen(){
     }
 
     useEffect(() =>{
-        getlibrary()
-    },[librarychanged])
+        if (netInfo.isInternetReachable === true){
+            getlibrary()
+        }
+    },[librarychanged,netInfo])
     const filterData = (item,index) =>{
         let album = JSON.parse(item[1])
         if (userInput === ""){
