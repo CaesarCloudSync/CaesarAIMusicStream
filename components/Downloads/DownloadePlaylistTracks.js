@@ -44,6 +44,7 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
     const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
     const[isfilterTyping,setIsFilterTyping] =useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
+    
     const shuffletracks = async () =>{
         const shuffled_tracks = album_tracks
         .map(value => ({ value, sort: Math.random() }))
@@ -66,12 +67,12 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
 
     const filterData = (item,index) =>{
         if (filteruserinput === ""){
-            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}/>)
+            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved}/>)
         }
        
         if (item.name.toLowerCase().includes(filteruserinput.toLowerCase())  || item.artist.toLowerCase().includes(filteruserinput.toLowerCase()) ){
             return(
-                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}/>
+                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved}/>
             )
         } 
 
@@ -104,7 +105,7 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
     }
     useEffect(() =>{
         getplaylist()
-    },[])
+    },[playlisttrackremoved])
     const delval = async () =>{
        const vals =  await RNFS.readDir(RNFS.DocumentDirectoryPath);
        const end = vals.filter((file) =>{return(file.path.includes("mp3"))})

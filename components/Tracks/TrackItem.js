@@ -177,6 +177,24 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         }
 
     }
+    const removedownload = async ()=>{
+        await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.mp3`)
+        await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg`)
+        await AsyncStorage.removeItem(`downloaded-track:${album_track_state.name}`)
+        await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.name}`)
+        const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
+        if (numofdownloaded){
+            let order = parseInt(numofdownloaded) - 1
+            await AsyncStorage.setItem("downloaded_num",JSON.stringify(order))
+        
+          }
+        if (playlisttrackremoved === false){
+            setPlaylistTrackRemoved(true)
+        }
+        else{
+            setPlaylistTrackRemoved(false)
+        }
+    }
     useEffect(() =>{
         check_downloaded()
     },[])
@@ -207,7 +225,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
 
                 <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
-                    <TouchableOpacity onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
+                    <TouchableOpacity onLongPress={() =>{removedownload()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
