@@ -16,14 +16,17 @@ import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gestu
 
 import { skipToTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
+import RNFS from "react-native-fs";
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved}){
     const navigate = useNavigate()
+    const [album_track_state,setAlbumTrackState] = useState(album_track)
+    const [album_tracks_state,setAlbumTracksState] = useState(album_tracks)
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const [isDownloaded,setIsDownloaded] = useState(false);
     const navartistprofileplaylist = async () =>{
-        //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
-        navigate("/artistprofile",{state:[album_track]})
+        //await AsyncStorage.setItem(`artist:${album_tracks_state[0].artist_name}`,JSON.stringify({"artist_id":album_tracks_state[0].artist_id}))
+        navigate("/artistprofile",{state:[album_track_state]})
     }
     const singleTap = Gesture.Tap().onEnd((_event,success) =>{
         if (success){
@@ -69,17 +72,17 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             const current_album_tracks = JSON.parse(stored_album_tracks)
             const currentTrackIndexInaAlbum = current_album_tracks.findIndex(track => track.id == currentTrack.id)
             let next_track_index =  currentTrackIndexInaAlbum+1 == current_album_tracks.length  ? 0 : currentTrackIndexInaAlbum+1
-            //console.log(album_tracks.length,next_track_index,currentTrackIndexInaAlbum+1,"hack")
+            //console.log(album_tracks_state.length,next_track_index,currentTrackIndexInaAlbum+1,"hack")
             await AsyncStorage.setItem("track_after_queue",JSON.stringify(next_track_index))
         }
 
-        await AsyncStorage.setItem("queue",JSON.stringify([album_tracks[index]]))
+        await AsyncStorage.setItem("queue",JSON.stringify([album_tracks_state[index]]))
         
         }
         else{
        
             let queue_json = JSON.parse(queue)
-            queue_json.push(album_tracks[index])
+            queue_json.push(album_tracks_state[index])
 
             await AsyncStorage.setItem("queue",JSON.stringify(queue_json))
         }
@@ -93,8 +96,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             
         },300) */  })
     const downloadsong = async () =>{
-        const [youtube_link,title] = await getstreaminglink(album_track)
-        await downloadFile(youtube_link,album_track.name,title,album_track)
+        const [youtube_link,title] = await getstreaminglink(album_track_state)
+        await downloadFile(youtube_link,album_track_state.name,title,album_track_state)
 
     }
     const playnowsong = async () =>{
@@ -103,16 +106,16 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         //console.log(stored_album_tracks)
         if (stored_album_tracks){
             const album_tracks_stored = JSON.parse(stored_album_tracks)
-            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks))
-            //console.log(album_tracks_stored[0].album_name,album_tracks[0].name)
-            if (album_tracks_stored[0].album_name !== album_tracks[0].album_name){
+            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
+            //console.log(album_tracks_stored[0].album_name,album_tracks_state[0].name)
+            if (album_tracks_stored[0].album_name !== album_tracks_state[0].album_name){
                 
                 await TrackPlayer.reset();
             }
 
         }
         else{
-            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks))
+            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
         }
 
         let currentTrackInd = await  TrackPlayer.getCurrentTrack()
@@ -122,14 +125,14 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             let next_track_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1
             console.log("next",next_track_ind,num_of_tracks)
         
-            let nextsong = album_track
+            let nextsong = album_track_state
     
             await skipToTrack(nextsong,next_track_ind)
         }
         else{
             let next_track_ind = 0
         
-            let nextsong = album_track
+            let nextsong = album_track_state
 
             await skipToTrack(nextsong,next_track_ind)
         }
@@ -139,14 +142,14 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
        
     }
     const showplaylistoptions = async ()=>{
-        setTrackForPlaylist(album_track)
+        setTrackForPlaylist(album_track_state)
         handleModal()
     }
     const removetrackfromplaylist = async () =>{
       
         await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":playlist_details.playlist_thumbnail,"playlist_size":playlist_details.playlist_size -1}))
-        await AsyncStorage.removeItem(`playlist-track:${playlist_details.playlist_name}-${album_track.name}`)
-        await AsyncStorage.removeItem(`playlist-track-order:${playlist_details.playlist_name}-${album_track.name}`)
+        await AsyncStorage.removeItem(`playlist-track:${playlist_details.playlist_name}-${album_track_state.name}`)
+        await AsyncStorage.removeItem(`playlist-track-order:${playlist_details.playlist_name}-${album_track_state.name}`)
         if (playlisttrackremoved === false){
             setPlaylistTrackRemoved(true)
         }
@@ -156,9 +159,15 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
     }
     const check_downloaded = async () =>{
-        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.name}`)
         if (track_downloaded){
-            setIsDownloaded(true)
+            setIsDownloaded(true);
+    
+            let new_album_track_state = Object.assign(album_track_state, {
+                thumbnail: `file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg` 
+             })
+            setAlbumTracksState(prevalbumtracks => { return [...prevalbumtracks, new_album_track_state]; });
+            setAlbumTrackState(prevalbumtrack => ({...prevalbumtrack, thumbnail: `file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg` }))
 
         }
         else{
@@ -179,14 +188,14 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             <TouchableOpacity style={{flex:1}} >
                 <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
                 <View  style={{flex:1,flexDirection:"row",alignItems:"center"}}>
-                <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:album_track.thumbnail}}></Image>
+                <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:!isDownloaded ?album_track_state.thumbnail: `file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg` }}></Image>
 
                 <View style={{padding:6}}>
 
                 </View>
                 <View style={{flex:1}}>
-                <Text style={{color:"white"}}>{album_track.name}</Text>
-                <Text style={{color:"grey"}}>{album_track.artist}</Text>
+                <Text style={{color:"white"}}>{album_track_state.name}</Text>
+                <Text style={{color:"grey"}}>{album_track_state.artist}</Text>
                 </View>
                 </View>
                 </GestureDetector>
