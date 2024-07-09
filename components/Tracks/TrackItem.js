@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved}){
     const navigate = useNavigate()
+    const [isDownloading,setIsDownloading] = useState(false);
     const [album_track_state,setAlbumTrackState] = useState(album_track)
     const [album_tracks_state,setAlbumTracksState] = useState(album_tracks)
     const [addedtoqueue,setAddedToQueue] = useState(false);
@@ -96,14 +97,15 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             
         },300) */  })
     const downloadsong = async () =>{
+        setIsDownloading(true)
         const [youtube_link,title] = await getstreaminglink(album_track_state)
         await downloadFile(youtube_link,album_track_state.name,title,album_track_state)
+        setIsDownloading(false)
 
     }
     const playnowsong = async () =>{
         await TrackPlayer.setRepeatMode(RepeatMode.Off);
         const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
-        //console.log(stored_album_tracks)
         if (stored_album_tracks){
             const album_tracks_stored = JSON.parse(stored_album_tracks)
             await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
@@ -205,8 +207,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
 
                 <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
-                    <TouchableOpacity onPress={()=>{if (isDownloaded === false){downloadsong()}}}>
-                        <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:isDownloaded === true ? "green" : "white",marginRight:15}}/>
+                    <TouchableOpacity onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
+                        <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
                         <MaterialIcons name="playlist-add" size={24} color="white" />

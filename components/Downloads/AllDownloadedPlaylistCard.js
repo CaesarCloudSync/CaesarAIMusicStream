@@ -8,11 +8,20 @@ import TrackPlayer from "react-native-track-player";
 import RNFS from "react-native-fs";
 export default function AllDownloadedPlaylistCard(){
     const navigate = useNavigate();
+    const [num_of_tracks,setNumOfTracks] = useState("");
     const getfiles = async () =>{
         const filedirs = await RNFS.readDir(RNFS.DocumentDirectoryPath);
         console.log(filedirs)
         navigate("/downloaded-playlist-tracks")
     }
+    const get_num_of_tracks = async () =>{
+        const num_tracks = await AsyncStorage.getItem("downloaded_num")
+        setNumOfTracks(num_tracks)
+        
+    }
+    useEffect(() =>{
+        get_num_of_tracks()
+    },[])
 
 
 
@@ -24,7 +33,7 @@ export default function AllDownloadedPlaylistCard(){
             <View style={{flexDirection:"row",flex:1}}>
             <Image style={{borderRadius:5,width: 50, height: 50}} source={{uri:"https://img.freepik.com/premium-vector/download-icon-vector-illustration-install-symbol_654297-207.jpg?w=1380"}}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
-                    Downloaded Songs | 30 Tracks
+                    Downloaded Songs | {parseInt(num_of_tracks)+1} Tracks
             </Text>
   
             

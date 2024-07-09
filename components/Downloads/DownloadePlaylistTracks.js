@@ -122,7 +122,7 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
 
     }
 
-    //onPress={() =>{delval()}}
+    //
     return(
         <View  style={{flex:1,backgroundColor:"#141212"}}>
    
