@@ -54,7 +54,7 @@ export default function NavigationFooter({currentpage}){
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
             <Link   underlayColor={"transparent"} to="/downloads">
                 <View>
-                    <MaterialCommunityIcons name="download-multiple" style={{fontSize:30,color:currentpage=== "library" ? "white" :"",marginLeft:10}}/>
+                    <MaterialCommunityIcons name="download-multiple" style={{fontSize:30,color:currentpage=== "downloads" ? "white" :"",marginLeft:10}}/>
                     
                         <Text style={{fontSize:10,color:currentpage=== "downloads" ? "white" :""}}>
                             Downloads

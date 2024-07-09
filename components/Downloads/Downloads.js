@@ -4,86 +4,48 @@ import {
   StyleSheet,
   ActivityIndicator,
   View,
+  Text,
+  Image
 } from 'react-native';
-import TrackPlayer from 'react-native-track-player';
-import { setupPlayer,addTracks } from '../../trackPlayerServices';
-import Header from './header';
-import Playlist from './playlist';
+import { FlatList } from 'react-native';
 import TrackProgress from '../TrackProgress/TrackProgress';
-import CaesarSongSearch from './caesarsongsearch';
-import axios from 'axios';
-import AskPermission from './askpermission';
-import NavigationFooter from '../NavigationFooter/NavigationFooter';
-import Controls from "./Controls"
-import Footer from './footer';
 import ShowCurrentTrack from '../ShowCurrentTrack/ShowCurrentTrack';
 import { useNetInfo } from '@react-native-community/netinfo';
 import ShowQueue from '../ShowQueue/showqueue';
-export default function Downloads() { 
+import NavigationFooter from '../NavigationFooter/NavigationFooter';
+import DownloadedPlaylistCard from './DownloadedPlaylistCard';
+export default function Downloads({seek, setSeek}) { 
   const netInfo = useNetInfo();
 
+  const [downloadedplaylists,setDownloadedPlaylists] = useState([{"downloaded_playlist_name":"Downloaded Songs","downloaded_playlist_thumbnail":"https://www.shutterstock.com/image-vector/download-vector-icon-install-symbol-260nw-1062015524.jpg","downloaded_playlist_size":"30"}]);
+  const [downloadedplaylistchanged,setDownloadedPlaylistChanged] = useState(false);
 
-  const [seek, setSeek] = useState(0);
-  const [songchanged,setSongsChanged] = useState(false);
-  const [nextqueue,setNextQueue] = useState([]);
-  const [isPlayerReady, setIsPlayerReady] = useState(false);
-  
-  const [currentTrack, setCurrentTrack] = useState(0);
 
-  useEffect(() => {
-    async function setup() {
-      let isSetup = await setupPlayer();
-      
-      const queue = await TrackPlayer.getQueue();
-      if(isSetup && queue.length <= 0) {
-        await addTracks(); 
-        //const name = await extractTracks();
-      }
-
-      setIsPlayerReady(isSetup);
-    }
-  
-    setup();
-    //setTrackInfo()
-    
-  }, []);
-
-  if(!isPlayerReady) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#bbb"/>
-      </SafeAreaView>
-    );
-  }
-  /*async function handleShuffle() {
-    let queue = await TrackPlayer.getQueue();
-    await TrackPlayer.reset();
-    queue.sort(() => Math.random() - 0.5);
-    await TrackPlayer.add(queue);
-
-    loadPlaylist()
-  }*/
-  
   
   return (
     <SafeAreaView style={{flex:1,backgroundColor:"#141212"}}>
-      {/*<AskPermission/>*/}
-      <CaesarSongSearch/>
+            <View  style={{flex:0.18,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
+                <View style={{flex:1,margin:10}}>
+                <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
+                
+                </View>
+                <View style={{flex:0.13,margin:10}}>
+                <Image style={{borderRadius:5,width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
+                </View>
 
-      
-          
-      <Header nextqueue={nextqueue} />
+            </View>
+            <FlatList 
 
-      <Playlist currentTrack={currentTrack} setCurrentTrack={setCurrentTrack} nextqueue={nextqueue} setNextQueue={setNextQueue}  seek={seek} setSeek={setSeek}/>
-      {/*<Controls nextqueue={nextqueue} setSeek={setSeek} onShuffle={handleShuffle}/> */}
-      <ShowCurrentTrack/>
-      <ShowQueue/>
+            data={downloadedplaylists}
+            style={{flex:1,backgroundColor:"#141212"}}
+            renderItem={({item,index}) => <DownloadedPlaylistCard  key={index} downloadedplaylist={item} index={index} downloadedplaylistchanged={downloadedplaylistchanged} setDownloadedPlaylistChanged={setDownloadedPlaylistChanged}/>}
+            />
 
-      <TrackProgress style={{flex:0.1}} seek={seek} setSeek={setSeek}/>
-     
-      <Footer styles={{flex:0.1}} nextqueue={nextqueue} currentTrack={currentTrack} isPlayerReady={isPlayerReady} ></Footer>
-
-      <NavigationFooter currentpage={"downloads"}/>
+            <View style={{flex:1}}></View>
+            <ShowCurrentTrack searchscreen={true}/>
+            <ShowQueue/>
+            <TrackProgress seek={seek} setSeek={setSeek}/>
+            <NavigationFooter currentpage={"downloads"}/>
     </SafeAreaView>
   );
 }

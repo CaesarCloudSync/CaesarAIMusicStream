@@ -21,6 +21,7 @@ import ArtistProfile from './components/ArtistProfile/ArtistProfile';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import PlaylistScreen from './components/PlaylistsScreen/PlaylistScreen';
 import PlaylistTracks from './components/PlaylistsScreen/PlaylistTracks';
+import DownloadedPlaylistTracks from './components/Downloads/DownloadePlaylistTracks';
 function App() { 
 
  
@@ -75,9 +76,10 @@ useEffect(() => {
     <Route path="/search" element={<Search seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>
     <Route path="/tracks" element={<Tracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
-    <Route  path="/downloads" element={<Downloads  />}></Route>
+    <Route  path="/downloads" element={<Downloads seek={seek} setSeek={setSeek} />}></Route>
     <Route  path="/playlists" element={<PlaylistScreen seek={seek} setSeek={setSeek} />}></Route>
     <Route path="/playlist-tracks" element={<PlaylistTracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
+    <Route path="/downloaded-playlist-tracks" element={<DownloadedPlaylistTracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
     <Route  path="/artistprofile" element={<ArtistProfile seek={seek} setSeek={setSeek} />}></Route>
   
     </Routes>
