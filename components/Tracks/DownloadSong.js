@@ -6,6 +6,7 @@ import { requestStoragePermission } from "./askpermission";
 import RNFS from 'react-native-fs';
 import notifee from '@notifee/react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export const downloadFile = async (songurl,name,notif_title,album_track) => {
   let filename = `${name}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
   const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
@@ -24,12 +25,13 @@ export const downloadFile = async (songurl,name,notif_title,album_track) => {
     discretionary: true, // Allow the OS to control the timing and speed (iOS only)
     progress: async (res) => {
       // Handle download progress updates if needed
+      await AsyncStorage.setItem(`current_downloading:${notif_id}`,JSON.stringify({"jobId":res.jobId}))
       const progress = (res.bytesWritten / res.contentLength) * 100;
       console.log(`Progress: ${progress.toFixed(2)}%`);
       await notifee.displayNotification({
         id:notif_id,
         title:notif_title,
-        body: 'Downloading:'+ notif_title + "...",
+        body: 'Downloading: '+ notif_title + "...",
         android: {
           channelId,
           progress: {
@@ -41,6 +43,14 @@ export const downloadFile = async (songurl,name,notif_title,album_track) => {
           pressAction: {
             id: 'default',
           },
+          actions: [
+            {
+              title: 'Cancel',
+              pressAction: {
+                id: `cancel-download-${notif_id}`,
+              },
+            },
+          ]
         },
       });
     },
@@ -67,6 +77,7 @@ export const downloadFile = async (songurl,name,notif_title,album_track) => {
 
       })
       await notifee.cancelNotification(notif_id);
+      await AsyncStorage.removeItem(`current_downloading:${notif_id}`)
     })
     .catch(async (err) => {
       console.log('Download error:', err);

@@ -8,12 +8,15 @@ import TrackPlayer, {
 import { getstreaminglink } from './components/Tracks/getstreamlinks';
 import { autoplaynextsong,autoplayprevioussong } from './components/controls/controls';
 // ...
+import notifee, { EventType } from '@notifee/react-native';
+
+
 import * as ScopedStorage from 'react-native-scoped-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 //import { Buffer } from "buffer";
-//import RNFS from 'react-native-fs';
+import RNFS from 'react-native-fs';
 
 
 export async function setupPlayer() {
@@ -131,6 +134,17 @@ export async function playbackService() {
 
 
    
+  });
+  notifee.onForegroundEvent(async ({ type, detail }) => {
+    if (type === EventType.ACTION_PRESS && detail.pressAction.id) {
+      console.log('User pressed an action with the id: ',detail.pressAction.id);
+      const jobIdjson = JSON.parse(await AsyncStorage.getItem(`current_downloading:${detail.notification.id}`));
+      console.log("notif_id",detail.notification.id)
+      console.log(jobIdjson)
+      await RNFS.stopDownload(jobIdjson["jobId"])
+      await notifee.cancelNotification(detail.notification.id);
+      
+    }
   });
   TrackPlayer.addEventListener(Event.RemotePause, () => {
     console.log('Event.RemotePause');
