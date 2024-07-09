@@ -13,7 +13,8 @@ export const downloadFile = async (songurl,name) => {
     name: 'Default Channel',
   });
 
-  console.log(songurl,"song")
+  console.log("song",songurl)
+  
   await RNFS.downloadFile({
     fromUrl: songurl,
     toFile: filePath,
@@ -23,7 +24,7 @@ export const downloadFile = async (songurl,name) => {
       // Handle download progress updates if needed
       const progress = (res.bytesWritten / res.contentLength) * 100;
       console.log(`Progress: ${progress.toFixed(2)}%`);
-      await notifee.displayNotification({
+      /*await notifee.displayNotification({
         title: 'Notification Title',
         body: 'Main body content of the notification',
         android: {
@@ -38,10 +39,10 @@ export const downloadFile = async (songurl,name) => {
             id: 'default',
           },
         },
-      });
+      });*/
     },
   })
-    .then( async (response) => {
+    .promise.then( async (response) => {
       console.log('File downloaded!', response);
       await notifee.cancelNotification(channelId);
     })
