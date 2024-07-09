@@ -20,6 +20,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const navigate = useNavigate()
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
+    const [isDownloaded,setIsDownloaded] = useState(false);
     const navartistprofileplaylist = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
         navigate("/artistprofile",{state:[album_track]})
@@ -154,6 +155,20 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         }
 
     }
+    const check_downloaded = async () =>{
+        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+        if (track_downloaded){
+            setIsDownloaded(true)
+
+        }
+        else{
+            setIsDownloaded(false)
+        }
+
+    }
+    useEffect(() =>{
+        check_downloaded()
+    },[])
 
 
 
@@ -181,8 +196,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
 
                 <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
-                    <TouchableOpacity onPress={()=>{downloadsong()}}>
-                        <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"white",marginRight:15}}/>
+                    <TouchableOpacity onPress={()=>{if (isDownloaded === false){downloadsong()}}}>
+                        <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:isDownloaded === true ? "green" : "white",marginRight:15}}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
                         <MaterialIcons name="playlist-add" size={24} color="white" />
