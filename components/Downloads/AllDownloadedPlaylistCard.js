@@ -7,13 +7,13 @@ import { useEffect, useState } from "react";
 import TrackPlayer from "react-native-track-player";
 import RNFS from "react-native-fs";
 export default function AllDownloadedPlaylistCard(){
+    const navigate = useNavigate();
     const getfiles = async () =>{
         const filedirs = await RNFS.readDir(RNFS.DocumentDirectoryPath);
         console.log(filedirs)
+        navigate("/downloaded-playlist-tracks")
     }
-    useEffect(() =>{
-        getfiles()
-    },[])
+
 
 
     return(

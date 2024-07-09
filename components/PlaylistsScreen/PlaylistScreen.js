@@ -12,6 +12,7 @@ import PlaylistCard from "./PlaylistCard";
 import { TextInput } from "react-native-gesture-handler";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import ShowQueue from "../ShowQueue/showqueue";
+import AllDownloadedPlaylistCard from "../Downloads/AllDownloadedPlaylistCard";
 export default function PlaylistScreen({seek, setSeek}){
     const [userInput,setUserInput] = useState("");
     const [playlistalbums,setPlaylistItems] = useState([]);
@@ -112,9 +113,10 @@ export default function PlaylistScreen({seek, setSeek}){
             <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
             </View>
             {/*Main Scroll Body*/}
+            <AllDownloadedPlaylistCard/>
             {playlistalbums.length > 0 && access_token !== ""  && 
             
-
+            
             <FlatList 
 
             data={playlistalbums}

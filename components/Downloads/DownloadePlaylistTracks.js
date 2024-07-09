@@ -17,18 +17,18 @@ import Feather from "react-native-vector-icons/Feather"
 import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
 import { GestureDetector,Gesture } from "react-native-gesture-handler"
+import RNFS from "react-native-fs";
+
 export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     const progress = useProgress();
-    const location = useLocation();
     const navigate = useNavigate();
     const [trackforplaylist,setTrackForPlaylist] = useState({});
     const [editingplaylistname,setEditingPlaylistName] = useState(false);
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
-    const [playlist_details,setPlaylistDetails] = useState(location.state.playlist_details)
-    const [album_tracks,setAlbumTracks] = useState(location.state.playlist_tracks);
+    const [album_tracks,setAlbumTracks] = useState([]);
     const [loadingaudio,setLoadingAudio] = useState(false)
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
@@ -42,7 +42,7 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
     const [userinput,setUserInput] = useState("");
     const [filteruserinput,setFilterInput] = useState("");
     const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
-    const[isfilterTyping,setIsFilterTyping] =useState(false)
+    const[isfilterTyping,setIsFilterTyping] =useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
     const shuffletracks = async () =>{
         const shuffled_tracks = album_tracks
@@ -66,53 +66,24 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
 
     const filterData = (item,index) =>{
         if (filteruserinput === ""){
-            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />)
+            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}/>)
         }
        
         if (item.name.toLowerCase().includes(filteruserinput.toLowerCase())  || item.artist.toLowerCase().includes(filteruserinput.toLowerCase()) ){
             return(
-                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />
+                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}/>
             )
         } 
 
     }
 
 
-    const navartistprofile = async () =>{
-        //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
-        navigate("/artistprofile",{state:album_tracks})
-    }
-    const editplaylistname = async () =>{
 
-        // Amend Playlist order values
-        let keys = await AsyncStorage.getAllKeys()
-        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-playlist-track-order:${playlist_details.playlist_name}`))}))
-        const playlist_order = items_order.map((item) =>{return(JSON.parse(item[1]))})
-        const new_playlist_order = playlist_order.map((item) =>{return([ `downloaded-playlist-track-order:${userinput}-${item.name}`,JSON.stringify(item)])})
-        await AsyncStorage.multiSet(new_playlist_order)
-        await AsyncStorage.multiRemove(album_tracks.map((item) =>{return(`downloaded-playlist-track-order:${playlist_details.playlist_name}-${item.name}`)}))
-        // Amend playlist values
-        await AsyncStorage.setItem(`playlist:${userinput}`,JSON.stringify({"playlist_name":userinput,"downloaded_playlist_thumbnail":playlist_details.downloaded_playlist_thumbnail,"playlist_size":playlist_details.playlist_size}))
-        //await AsyncStorage.setItem(`downloaded-playlist-track-order:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
-        let new_playlist_tracks = album_tracks.map((item) =>{item["playlist_name"] = userinput;return([ `downloaded-playlist-track:${userinput}-${item.name}`,JSON.stringify(item)])})
-        await AsyncStorage.multiSet(new_playlist_tracks)
-        await AsyncStorage.multiRemove(album_tracks.map((item) =>{return(`downloaded-playlist-track:${playlist_details.playlist_name}-${item.name}`)}))
-
-        // Remove Playlist and render on page
-        await AsyncStorage.removeItem(`playlist:${playlist_details.playlist_name}`)
-        playlist_details.playlist_name = userinput
-        setPlaylistDetails(playlist_details)
-        setIsTyping(false)
-        setEditingPlaylistName(false);
-        await TrackPlayer.reset()
-
-
-    }
     const getplaylist = async () =>{
         let keys = await AsyncStorage.getAllKeys()
-        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-playlist-track:${playlist_details.playlist_name}`))}))
+        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
         const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
-        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-playlist-track-order:${playlist_details.playlist_name}`))}))
+        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track-order`))}))
         const playlist_tracks_order = items_order.map((item) =>{return(JSON.parse(item[1]))})
 
         function customSort(a, b) {
@@ -126,20 +97,31 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
 
        
         playlist_tracks.sort(customSort);
+        //console.log(playlist_tracks[0])
         //console.log(final_track_fin)
         setAlbumTracks(playlist_tracks)
-        let playlist_detts = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`)
 
-        setPlaylistDetails(playlist_details)
     }
     useEffect(() =>{
         getplaylist()
-    },[playlisttrackremoved])
-    const setthumbnailimage = async () =>{
-        const response = await requestGalleryWithPermission();
-        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"downloaded_playlist_thumbnail":response["uri"],"playlist_size":playlist_details.playlist_size}))
-        setPlaylistDetails({...playlist_details,downloaded_playlist_thumbnail: response["uri"]})
+    },[])
+    const delval = async () =>{
+       const vals =  await RNFS.readDir(RNFS.DocumentDirectoryPath);
+       const end = vals.filter((file) =>{return(file.path.includes("mp3"))})
+       console.log(end)
+       const promises = end.map(async (file) =>{
+        await RNFS.unlink(file.path)
+       })
+       await Promise.all(promises)
+       console.log("done")
+       const keyorder = await  AsyncStorage.getAllKeys()
+       
+       await AsyncStorage.removeItem("downloaded_num")
+       await AsyncStorage.multiRemove(keyorder.filter((key) =>{return(key.includes("downloaded-track-order"))}))
+       await AsyncStorage.multiRemove(keyorder.filter((key) =>{return(key.includes("downloaded-track"))}))
+
     }
+
 
     return(
         <View  style={{flex:1,backgroundColor:"#141212"}}>
@@ -161,9 +143,9 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
             </View>
 
             
-            <TouchableOpacity style={{justifyContent:"center",alignItems:"center",flex:0.5}}>
-                <GestureDetector gesture={Gesture.Exclusive(longPress,doubleTap)}  >
-                    <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:playlist_details.downloaded_playlist_thumbnail}}></Image>
+            <TouchableOpacity onPress={() =>{delval()}} style={{justifyContent:"center",alignItems:"center",flex:0.5}}>
+                <GestureDetector gesture={Gesture.Exclusive(doubleTap)}  >
+                    <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:"https://img.freepik.com/premium-vector/download-icon-vector-illustration-install-symbol_654297-207.jpg?w=1380"}}></Image>
 
                 </GestureDetector>
             </TouchableOpacity>
@@ -171,8 +153,8 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
             <View style={{flex:editingplaylistname === false ? isfilterTyping ? 0.9 : 0.1:isTyping ?0.5: 0.2,justifyContent:"center",alignItems:"center"}}>
                     <View style={{flexDirection:"row"}}>
                         {editingplaylistname === false ?
-                        <Text style={{color:"white",fontSize:20}}>{playlist_details.playlist_name}</Text>:
-                        <TextInput onSubmitEditing={() =>{editplaylistname()}} onTouchStart={() =>{setIsTyping(true)}} onEndEditing={() =>{setIsTyping(false)}} style={{width:150}} placeholder="Enter New Playlist" onChangeText={(text) =>{setUserInput(text)}}/>}
+                        <Text style={{color:"white",fontSize:20}}>Downloaded Songs</Text>:
+                        <TextInput onTouchStart={() =>{setIsTyping(true)}} onEndEditing={() =>{setIsTyping(false)}} style={{width:150}} placeholder="Enter New Playlist" onChangeText={(text) =>{setUserInput(text)}}/>}
                         {editingplaylistname === false ?
                                                 <TouchableOpacity onPress={() =>{setEditingPlaylistName(true)}}>
                                                 <Feather style={{top:5,left:3}} size={17} name="edit-2"></Feather>
@@ -181,7 +163,7 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
                                     <Text>x</Text></TouchableOpacity>}
 
                     </View>
-                    <Text style={{color:"grey",fontSize:15}}>{playlist_details.playlist_size} Tracks</Text>
+                    <Text style={{color:"grey",fontSize:15}}>{album_tracks.length} Tracks</Text>
             </View>
             <View style={{flexDirection:"row"}}>
             <AntDesign style={{position:"relative",top:18}} name="filter"/>

@@ -6,9 +6,10 @@ import { requestStoragePermission } from "./askpermission";
 import RNFS from 'react-native-fs';
 import notifee from '@notifee/react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-export const downloadFile = async (songurl,name,album_track) => {
+export const downloadFile = async (songurl,name,notif_title,album_track) => {
   let filename = `${name}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
   const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
+  const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${filename.replace("mp3","jpg")}`;
   const channelId = await notifee.createChannel({
     id: 'default',
     name: 'Default Channel',
@@ -27,8 +28,8 @@ export const downloadFile = async (songurl,name,album_track) => {
       console.log(`Progress: ${progress.toFixed(2)}%`);
       await notifee.displayNotification({
         id:notif_id,
-        title:name,
-        body: 'Downloading:'+ name + "...",
+        title:notif_title,
+        body: 'Downloading:'+ notif_title + "...",
         android: {
           channelId,
           progress: {
@@ -46,7 +47,25 @@ export const downloadFile = async (songurl,name,album_track) => {
   })
     .promise.then( async (response) => {
       console.log('File downloaded!', response);
-      await AsyncStorage.setItem("downloaded-song:")
+      await AsyncStorage.setItem(`downloaded-track:${name}`,JSON.stringify(album_track))
+      const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
+      if (numofdownloaded){
+        let order = parseInt(numofdownloaded) + 1
+        await AsyncStorage.setItem("downloaded_num",JSON.stringify(order))
+        await AsyncStorage.setItem(`downloaded-track-order:${name}`,JSON.stringify({"name":name,"order":order}))
+      }
+      else{
+        await AsyncStorage.setItem("downloaded_num",JSON.stringify(0))
+        await AsyncStorage.setItem(`downloaded-track-order:${name}`,JSON.stringify({"name":name,"order":0}))
+      }
+      
+      await RNFS.downloadFile({
+        fromUrl: album_track.thumbnail,
+        toFile: thumbnail_filePath,
+        background: true, // Enable downloading in the background (iOS only)
+        discretionary: true, // Allow the OS to control the timing and speed (iOS only)
+
+      })
       await notifee.cancelNotification(notif_id);
     })
     .catch(async (err) => {
