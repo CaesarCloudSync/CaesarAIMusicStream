@@ -17,10 +17,9 @@ export default function PlaylistScreen({seek, setSeek}){
     const [userInput,setUserInput] = useState("");
     const [playlistalbums,setPlaylistItems] = useState([]);
     const [playlistchanged,setPlaylistChanged] = useState(false)
-    const [access_token,setAccessToken] = useState("");
+
     const getplaylist = async () =>{
-        const access_token = await get_access_token()
-        setAccessToken(access_token)
+
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("playlist:"))}))
         const playlistitems = items.map((item) =>{return(JSON.parse(item[1]))})
@@ -61,6 +60,7 @@ export default function PlaylistScreen({seek, setSeek}){
         //const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
     }
     const add_to_summer = async () =>{
+        const access_token = await get_access_token()
         let playlist_nake = "New Amari Sleep"
         const val = await AsyncStorage.getItem(`playlist-track:${playlist_nake}-White Ferrari`)
         console.log(val)
@@ -114,7 +114,7 @@ export default function PlaylistScreen({seek, setSeek}){
             </View>
             {/*Main Scroll Body*/}
             <AllDownloadedPlaylistCard/>
-            {playlistalbums.length > 0 && access_token !== ""  && 
+            {playlistalbums.length > 0  && 
             
             
             <FlatList 
@@ -126,9 +126,9 @@ export default function PlaylistScreen({seek, setSeek}){
     }
       
 
-            {playlistalbums.length > 0 && access_token !== ""  && <ShowCurrentTrack searchscreen={true}/>}
-            {playlistalbums.length > 0 && access_token !== "" && <ShowQueue/>}
-            {playlistalbums.length > 0 && access_token !== ""  &&  <TrackProgress seek={seek} setSeek={setSeek}/>}
+            {playlistalbums.length > 0  && <ShowCurrentTrack searchscreen={true}/>}
+            {playlistalbums.length > 0 && <ShowQueue/>}
+            {playlistalbums.length > 0  &&  <TrackProgress seek={seek} setSeek={setSeek}/>}
             {/*Navigation Footer*/}
             {playlistalbums.length === 0 && <View style={{flex:1}}></View>} 
            <NavigationFooter currentpage={"playlists"}/>

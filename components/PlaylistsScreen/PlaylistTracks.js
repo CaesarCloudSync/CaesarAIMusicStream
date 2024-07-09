@@ -18,10 +18,13 @@ import Feather from "react-native-vector-icons/Feather"
 import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
 import { GestureDetector,Gesture } from "react-native-gesture-handler"
+import { useNetInfo } from "@react-native-community/netinfo"
 export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     const progress = useProgress();
     const location = useLocation();
+    const netInfo = useNetInfo();
+
     const navigate = useNavigate();
     const [trackforplaylist,setTrackForPlaylist] = useState({});
     const [editingplaylistname,setEditingPlaylistName] = useState(false);
@@ -29,7 +32,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
     const [playlist_details,setPlaylistDetails] = useState(location.state.playlist_details)
-    const [album_tracks,setAlbumTracks] = useState(location.state.playlist_tracks);
+    const [album_tracks,setAlbumTracks] = useState(); // location.state.playlist_tracks
     const [loadingaudio,setLoadingAudio] = useState(false)
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
@@ -128,14 +131,28 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
        
         playlist_tracks.sort(customSort);
         //console.log(final_track_fin)
-        setAlbumTracks(playlist_tracks)
+        const final_promises = playlist_tracks.map(async (track) =>{
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${track.name}`);
+            if (track_downloaded){
+                return (track)
+            }
+            else{
+                return (undefined)
+            }
+        })
+        const final_playlist_tracks = netInfo.isInternetReachable === false ? (await Promise.all(final_promises)).filter((track) =>{return(track !== undefined)}) : playlist_tracks  
+
+        setAlbumTracks(final_playlist_tracks)
+  
         let playlist_detts = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`)
 
         setPlaylistDetails(playlist_details)
     }
     useEffect(() =>{
+        
         getplaylist()
-    },[playlisttrackremoved])
+        
+    },[playlisttrackremoved,netInfo])
     const setthumbnailimage = async () =>{
         const response = await requestGalleryWithPermission();
         await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":response["uri"],"playlist_size":playlist_details.playlist_size}))
