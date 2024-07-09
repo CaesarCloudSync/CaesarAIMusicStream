@@ -5,16 +5,17 @@ import RNFetchBlob from 'rn-fetch-blob'
 import { requestStoragePermission } from "./askpermission";
 import RNFS from 'react-native-fs';
 import notifee from '@notifee/react-native';
-export const downloadFile = async (songurl,name) => {
-  let filename = `${name.replaceAll(/[/\\?%*:|"<>]/g, '_')}.mp3`
+import AsyncStorage from "@react-native-async-storage/async-storage";
+export const downloadFile = async (songurl,name,album_track) => {
+  let filename = `${name}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
   const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
   const channelId = await notifee.createChannel({
     id: 'default',
     name: 'Default Channel',
   });
-
+  let notif_id = `notif_${filename}`
   console.log("song",songurl)
-  
+
   await RNFS.downloadFile({
     fromUrl: songurl,
     toFile: filePath,
@@ -24,9 +25,10 @@ export const downloadFile = async (songurl,name) => {
       // Handle download progress updates if needed
       const progress = (res.bytesWritten / res.contentLength) * 100;
       console.log(`Progress: ${progress.toFixed(2)}%`);
-      /*await notifee.displayNotification({
-        title: 'Notification Title',
-        body: 'Main body content of the notification',
+      await notifee.displayNotification({
+        id:notif_id,
+        title:name,
+        body: 'Downloading:'+ name + "...",
         android: {
           channelId,
           progress: {
@@ -39,16 +41,17 @@ export const downloadFile = async (songurl,name) => {
             id: 'default',
           },
         },
-      });*/
+      });
     },
   })
     .promise.then( async (response) => {
       console.log('File downloaded!', response);
-      await notifee.cancelNotification(channelId);
+      await AsyncStorage.setItem("downloaded-song:")
+      await notifee.cancelNotification(notif_id);
     })
     .catch(async (err) => {
       console.log('Download error:', err);
-      await notifee.cancelNotification(channelId);
+      await notifee.cancelNotification(notif_id);
     });
 
 };

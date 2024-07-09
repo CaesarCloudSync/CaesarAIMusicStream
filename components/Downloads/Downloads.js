@@ -14,17 +14,18 @@ import { useNetInfo } from '@react-native-community/netinfo';
 import ShowQueue from '../ShowQueue/showqueue';
 import NavigationFooter from '../NavigationFooter/NavigationFooter';
 import DownloadedPlaylistCard from './DownloadedPlaylistCard';
+import AllDownloadedPlaylistCard from './AllDownloadedPlaylistCard';
 export default function Downloads({seek, setSeek}) { 
   const netInfo = useNetInfo();
 
-  const [downloadedplaylists,setDownloadedPlaylists] = useState([{"downloaded_playlist_name":"Downloaded Songs","downloaded_playlist_thumbnail":"https://www.shutterstock.com/image-vector/download-vector-icon-install-symbol-260nw-1062015524.jpg","downloaded_playlist_size":"30"}]);
+
   const [downloadedplaylistchanged,setDownloadedPlaylistChanged] = useState(false);
 
 
   
   return (
     <SafeAreaView style={{flex:1,backgroundColor:"#141212"}}>
-            <View  style={{flex:0.18,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
+            <View  style={{flex:0.13,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
                 <View style={{flex:1,margin:10}}>
                 <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
                 
@@ -34,12 +35,16 @@ export default function Downloads({seek, setSeek}) {
                 </View>
 
             </View>
-            <FlatList 
+            <View style={{flex:0.05}}>
+              <AllDownloadedPlaylistCard  />
+            </View>
+            {/*
+                        <FlatList 
 
             data={downloadedplaylists}
             style={{flex:1,backgroundColor:"#141212"}}
             renderItem={({item,index}) => <DownloadedPlaylistCard  key={index} downloadedplaylist={item} index={index} downloadedplaylistchanged={downloadedplaylistchanged} setDownloadedPlaylistChanged={setDownloadedPlaylistChanged}/>}
-            />
+            /> */}
 
             <View style={{flex:1}}></View>
             <ShowCurrentTrack searchscreen={true}/>
