@@ -8,7 +8,7 @@ import { getTableNames } from "../SQLDB/SQLDB";
 import Entypo from "react-native-vector-icons/Entypo"
 import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
-import addSong from "./DownloadSong";
+import {downloadFile}from "./DownloadSong";
 import TrackPlayer,{RepeatMode} from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
@@ -93,7 +93,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         },300) */  })
     const downloadsong = async () =>{
         const [youtube_link,title] = await getstreaminglink(album_track)
-        await addSong(youtube_link,title)
+        await downloadFile(youtube_link,title)
 
     }
     const playnowsong = async () =>{

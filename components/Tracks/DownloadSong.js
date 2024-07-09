@@ -3,9 +3,55 @@ import ytdl from "react-native-ytdl"
 
 import RNFetchBlob from 'rn-fetch-blob'
 import { requestStoragePermission } from "./askpermission";
+import RNFS from 'react-native-fs';
+import notifee from '@notifee/react-native';
+export const downloadFile = async (songurl,name) => {
+  let filename = `${name.replaceAll(/[/\\?%*:|"<>]/g, '_')}.mp3`
+  const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
+  const channelId = await notifee.createChannel({
+    id: 'default',
+    name: 'Default Channel',
+  });
 
+  console.log(songurl,"song")
+  await RNFS.downloadFile({
+    fromUrl: songurl,
+    toFile: filePath,
+    background: true, // Enable downloading in the background (iOS only)
+    discretionary: true, // Allow the OS to control the timing and speed (iOS only)
+    progress: async (res) => {
+      // Handle download progress updates if needed
+      const progress = (res.bytesWritten / res.contentLength) * 100;
+      console.log(`Progress: ${progress.toFixed(2)}%`);
+      await notifee.displayNotification({
+        title: 'Notification Title',
+        body: 'Main body content of the notification',
+        android: {
+          channelId,
+          progress: {
+            max: 100,
+            current: progress,
+          },
+          smallIcon: 'ic_launcher', // optional, defaults to 'ic_launcher'.
+          // pressAction is needed if you want the notification to open the app when pressed
+          pressAction: {
+            id: 'default',
+          },
+        },
+      });
+    },
+  })
+    .then( async (response) => {
+      console.log('File downloaded!', response);
+      await notifee.cancelNotification(channelId);
+    })
+    .catch(async (err) => {
+      console.log('Download error:', err);
+      await notifee.cancelNotification(channelId);
+    });
 
-export default async function addSong(songurl,name) {
+};
+export const downloadSong = async (songurl,name) => {
     //const getInfo = util.promisify(ytdl.getInfo);
 
     //let youtubeurlt = "https://www.youtube.com/watch?v=CPpyc-mrb5k"
@@ -18,7 +64,10 @@ export default async function addSong(songurl,name) {
       //downloadFile("https://file-examples.com/wp-content/storage/2017/11/file_example_MP3_700KB.mp3",filename)
       await requestStoragePermission()
       const { config, fs } = RNFetchBlob;
-      let PictureDir = fs.dirs.MovieDir
+      let dir = fs.dirs.DownloadDir
+      console.log(dir,songurl)
+      let external_path = dir + "/" + filename
+      let internal_path = "file://" + RNFS.DocumentDirectoryPath + "/" + filename
 
       let options = {
         fileCache: true,
@@ -27,23 +76,27 @@ export default async function addSong(songurl,name) {
           useDownloadManager: true,
           notification: true,
           path:
-            PictureDir + "/" + filename,
+          external_path,
           description: 'Downloading:'+ name + "...",
         },
       };
-      config(options)
-        .fetch('GET', songurl)
-        .then(res => {
-          // Showing alert after successful downloading
-          console.log('res -> ', JSON.stringify(res));
-          Alert.alert(`Success downloading ${name}`)
-          //alert('Image Downloaded Successfully.');
-        }).catch(
-          (err) =>{
-            Alert.alert("Error:" + err)
-          }
-        )
-        ;
+      try{
+        await config(options).fetch('GET', songurl)
+        await RNFS.copyFile(external_path,internal_path)
+        await RNFS.unlink(external_path)
+         Alert.alert(`Success downloading ${name}`)
+        
+                        // The picked document is available in the 'result' object
+        /*let filename = image?.filename || `image_${Date.now()}.${getFileExtension(imageCompressed?.path)}`
+       
+        */
+      }
+      catch(err){
+        Alert.alert(err)
+      }
+    
+        /*
+*/
     
       
   } catch (err) {
