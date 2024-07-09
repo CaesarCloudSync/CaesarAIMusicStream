@@ -31,7 +31,7 @@ export default function AllDownloadedPlaylistCard(){
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
             <TouchableOpacity onLongPress={() =>{removeplaylist()}} style={{flexDirection:"row",flex:1}} onPress={() =>{getfiles()}}>
             <View style={{flexDirection:"row",flex:1}}>
-            <Image style={{borderRadius:5,width: 50, height: 50}} source={{uri:"https://img.freepik.com/premium-vector/download-icon-vector-illustration-install-symbol_654297-207.jpg?w=1380"}}></Image>
+            <Image style={{borderRadius:5,width: 50, height: 45}} source={require('../../assets/Download.png')}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
                     Downloaded Songs | {parseInt(num_of_tracks)+1} Tracks
             </Text>

@@ -146,7 +146,7 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
             
             <TouchableOpacity  style={{justifyContent:"center",alignItems:"center",flex:0.5}}>
                 <GestureDetector gesture={Gesture.Exclusive(doubleTap)}  >
-                    <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:"https://img.freepik.com/premium-vector/download-icon-vector-illustration-install-symbol_654297-207.jpg?w=1380"}}></Image>
+                    <Image style={{borderRadius:5,width: 175, height: 175}} source={require('../../assets/Download.png')}></Image>
 
                 </GestureDetector>
             </TouchableOpacity>

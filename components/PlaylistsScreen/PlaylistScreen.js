@@ -113,17 +113,15 @@ export default function PlaylistScreen({seek, setSeek}){
             <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
             </View>
             {/*Main Scroll Body*/}
-            <AllDownloadedPlaylistCard/>
+            
             {playlistalbums.length > 0  && 
-            
-            
-            <FlatList 
-
-            data={playlistalbums}
-            style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =>filterData(item,index)}
-            />
-    }
+            <ScrollView emoveClippedSubviews={true} style={{flex:1,backgroundColor:"#141212"}}>  
+                {playlistalbums.map((item,index) =>{return(
+                    filterData(item,index)
+                )})}
+                <AllDownloadedPlaylistCard/>
+            </ScrollView>
+            }
       
 
             {playlistalbums.length > 0  && <ShowCurrentTrack searchscreen={true}/>}

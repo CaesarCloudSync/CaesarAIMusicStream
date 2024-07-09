@@ -52,13 +52,12 @@ export default function NavigationFooter({currentpage}){
             </View>
         </View>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-            <Link   underlayColor={"transparent"} to="/downloads">
+            <Link   underlayColor={"transparent"} >
                 <View>
-                    <MaterialCommunityIcons name="download-multiple" style={{fontSize:30,color:currentpage=== "downloads" ? "white" :"",marginLeft:10}}/>
+              
+                    <Image style={{borderRadius:5,width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
                     
-                        <Text style={{fontSize:10,color:currentpage=== "downloads" ? "white" :""}}>
-                            Downloads
-                        </Text>
+     
                 
 
                 </View>
