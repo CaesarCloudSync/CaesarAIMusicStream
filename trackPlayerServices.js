@@ -146,6 +146,17 @@ export async function playbackService() {
       
     }
   });
+  notifee.onBackgroundEvent(async ({ type, detail }) => {
+    if (type === EventType.ACTION_PRESS && detail.pressAction.id) {
+      console.log('User pressed an action with the id: ',detail.pressAction.id);
+      const jobIdjson = JSON.parse(await AsyncStorage.getItem(`current_downloading:${detail.notification.id}`));
+      console.log("notif_id",detail.notification.id)
+      console.log(jobIdjson)
+      await RNFS.stopDownload(jobIdjson["jobId"])
+      await notifee.cancelNotification(detail.notification.id);
+      
+    }
+  });
   TrackPlayer.addEventListener(Event.RemotePause, () => {
     console.log('Event.RemotePause');
     TrackPlayer.pause();

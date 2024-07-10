@@ -185,7 +185,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
         if (numofdownloaded){
             let order = parseInt(numofdownloaded) - 1
-            await AsyncStorage.setItem("downloaded_num",JSON.stringify(order))
+            let keys = await AsyncStorage.getAllKeys()
+            const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
+            await AsyncStorage.setItem("downloaded_num",JSON.stringify(items.length))
         
           }
         if (playlisttrackremoved === false){

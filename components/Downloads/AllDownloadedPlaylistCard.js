@@ -33,7 +33,7 @@ export default function AllDownloadedPlaylistCard(){
             <View style={{flexDirection:"row",flex:1}}>
             <Image style={{borderRadius:5,width: 50, height: 45}} source={require('../../assets/Download.png')}></Image>
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
-                    Downloaded Songs | {parseInt(num_of_tracks)+1} Tracks
+                    Downloaded Songs | {num_of_tracks ? parseInt(num_of_tracks) +1: 0} Tracks
             </Text>
   
             
