@@ -178,8 +178,13 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
     }
     const removedownload = async ()=>{
-        await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.mp3`)
-        await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg`)
+        try{
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.mp3`)
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg`)
+        }
+        catch{
+
+        }
         await AsyncStorage.removeItem(`downloaded-track:${album_track_state.name}`)
         await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.name}`)
         const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
@@ -190,12 +195,15 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             await AsyncStorage.setItem("downloaded_num",JSON.stringify(items.length))
         
           }
-        if (playlisttrackremoved === false){
-            setPlaylistTrackRemoved(true)
-        }
-        else{
-            setPlaylistTrackRemoved(false)
-        }
+          if (setPlaylistTrackRemoved){
+            if (playlisttrackremoved === false){
+                setPlaylistTrackRemoved(true)
+            }
+            else{
+                setPlaylistTrackRemoved(false)
+            }
+          }
+
     }
     useEffect(() =>{
         check_downloaded()
