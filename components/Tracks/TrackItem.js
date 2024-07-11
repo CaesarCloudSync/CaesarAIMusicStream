@@ -25,6 +25,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const [isDownloaded,setIsDownloaded] = useState(false);
+    const [downloadwasremoved,setDownloadWasRemoved] = useState(false)
     const navartistprofileplaylist = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks_state[0].artist_name}`,JSON.stringify({"artist_id":album_tracks_state[0].artist_id}))
         navigate("/artistprofile",{state:[album_track_state]})
@@ -195,19 +196,18 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             await AsyncStorage.setItem("downloaded_num",JSON.stringify(items.length))
         
           }
-          if (setPlaylistTrackRemoved){
-            if (playlisttrackremoved === false){
-                setPlaylistTrackRemoved(true)
-            }
-            else{
-                setPlaylistTrackRemoved(false)
-            }
-          }
+        if (downloadwasremoved === true){
+            setDownloadWasRemoved(false)
+        }
+        else{
+            setDownloadWasRemoved(true)
+        }
+
 
     }
     useEffect(() =>{
         check_downloaded()
-    },[])
+    },[downloadwasremoved])
 
 
 
