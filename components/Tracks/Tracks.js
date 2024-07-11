@@ -68,6 +68,24 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     useEffect(() =>{
         //
     },[isModalVisible])
+    const check_all_downloaded = async () =>{
+        let number_of_downloaded = 0
+        const promises = album_tracks.map(async(album_track) =>{
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            if (track_downloaded){
+                number_of_downloaded +=1
+            }
+        })
+        await Promise.all(promises)
+        if (number_of_downloaded === album_tracks.length){
+            setIsDownloaded(true)
+        }
+
+
+    }
+    useEffect(() =>{
+        check_all_downloaded()
+    },[])
     const downloadsong = async () =>{
         setIsDownloading(true)
         const [youtube_link,title] = await getstreaminglink(album_track_state)
