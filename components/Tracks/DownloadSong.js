@@ -11,6 +11,14 @@ export const downloadFile = async (songurl,name,notif_title,album_track) => {
   let filename = `${name}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
   const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
   const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${filename.replace("mp3","jpg")}`;
+  console.log("path",album_track.thumbnail,thumbnail_filePath)
+  await RNFS.downloadFile({
+    fromUrl: album_track.thumbnail,
+    toFile: thumbnail_filePath,
+    background: true, // Enable downloading in the background (iOS only)
+    discretionary: true, // Allow the OS to control the timing and speed (iOS only)
+
+  })
   const channelId = await notifee.createChannel({
     id: 'default',
     name: 'Default Channel',
@@ -70,13 +78,7 @@ export const downloadFile = async (songurl,name,notif_title,album_track) => {
         await AsyncStorage.setItem(`downloaded-track-order:${name}`,JSON.stringify({"name":name,"order":0}))
       }
       
-      await RNFS.downloadFile({
-        fromUrl: album_track.thumbnail,
-        toFile: thumbnail_filePath,
-        background: true, // Enable downloading in the background (iOS only)
-        discretionary: true, // Allow the OS to control the timing and speed (iOS only)
 
-      })
       await notifee.cancelNotification(notif_id);
       await AsyncStorage.removeItem(`current_downloading:${notif_id}`)
     })

@@ -17,6 +17,7 @@ import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gestu
 import { skipToTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
+import axios from "axios";
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
@@ -26,6 +27,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const [isDownloaded,setIsDownloaded] = useState(false);
     const [downloadwasremoved,setDownloadWasRemoved] = useState(false)
+    console.log(album_tracks)
     const navartistprofileplaylist = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks_state[0].artist_name}`,JSON.stringify({"artist_id":album_tracks_state[0].artist_id}))
         navigate("/artistprofile",{state:[album_track_state]})
@@ -100,7 +102,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const downloadsong = async () =>{
         setIsDownloading(true)
         const [youtube_link,title] = await getstreaminglink(album_track_state)
-        await downloadFile(youtube_link,album_track_state.name,title,album_track_state)
+        await downloadFile(youtube_link,album_track_state.name,title,album_track)
         setIsDownloaded(true)
         let number_of_downloaded = 0
         const promises =  album_tracks_state.map(async(album_track) =>{
@@ -182,7 +184,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.name}`)
         if (track_downloaded){
             setIsDownloaded(true);
-    
+        
             let new_album_track_state = Object.assign(album_track_state, {
                 thumbnail: `file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg` 
              })
@@ -232,7 +234,6 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         if (number_of_downloaded === 0){
             await AsyncStorage.removeItem(`library-downloaded:${album_tracks_state[0].album_name}|${album_tracks_state[0].artist}`)
         }
-
 
     }
     useEffect(() =>{
