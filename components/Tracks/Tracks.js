@@ -115,6 +115,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
                 }
                 await AsyncStorage.removeItem(`downloaded-track:${album_track.name}`)
                 await AsyncStorage.removeItem(`downloaded-track-order:${album_track.name}`)
+                await AsyncStorage.removeItem(`library-downloaded:${album_tracks[0].album_name}|${album_tracks[0].artist}`)
                 const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
                 if (numofdownloaded){
                     let keys = await AsyncStorage.getAllKeys()
