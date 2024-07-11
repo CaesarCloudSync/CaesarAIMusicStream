@@ -17,7 +17,7 @@ import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gestu
 import { skipToTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull}){
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
     const [album_track_state,setAlbumTrackState] = useState(album_track)
@@ -237,7 +237,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     }
     useEffect(() =>{
         check_downloaded()
-    },[downloadwasremoved])
+    },[downloadwasremoved,removealldownloadsdone])
     useEffect(() =>{
         console.log("current-download",index,downloadedsongind)
         if (index === downloadedsongind +1){

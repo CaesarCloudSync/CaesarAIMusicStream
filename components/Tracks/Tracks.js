@@ -39,7 +39,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [completedpromises,setCompletedPromises] = useState(0);
     const [downloadedsongind,setDownloadedSongInd] = useState(0)
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [downloadalbumisfull,setDownloadedAlbumIsFull] = useState(false)
+    const [downloadalbumisfull,setDownloadedAlbumIsFull] = useState(false);
+    const [removealldownloadsdone,setRemoveAllDownloadsDone] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
 
@@ -110,6 +111,14 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
            
         })
         await Promise.all(promises)
+        if (number_of_downloaded === album_tracks.length){
+            let library = await AsyncStorage.getItem(JSON.stringify(`library:${album_tracks[0].album_name}|${album_tracks[0].artist}`)) 
+            if (!library){
+                await AsyncStorage.setItem(`library:${album_tracks[0].album_name}|${album_tracks[0].artist}`,JSON.stringify(album_tracks))
+                await AsyncStorage.setItem(`library-downloaded:${album_tracks[0].album_name}|${album_tracks[0].artist}`,JSON.stringify({"downloaded":"true"}))
+            }
+            setIsDownloaded(true)
+        }
         setIsDownloaded(true)
 
     }
@@ -136,6 +145,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             }
         })
         await Promise.all(promises)
+        setRemoveAllDownloadsDone(true)
 
 
 
@@ -176,7 +186,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind} setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind} setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull} removealldownloadsdone={removealldownloadsdone}/>}
             />
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>
