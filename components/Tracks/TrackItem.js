@@ -101,7 +101,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         setIsDownloading(true)
         const [youtube_link,title] = await getstreaminglink(album_track_state)
         await downloadFile(youtube_link,album_track_state.name,title,album_track_state)
-        setIsDownloading(false)
+        setIsDownloaded(true)
 
     }
     const playnowsong = async () =>{
