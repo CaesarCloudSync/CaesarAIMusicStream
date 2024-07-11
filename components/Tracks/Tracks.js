@@ -15,8 +15,11 @@ import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
 import PlaylistModal from "../PlaylistModal/playlistmodal";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
+    const [isDownloading,setIsDownloading] = useState(false);
+    const [isDownloaded,setIsDownloaded] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const [trackforplaylist,setTrackForPlaylist] = useState({});
@@ -65,7 +68,40 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     useEffect(() =>{
         //
     },[isModalVisible])
+    const downloadsong = async () =>{
+        setIsDownloading(true)
+        const [youtube_link,title] = await getstreaminglink(album_track_state)
+        await downloadFile(youtube_link,album_track_state.name,title,album_track_state)
+        setIsDownloading(false)
 
+    }
+    const removedownload = async ()=>{
+        try{
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.mp3`)
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg`)
+        }
+        catch{
+
+        }
+        await AsyncStorage.removeItem(`downloaded-track:${album_track_state.name}`)
+        await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.name}`)
+        const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
+        if (numofdownloaded){
+            let order = parseInt(numofdownloaded) - 1
+            let keys = await AsyncStorage.getAllKeys()
+            const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
+            await AsyncStorage.setItem("downloaded_num",JSON.stringify(items.length))
+        
+          }
+        if (downloadwasremoved === true){
+            setDownloadWasRemoved(false)
+        }
+        else{
+            setDownloadWasRemoved(true)
+        }
+
+
+    }
     return(
         <View  style={{flex:1,backgroundColor:"#141212"}}>
    
@@ -85,16 +121,19 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
                       }
             </View>
 
+
             
  
             <TouchableOpacity onLongPress={() =>{storeonlineplaylist()}} onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
                 <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_thumbnail : album_tracks[0].thumbnail}}></Image>
 
             </TouchableOpacity>
-
             <View style={{flex:0.1,justifyContent:"center",alignItems:"center"}}>
                     <Text style={{color:"white",fontSize:20}}>{"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_name : album_tracks[0].album_name}</Text>
             </View>
+            <TouchableOpacity style={{alignItems:"flex-end"}} onLongPress={() =>{removedownload()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
+                        <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
+            </TouchableOpacity>
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
