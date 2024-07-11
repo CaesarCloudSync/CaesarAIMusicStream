@@ -78,6 +78,11 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         })
         await Promise.all(promises)
         if (number_of_downloaded === album_tracks.length){
+            let library = await AsyncStorage.getItem(JSON.stringify(`library:${album_tracks[0].album_name}|${album_tracks[0].artist}`)) 
+            if (!library){
+                await AsyncStorage.setItem(`library:${album_tracks[0].album_name}|${album_tracks[0].artist}`,JSON.stringify(album_tracks))
+                await AsyncStorage.setItem(`library-downloaded:${album_tracks[0].album_name}|${album_tracks[0].artist}`,JSON.stringify({"downloaded":"true"}))
+            }
             setIsDownloaded(true)
         }
 
@@ -154,6 +159,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             </View>
             <TouchableOpacity style={{alignItems:"flex-end"}} onLongPress={() =>{removealldownloads()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadallsong()}}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
+            
             </TouchableOpacity>
             <FlatList 
             data={album_tracks}

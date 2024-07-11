@@ -3,9 +3,22 @@ import { useNavigate } from "react-router-native";
 import Entypo from "react-native-vector-icons/Entypo"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
-
+import { useEffect, useState } from "react";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 export default function LibraryCard({album,index,setLibraryChanged,librarychanged}){
     //console.log(album)
+    const [isDownloaded,setIsDownloaded] = useState(false);
+    const check_downloaded = async ()=>{
+        let library_downloaded = await AsyncStorage.getItem(`library-downloaded:${album[0].album_name}|${album[0].artist}`) 
+        if (library_downloaded){
+            setIsDownloaded(true);
+        }
+
+        
+    }
+    useEffect(() =>{
+        check_downloaded()
+    },[])
     const singleTap = Gesture.Tap().onEnd((_event,success) =>{
         if (success){
             getalbumtracks(`/tracks`)
@@ -52,6 +65,9 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
 
             </View>
             </GestureDetector>
+            {isDownloaded === true &&<MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:"green"}}/>}
+
+            
 
 
 
