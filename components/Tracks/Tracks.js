@@ -39,6 +39,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [completedpromises,setCompletedPromises] = useState(0);
     const [downloadedsongind,setDownloadedSongInd] = useState(0)
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [downloadalbumisfull,setDownloadedAlbumIsFull] = useState(false)
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
 
@@ -97,7 +98,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     }
     useEffect(() =>{
         check_all_downloaded()
-    },[])
+    },[downloadalbumisfull])
     const downloadallsong = async () =>{
         setIsDownloading(true)
         let number_of_downloaded = 0
@@ -175,7 +176,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind} setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull}/>}
             />
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>

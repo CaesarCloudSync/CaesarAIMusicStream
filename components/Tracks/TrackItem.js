@@ -17,7 +17,7 @@ import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gestu
 import { skipToTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind}){
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
     const [album_track_state,setAlbumTrackState] = useState(album_track)
@@ -102,6 +102,23 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         const [youtube_link,title] = await getstreaminglink(album_track_state)
         await downloadFile(youtube_link,album_track_state.name,title,album_track_state)
         setIsDownloaded(true)
+        let number_of_downloaded = 0
+        const promises =  album_tracks_state.map(async(album_track) =>{
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            if (track_downloaded){
+                number_of_downloaded +=1
+                
+            }
+        })
+        await Promise.all(promises)
+        if (number_of_downloaded === album_tracks_state.length){
+            if (downloadalbumisfull === true){
+                setDownloadedAlbumIsFull(false)
+            }
+            else{
+                setDownloadedAlbumIsFull(true)
+            }
+        }
 
     }
     const playnowsong = async () =>{
@@ -201,6 +218,19 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         }
         else{
             setDownloadWasRemoved(true)
+        }
+        let number_of_downloaded = 0
+        const promises =  album_tracks_state.map(async(album_track) =>{
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            if (track_downloaded){
+                number_of_downloaded +=1
+                
+            }
+        })
+        await Promise.all(promises)
+
+        if (number_of_downloaded === 0){
+            await AsyncStorage.removeItem(`library-downloaded:${album_tracks_state[0].album_name}|${album_tracks_state[0].artist}`)
         }
 
 
