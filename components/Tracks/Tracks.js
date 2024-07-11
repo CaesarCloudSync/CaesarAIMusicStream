@@ -16,6 +16,8 @@ import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
 import PlaylistModal from "../PlaylistModal/playlistmodal";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+import { downloadFile } from "./DownloadSong";
+import RNFS from "react-native-fs"
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
     const [isDownloading,setIsDownloading] = useState(false);
@@ -35,6 +37,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [preload,setPreload] = useState(false);
     const [totalpromises,setTotalPromises] = useState(0);
     const [completedpromises,setCompletedPromises] = useState(0);
+    const [downloadedsongind,setDownloadedSongInd] = useState(0)
     const [isModalVisible, setIsModalVisible] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
@@ -74,6 +77,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
             if (track_downloaded){
                 number_of_downloaded +=1
+                
             }
         })
         await Promise.all(promises)
@@ -85,6 +89,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             }
             setIsDownloaded(true)
         }
+        if (number_of_downloaded === 0){
+            await AsyncStorage.removeItem(`library-downloaded:${album_tracks[0].album_name}|${album_tracks[0].artist}`)
+        }
 
 
     }
@@ -93,9 +100,12 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     },[])
     const downloadallsong = async () =>{
         setIsDownloading(true)
+        let number_of_downloaded = 0
         const promises = album_tracks.map(async (album_track) =>{
             const [youtube_link,title] = await getstreaminglink(album_track)
             await downloadFile(youtube_link,album_track.name,title,album_track)
+            number_of_downloaded +=1
+            setDownloadedSongInd(number_of_downloaded)
            
         })
         await Promise.all(promises)
@@ -165,7 +175,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <FlatList 
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind}/>}
             />
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>
