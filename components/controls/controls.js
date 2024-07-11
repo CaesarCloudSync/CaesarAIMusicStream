@@ -24,7 +24,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
 
         }
         else{
-
+            console.log("nextsong",nextsong)
         
         await TrackPlayer.add([{index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:nextsong.thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:nextsong.thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
         await TrackPlayer.add([{index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:nextsong.thumbnail,isActive:true,id:nextsong.id + "dummy",url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:nextsong.thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
@@ -53,7 +53,7 @@ export const autoplaynextsong = async () =>{
     let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
     //console.log(currentTrack.index,currentTrack)
     let player_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1 // This adds songs to player regardless of order in album. It just makes sure not to exceed the num of songs in album. The index of song would then be found in player then added to end or skipped to.
-    //console.log("next",player_ind,num_of_tracks,)
+    //console.log("next",player_ind,num_of_tracks,album_tracks)
     const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
     let next_ind_in_album = (currentTrackIndexInaAlbum +1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +1 
    
@@ -78,13 +78,24 @@ export const autoplaynextsong = async () =>{
 
     }
     else{
-        const track_after_queue = await AsyncStorage.getItem("track_after_queue")
+        //await AsyncStorage.removeItem("track_after_queue")
+        const track_after_queue = await AsyncStorage.getItem("track_after_queue");
 
-        let nextsong = track_after_queue ? album_tracks[parseInt(track_after_queue)]:album_tracks[next_ind_in_album]
-        await skipToTrack(nextsong,player_ind)
-        if (track_after_queue){
+
+        let nextsong = track_after_queue  ? album_tracks[parseInt(track_after_queue)]:album_tracks[next_ind_in_album]
+        if (nextsong === undefined){
             await AsyncStorage.removeItem("track_after_queue")
+            
+            await skipToTrack(album_tracks[next_ind_in_album],player_ind)
         }
+        else{
+            await skipToTrack(nextsong,player_ind)
+            if (track_after_queue){
+                await AsyncStorage.removeItem("track_after_queue")
+            }
+        }
+
+
     }
     console.log(newqueue)
     //await TrackPlayer.setRepeatMode(RepeatMode.Off);
