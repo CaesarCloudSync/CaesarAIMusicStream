@@ -86,37 +86,40 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     useEffect(() =>{
         check_all_downloaded()
     },[])
-    const downloadsong = async () =>{
+    const downloadallsong = async () =>{
         setIsDownloading(true)
-        const [youtube_link,title] = await getstreaminglink(album_track_state)
-        await downloadFile(youtube_link,album_track_state.name,title,album_track_state)
-        setIsDownloading(false)
+        const promises = album_tracks.map(async (album_track) =>{
+            const [youtube_link,title] = await getstreaminglink(album_track)
+            await downloadFile(youtube_link,album_track.name,title,album_track)
+           
+        })
+        await Promise.all(promises)
+        setIsDownloaded(true)
 
     }
-    const removedownload = async ()=>{
-        try{
-            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.mp3`)
-            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg`)
-        }
-        catch{
-
-        }
-        await AsyncStorage.removeItem(`downloaded-track:${album_track_state.name}`)
-        await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.name}`)
-        const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
-        if (numofdownloaded){
-            let order = parseInt(numofdownloaded) - 1
-            let keys = await AsyncStorage.getAllKeys()
-            const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
-            await AsyncStorage.setItem("downloaded_num",JSON.stringify(items.length))
+    const removealldownloads = async ()=>{
+        const promises = album_tracks.map(async (album_track) =>{
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            if (track_downloaded){
+                try{
+                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track.name}.mp3`)
+                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track.name}.jpg`)
+                }
+                catch{
         
-          }
-        if (downloadwasremoved === true){
-            setDownloadWasRemoved(false)
-        }
-        else{
-            setDownloadWasRemoved(true)
-        }
+                }
+                await AsyncStorage.removeItem(`downloaded-track:${album_track.name}`)
+                await AsyncStorage.removeItem(`downloaded-track-order:${album_track.name}`)
+                const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
+                if (numofdownloaded){
+                    let keys = await AsyncStorage.getAllKeys()
+                    const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
+                    await AsyncStorage.setItem("downloaded_num",JSON.stringify(items.length))
+                }
+            }
+        })
+        await Promise.all(promises)
+
 
 
     }
@@ -149,7 +152,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             <View style={{flex:0.1,justifyContent:"center",alignItems:"center"}}>
                     <Text style={{color:"white",fontSize:20}}>{"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_name : album_tracks[0].album_name}</Text>
             </View>
-            <TouchableOpacity style={{alignItems:"flex-end"}} onLongPress={() =>{removedownload()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
+            <TouchableOpacity style={{alignItems:"flex-end"}} onLongPress={() =>{removealldownloads()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadallsong()}}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
             </TouchableOpacity>
             <FlatList 
