@@ -97,7 +97,7 @@ export default function LibraryScreen(){
     }
       
 
-            {libraryalbums.length > 0 &&  <ShowCurrentTrack searchscreen={true}/>}
+            {libraryalbums.length > 0 &&  <ShowCurrentTrack />}
             {libraryalbums.length > 0 &&  <ShowQueue/>}
             {libraryalbums.length > 0 &&   <TrackProgress/>}
             {/*Navigation Footer*/}

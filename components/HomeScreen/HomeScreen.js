@@ -249,7 +249,7 @@ function parseISOString(s) {
     }
     else{
         return(
-            <View style={{flex:1}}>
+            <View style={{flex:1,backgroundColor:"#141212"}}>
                 {/*Header */}
                 <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
                     <View style={{flex:1,margin:10}}>
@@ -268,12 +268,10 @@ function parseISOString(s) {
                     Play your Downloads
                     </Text>
                 </View>
-
                 {/*Song Progress Tracker */}
-                <View style={{flex:0.08,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
-                    <TrackProgress seek={seek} setSeek={setSeek}/>
-
-                </View>
+                <ShowCurrentTrack />
+                <ShowQueue/>
+                <TrackProgress seek={seek} setSeek={setSeek}/>
 
                 {/*Navigation Footer*/}
                 <NavigationFooter currentpage={"home"}/>

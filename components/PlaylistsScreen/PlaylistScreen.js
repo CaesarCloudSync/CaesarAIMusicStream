@@ -124,7 +124,7 @@ export default function PlaylistScreen({seek, setSeek}){
             }
       
 
-            {playlistalbums.length > 0  && <ShowCurrentTrack searchscreen={true}/>}
+            {playlistalbums.length > 0  && <ShowCurrentTrack />}
             {playlistalbums.length > 0 && <ShowQueue/>}
             {playlistalbums.length > 0  &&  <TrackProgress seek={seek} setSeek={setSeek}/>}
             {/*Navigation Footer*/}
