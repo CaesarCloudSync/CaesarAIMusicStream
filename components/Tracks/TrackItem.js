@@ -27,7 +27,6 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const [isDownloaded,setIsDownloaded] = useState(false);
     const [downloadwasremoved,setDownloadWasRemoved] = useState(false)
-    console.log(album_tracks)
     const navartistprofileplaylist = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks_state[0].artist_name}`,JSON.stringify({"artist_id":album_tracks_state[0].artist_id}))
         navigate("/artistprofile",{state:[album_track_state]})

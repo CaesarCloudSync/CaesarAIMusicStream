@@ -6,14 +6,23 @@ import { requestStoragePermission } from "./askpermission";
 import RNFS from 'react-native-fs';
 import notifee from '@notifee/react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { get_access_token } from "../access_token/getaccesstoken";
+const get_thumbnail = async (album_id) =>{
+  const access_token = await get_access_token();
+  const headers = {Authorization: `Bearer ${access_token}`}
+  const resp = await fetch(`https://api.spotify.com/v1/albums/${album_id}`, {headers: headers})
+  const feedresult = await resp.json()
+  let album_thumbnail_after = feedresult.images[0].url
+  return album_thumbnail_after
 
+}
 export const downloadFile = async (songurl,name,notif_title,album_track) => {
   let filename = `${name}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
   const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
   const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${filename.replace("mp3","jpg")}`;
-  console.log("path",album_track.thumbnail,thumbnail_filePath)
+  let thumbnail = await get_thumbnail(album_track.album_id)
   await RNFS.downloadFile({
-    fromUrl: album_track.thumbnail,
+    fromUrl: thumbnail,
     toFile: thumbnail_filePath,
     background: true, // Enable downloading in the background (iOS only)
     discretionary: true, // Allow the OS to control the timing and speed (iOS only)
