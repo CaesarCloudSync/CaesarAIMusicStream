@@ -71,13 +71,8 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
           navigate("/playlist-tracks", { state: {playlist_details:playlist_details,playlist_tracks:playlist_tracks}});
         }
         else if (!("playlist_name" in currentTrack)){
-          const access_token = await get_access_token()
-          const headers = {Authorization: `Bearer ${access_token}`}
-          //console.log(currentTrack)
-          const resp = await fetch(`https://api.spotify.com/v1/albums/${currentTrack.album_id}`, {headers: headers})
-          const feedresult = await resp.json()
-      
-          let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":currentTrack.album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":currentTrack.thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+          const stored_album_tracks = JSON.parse(await AsyncStorage.getItem("current-tracks"))
+          let album_tracks = stored_album_tracks.map((track) =>{return({"album_id":stored_album_tracks[0].album_id,"album_name":currentTrack.album_name,"name":track.name,"id":track.id,"artist":track.artist,"artist_id":track.artist_id,"thumbnail":currentTrack.thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
           navigate("/tracks", { state: album_tracks });
 
         }
