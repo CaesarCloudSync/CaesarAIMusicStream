@@ -7,6 +7,7 @@ import RNFS from 'react-native-fs';
 import notifee from '@notifee/react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { get_access_token } from "../access_token/getaccesstoken";
+import { convertToValidFilename } from "../tool/tools";
 const get_thumbnail = async (album_id) =>{
   const access_token = await get_access_token();
   const headers = {Authorization: `Bearer ${access_token}`}
@@ -17,7 +18,7 @@ const get_thumbnail = async (album_id) =>{
 
 }
 export const downloadFile = async (songurl,name,notif_title,album_track) => {
-  let filename = `${name}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
+  let filename = `${convertToValidFilename(name)}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
   const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
   const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${filename.replace("mp3","jpg")}`;
   let thumbnail = await get_thumbnail(album_track.album_id)

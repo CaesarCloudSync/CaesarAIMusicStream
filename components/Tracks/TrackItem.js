@@ -18,6 +18,7 @@ import { skipToTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
 import axios from "axios";
+import { convertToValidFilename } from "../tool/tools";
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
@@ -185,10 +186,10 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             setIsDownloaded(true);
         
             let new_album_track_state = Object.assign(album_track_state, {
-                thumbnail: `file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg` 
+                thumbnail: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track_state.name)}.jpg` 
              })
             setAlbumTracksState(prevalbumtracks => { return [...prevalbumtracks, new_album_track_state]; });
-            setAlbumTrackState(prevalbumtrack => ({...prevalbumtrack, thumbnail: `file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg` }))
+            setAlbumTrackState(prevalbumtrack => ({...prevalbumtrack, thumbnail: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track_state.name)}.jpg` }))
 
         }
         else{
@@ -198,8 +199,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     }
     const removedownload = async ()=>{
         try{
-            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.mp3`)
-            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg`)
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track_state.name)}.mp3`)
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track_state.name)}.jpg`)
         }
         catch{
 
@@ -255,7 +256,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             <TouchableOpacity style={{flex:1}} >
                 <GestureDetector gesture={Gesture.Exclusive(doubleTap,longPress,singleTap)} >
                 <View  style={{flex:1,flexDirection:"row",alignItems:"center"}}>
-                <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:!isDownloaded ?album_track_state.thumbnail: `file://${RNFS.DocumentDirectoryPath}/${album_track_state.name}.jpg` }}></Image>
+                <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:!isDownloaded ?album_track_state.thumbnail: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track_state.name)}.jpg` }}></Image>
 
                 <View style={{padding:6}}>
 

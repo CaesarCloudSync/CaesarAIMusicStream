@@ -19,6 +19,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { downloadFile } from "./DownloadSong";
 import RNFS from "react-native-fs"
 import { get_access_token } from "../access_token/getaccesstoken";
+import { convertToValidFilename } from "../tool/tools";
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
     const [isDownloading,setIsDownloading] = useState(false);
@@ -128,8 +129,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
             if (track_downloaded){
                 try{
-                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track.name}.mp3`)
-                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${album_track.name}.jpg`)
+                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track.name)}.mp3`)
+                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track.name)}.jpg`)
                 }
                 catch{
         

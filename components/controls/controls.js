@@ -3,6 +3,7 @@ import TrackPlayer  from "react-native-track-player"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import RNFS from "react-native-fs";
 import { get_access_token } from "../access_token/getaccesstoken";
+import { convertToValidFilename } from "../tool/tools";
 const get_thumbnail = async (album_id) =>{
     const access_token = await get_access_token();
     const headers = {Authorization: `Bearer ${access_token}`}
@@ -18,8 +19,8 @@ export const skipToTrack = async (nextsong,player_ind)=>{
   
     if (next_exists_queue.length === 0){
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.name}`)
-        let [streaming_link,title] = !track_downloaded  ? await getstreaminglink(nextsong) :  [`file://${RNFS.DocumentDirectoryPath}/${nextsong.name}.mp3`,undefined]
-        let thumbnail = !track_downloaded  ? await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${nextsong.name}.jpg`
+        let [streaming_link,title] = !track_downloaded  ? await getstreaminglink(nextsong) :  [`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(nextsong.name)}.mp3`,undefined]
+        let thumbnail = !track_downloaded  ? await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(nextsong.name)}.jpg`
         
         
         if ("playlist_thumbnail" in nextsong && !("playlist_local" in nextsong)){
