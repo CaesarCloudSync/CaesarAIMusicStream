@@ -59,7 +59,7 @@ export const autoplaynextsong = async () =>{
     const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
     const album_tracks = JSON.parse(stored_album_tracks)
     //console.log(album_tracks[0])
-    let num_of_tracks = album_tracks.length
+    let num_of_tracks = album_tracks.length -1
     //console.log(num_of_tracks)
     let currentTrackInd = await  TrackPlayer.getCurrentTrack()
     //console.log("current",currentTrackInd)
@@ -70,7 +70,7 @@ export const autoplaynextsong = async () =>{
     const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
     let next_ind_in_album = (currentTrackIndexInaAlbum +1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +1 
    
-    
+    // next_ind null 23 22
     const newqueue = await AsyncStorage.getItem("queue")
     if (newqueue){
         let queue_json = JSON.parse(newqueue)
@@ -91,10 +91,11 @@ export const autoplaynextsong = async () =>{
 
     }
     else{
+       
         //await AsyncStorage.removeItem("track_after_queue")
         const track_after_queue = await AsyncStorage.getItem("track_after_queue");
 
-
+        console.log("next_ind",track_after_queue,next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum)
         let nextsong = track_after_queue  ? album_tracks[parseInt(track_after_queue)]:album_tracks[next_ind_in_album]
         if (nextsong === undefined){
             await AsyncStorage.removeItem("track_after_queue")
