@@ -75,17 +75,17 @@ export const downloadFile = async (songurl,name,notif_title,album_track) => {
   })
     .promise.then( async (response) => {
       console.log('File downloaded!', response);
-      await AsyncStorage.setItem(`downloaded-track:${name}`,JSON.stringify(album_track))
+      await AsyncStorage.setItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`,JSON.stringify(album_track))
       const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
       if (numofdownloaded){
         let keys = await AsyncStorage.getAllKeys()
         const number_of_downloaded = (await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))).length
         await AsyncStorage.setItem("downloaded_num",JSON.stringify(number_of_downloaded))
-        await AsyncStorage.setItem(`downloaded-track-order:${name}`,JSON.stringify({"name":name,"order":number_of_downloaded }))
+        await AsyncStorage.setItem(`downloaded-track-order:${album_track.artist}-${album_track.album_name}-${name}`,JSON.stringify({"name":name,"order":number_of_downloaded }))
       }
       else{
         await AsyncStorage.setItem("downloaded_num",JSON.stringify(0))
-        await AsyncStorage.setItem(`downloaded-track-order:${name}`,JSON.stringify({"name":name,"order":0}))
+        await AsyncStorage.setItem(`downloaded-track-order:${album_track.artist}-${album_track.album_name}-${name}`,JSON.stringify({"name":name,"order":0}))
       }
       
 

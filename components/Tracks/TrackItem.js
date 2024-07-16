@@ -106,7 +106,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         setIsDownloaded(true)
         let number_of_downloaded = 0
         const promises =  album_tracks_state.map(async(album_track) =>{
-            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
             if (track_downloaded){
                 number_of_downloaded +=1
                 
@@ -181,7 +181,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
     }
     const check_downloaded = async () =>{
-        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.name}`)
+        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)
         if (track_downloaded){
             setIsDownloaded(true);
         
@@ -205,8 +205,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         catch{
 
         }
-        await AsyncStorage.removeItem(`downloaded-track:${album_track_state.name}`)
-        await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.name}`)
+        await AsyncStorage.removeItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)
+        await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)
         const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
         if (numofdownloaded){
             let order = parseInt(numofdownloaded) - 1
@@ -223,7 +223,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         }
         let number_of_downloaded = 0
         const promises =  album_tracks_state.map(async(album_track) =>{
-            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
             if (track_downloaded){
                 number_of_downloaded +=1
                 

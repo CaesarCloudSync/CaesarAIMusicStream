@@ -95,9 +95,31 @@ export default function PlaylistScreen({seek, setSeek}){
 
 
     }
+    const changedownloads = async() =>{
+        // downloaded-track:${album_track.name} , `downloaded-track-order:${album_track_state.name}`
+        let keys = await AsyncStorage.getAllKeys()
+        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
+        const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+        
+        //console.log(playlist_tracks)
+        // {"album_id": "2nEYdvrxSayukBpLMIEr2f", "album_name": "Come As You Are (Deluxe)", "artist": "DC The Don", "artist_id": "3YYbAExunnHv5pW7GUZefk", "duration_ms": 200124, "id": "0tAwhhy5yrY3IKQ5p4TM3G", "name": "ØUTLAW", "thumbnail": "https://i.scdn.co/image/ab67616d0000b273c21b2b4789e6545b870b66cc", "track_number": 9}
+        //const new_playlist_order = playlist_order.map((item) =>{return([ `playlist-track-order:${userinput}-${item.name}`,JSON.stringify(item)])})
+        //await AsyncStorage.multiSet(new_playlist_order)
+        
+        let new_playlist_tracks = playlist_tracks.map((item) =>{return([ `downloaded-track:${item.artist}-${item.album_name}-${item.name}`,JSON.stringify(item)])});
+        //console.log(new_playlist_tracks)
+        await AsyncStorage.multiSet(new_playlist_tracks)
+
+        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track-order:`))}))
+        const playlist_order = items_order.map((item) =>{return(JSON.parse(item[1]))})
+        const new_playlist_order = playlist_order.map((item,index) =>{return([ `downloaded-track-order:${playlist_tracks[index].artist}-${playlist_tracks[index].album_name}-${playlist_tracks[index].name}`,JSON.stringify(item)])})
+        console.log(new_playlist_order)
+        await AsyncStorage.multiSet(new_playlist_order)
+    }
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
+
             <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
                     <View style={{flex:1,margin:10}}>
                     <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>

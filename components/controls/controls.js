@@ -18,7 +18,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     let next_exists_queue = queue.filter((track) =>{return (track.id === nextsong.id)})
   
     if (next_exists_queue.length === 0){
-        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.name}`)
+        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
         let [streaming_link,title] = !track_downloaded  ? await getstreaminglink(nextsong) :  [`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(nextsong.name)}.mp3`,undefined]
         let thumbnail = !track_downloaded  ? await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(nextsong.name)}.jpg`
         

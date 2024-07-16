@@ -78,7 +78,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const check_all_downloaded = async () =>{
         let number_of_downloaded = 0
         const promises = album_tracks.map(async(album_track) =>{
-            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
             if (track_downloaded){
                 number_of_downloaded +=1
                 
@@ -126,7 +126,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     }
     const removealldownloads = async ()=>{
         const promises = album_tracks.map(async (album_track) =>{
-            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.name}`)
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
             if (track_downloaded){
                 try{
                     await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track.name)}.mp3`)
@@ -135,8 +135,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
                 catch{
         
                 }
-                await AsyncStorage.removeItem(`downloaded-track:${album_track.name}`)
-                await AsyncStorage.removeItem(`downloaded-track-order:${album_track.name}`)
+                await AsyncStorage.removeItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
+                await AsyncStorage.removeItem(`downloaded-track-order:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
                 await AsyncStorage.removeItem(`library-downloaded:${album_tracks[0].album_name}|${album_tracks[0].artist}`)
                 const numofdownloaded = await AsyncStorage.getItem("downloaded_num")
                 if (numofdownloaded){

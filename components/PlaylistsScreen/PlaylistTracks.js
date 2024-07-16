@@ -132,7 +132,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         playlist_tracks.sort(customSort);
         //console.log(final_track_fin)
         const final_promises = playlist_tracks.map(async (track) =>{
-            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${track.name}`);
+            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${track.artist}-${track.album_name}-${track.name}`);
             if (track_downloaded){
                 return (track)
             }
