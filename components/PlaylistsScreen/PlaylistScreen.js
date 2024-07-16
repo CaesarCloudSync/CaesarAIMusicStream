@@ -13,6 +13,8 @@ import { TextInput } from "react-native-gesture-handler";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import ShowQueue from "../ShowQueue/showqueue";
 import AllDownloadedPlaylistCard from "../Downloads/AllDownloadedPlaylistCard";
+import { convertToValidFilename } from "../tool/tools";
+import RNFS from "react-native-fs";
 export default function PlaylistScreen({seek, setSeek}){
     const [userInput,setUserInput] = useState("");
     const [playlistalbums,setPlaylistItems] = useState([]);
@@ -95,6 +97,30 @@ export default function PlaylistScreen({seek, setSeek}){
 
 
     }
+    const moveAll = async (path, outputPath) => {
+        // is a folder
+        if (path.split(".").length == 1) {
+          // CHeck if folder already exists
+          var exists = await RNFS.exists(outputPath);
+          if (exists) {
+            await RNFS.unlink(outputPath);
+            await RNFS.mkdir(outputPath);
+          }
+          // MAKE FRESH FOLDER
+          var result = await RNFS.readDir(path);
+          for (var i = 0; i < result.length; i++) {
+            if (result[i].isDirectory()) {
+              await RNFS.mkdir(outputPath + "/" + result[i].name);
+            }
+            var val = await this.moveAll(result[i].path, outputPath + "/" + result[i].name);
+          }
+          await RNFS.unlink(path);
+          return 1;
+        } else {
+          await RNFS.moveFile(path, outputPath);
+          return 1;
+        }
+      }
     const changedownloads = async() =>{
         // downloaded-track:${album_track.name} , `downloaded-track-order:${album_track_state.name}`
         let keys = await AsyncStorage.getAllKeys()
@@ -115,6 +141,18 @@ export default function PlaylistScreen({seek, setSeek}){
         const new_playlist_order = playlist_order.map((item,index) =>{return([ `downloaded-track-order:${playlist_tracks[index].artist}-${playlist_tracks[index].album_name}-${playlist_tracks[index].name}`,JSON.stringify(item)])})
         console.log(new_playlist_order)
         await AsyncStorage.multiSet(new_playlist_order)
+    }
+    const changemedia = async () =>{
+        let keys = await AsyncStorage.getAllKeys()
+        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
+        await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes(`downloaded-track-order:`))}))
+        const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
+
+
+
+
+        //   RNFS.moveFile()
+
     }
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>

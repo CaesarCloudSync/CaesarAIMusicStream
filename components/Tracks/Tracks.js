@@ -129,8 +129,8 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
             if (track_downloaded){
                 try{
-                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track.name)}.mp3`)
-                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(album_track.name)}.jpg`)
+                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${album_track.name}`)}.mp3`)
+                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${album_track.name}`)}.jpg`)
                 }
                 catch{
         

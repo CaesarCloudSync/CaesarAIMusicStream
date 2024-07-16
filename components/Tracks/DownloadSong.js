@@ -18,7 +18,7 @@ const get_thumbnail = async (album_id) =>{
 
 }
 export const downloadFile = async (songurl,name,notif_title,album_track) => {
-  let filename = `${convertToValidFilename(name)}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
+  let filename = `${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${name}`)}.mp3` // .replaceAll(/[/\\?%*:|"<>]/g, '_')}
   const filePath = RNFS.DocumentDirectoryPath + `/${filename}`;
   const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${filename.replace("mp3","jpg")}`;
   let thumbnail = await get_thumbnail(album_track.album_id)
