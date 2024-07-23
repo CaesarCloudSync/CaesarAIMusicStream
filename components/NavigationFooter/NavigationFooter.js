@@ -1,11 +1,40 @@
-import { View,Text,Image } from 'react-native';
+import { View,Text,Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { Link } from "react-router-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TrackPlayer from 'react-native-track-player';
-export default function NavigationFooter({currentpage}){
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+export default function NavigationFooter({currentpage,setShowCustomYTInput}){
+
+    async function openLink() {
+        try {
+          const isAvailable = await InAppBrowser.isAvailable()
+          const url = 'https://youtube.com'
+          if (isAvailable) {
+            InAppBrowser.open(url, {
+              // iOS Properties
+              dismissButtonStyle: 'cancel',
+              preferredBarTintColor: 'gray',
+              preferredControlTintColor: 'white',
+              // Android Properties
+              showTitle: true,
+              toolbarColor: '#6200EE',
+              secondaryToolbarColor: 'black',
+              enableUrlBarHiding: true,
+              enableDefaultShare: true,
+              forceCloseOnRedirection: true,
+            }).then((result) => {
+                setShowCustomYTInput(true);
+              //Alert.alert(JSON.stringify(result))
+            })
+          } else Linking.openURL(url)
+        } catch (error) {
+          Alert.alert(error.message)
+        }
+      }
+  
 
     return(
         <View style={{flex:0.13,backgroundColor:"#141212"}}>
@@ -53,14 +82,12 @@ export default function NavigationFooter({currentpage}){
         </View>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
             <Link   underlayColor={"transparent"} >
-                <View>
+                <TouchableOpacity onLongPress={() =>{if (setShowCustomYTInput){openLink()}}}>
               
                     <Image style={{borderRadius:5,width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
                     
      
-                
-
-                </View>
+                </TouchableOpacity>
             </Link>
         </View>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>

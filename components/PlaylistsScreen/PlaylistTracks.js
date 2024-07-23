@@ -19,6 +19,7 @@ import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
 import { GestureDetector,Gesture } from "react-native-gesture-handler"
 import { useNetInfo } from "@react-native-community/netinfo"
+import CustomYTModal from "../CustomYTModal/customytmodal"
 export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     const progress = useProgress();
@@ -46,7 +47,8 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const [userinput,setUserInput] = useState("");
     const [filteruserinput,setFilterInput] = useState("");
     const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
-    const[isfilterTyping,setIsFilterTyping] =useState(false)
+    const[isfilterTyping,setIsFilterTyping] =useState(false);
+    const [showCustomYTInput,setShowCustomYTInput] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
     const shuffletracks = async () =>{
         const shuffled_tracks = album_tracks
@@ -215,8 +217,9 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
             <TrackProgress  seek={seek} setSeek={setSeek}/>
   
-            <NavigationFooter currentpage={"home"}/>
+            <NavigationFooter currentpage={"home"} setShowCustomYTInput={setShowCustomYTInput}/>
             <PlaylistModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} trackforplaylist={trackforplaylist}/>
+            <CustomYTModal isModalVisible={showCustomYTInput} setIsModalVisible={setShowCustomYTInput}/>
 
         </View>
     )
