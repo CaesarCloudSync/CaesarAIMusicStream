@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "./modal"
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text,FlatList } from "react-native";
@@ -23,7 +23,13 @@ export default function CustomYTModal({isModalVisible,setIsModalVisible}){
             let ytlink = userInput.replace("m.","")
             const response = await axios.get(`https://caesaraimusicstreamyt-qqbn26mgpa-nw.a.run.app/getytaudio?url=${ytlink}`)
             let result = response.data
-            console.log(result)
+          
+            if ("error" in result){
+                Alert.alert(result.error)
+            }
+            else{
+                console.log(result)
+            }
         }
         
     }
