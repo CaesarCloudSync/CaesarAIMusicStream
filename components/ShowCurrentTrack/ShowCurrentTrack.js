@@ -98,7 +98,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
             <Image style={{borderRadius:5,width: 40, height: 40}} source={{uri:typeof(currentTrack.artwork) === "string" ? currentTrack.artwork :currentTrack.artwork.uri}}></Image>
             
             </View>}
-            <View style={{marginLeft:20}}>
+            <View style={{flex:1}}>
             <Text >{currentTrack.title}</Text>
             <Text>{currentTrack.artist}</Text>
             </View>
