@@ -17,7 +17,7 @@ export default function CustomYTModal({playlist_details,setPlaylistDetails,isMod
     const navigate = useNavigate();
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
     // {"album_id": "2ygz2yoIAR5S9WWIxnvkAL", "album_name": "STARFACE", "artist": "Lava La Rue", "artist_id": "271bbpX3pdCi56ZJA1jQ43", "duration_ms": 195857, "id": "13pVWYP4Bg03zb7VHiC1Us", "name": "Manifestation Manifesto", "playlist_local": "true", "playlist_name": "BUSSDOWN", "thumbnail": "https://i.scdn.co/image/ab67616d00001e022e975b1e2113c800d86e02fd", "track_number": 3}
-    const addtracktoplaylist = async () =>{
+    const addtracktoplaylist = async (trackforplaylist) =>{
 
      
         await AsyncStorage.setItem(`playlist-track:${playlist_details.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
@@ -54,6 +54,7 @@ export default function CustomYTModal({playlist_details,setPlaylistDetails,isMod
             else{
                 let trackforplaylist = {"album_id": result.ytid, "album_name":result.album_name, "artist": result.artist, "artist_id": result.artist_id, "duration_ms": result.duration_ms, "id": result.ytid, "name": result.title, "playlist_local": "true", "playlist_name": playlist_details.playlist_name, "thumbnail": result.thumbnail, "track_number": 1,"ytcustom":"true"}
                 console.log(trackforplaylist)
+                await addtracktoplaylist(trackforplaylist)
             }
         }
         

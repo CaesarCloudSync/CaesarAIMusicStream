@@ -219,7 +219,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
   
             <NavigationFooter currentpage={"home"} setShowCustomYTInput={setShowCustomYTInput}/>
             <PlaylistModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} trackforplaylist={trackforplaylist}/>
-            <CustomYTModal isModalVisible={showCustomYTInput} setIsModalVisible={setShowCustomYTInput} setplaylistchanged={playlisttrackremoved} setPlaylistChanged={setPlaylistTrackRemoved} playlist_details={playlist_details} setPlaylistDetails={setPlaylistDetails}/>
+            <CustomYTModal isModalVisible={showCustomYTInput} setIsModalVisible={setShowCustomYTInput} playlistchanged={playlisttrackremoved} setPlaylistChanged={setPlaylistTrackRemoved} playlist_details={playlist_details} setPlaylistDetails={setPlaylistDetails}/>
 
         </View>
     )
