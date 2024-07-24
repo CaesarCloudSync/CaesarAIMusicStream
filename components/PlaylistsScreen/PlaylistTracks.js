@@ -117,6 +117,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const getplaylist = async () =>{
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist_details.playlist_name}`))}))
+        console.log("playlist_big")
         const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
         const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track-order:${playlist_details.playlist_name}`))}))
         const playlist_tracks_order = items_order.map((item) =>{return(JSON.parse(item[1]))})

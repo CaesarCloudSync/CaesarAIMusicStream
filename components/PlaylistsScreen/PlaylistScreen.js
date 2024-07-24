@@ -89,7 +89,7 @@ export default function PlaylistScreen({seek, setSeek}){
             await AsyncStorage.setItem(`playlist-track:${playlist_nake}-${song_data.name}`,JSON.stringify(song_json))
             await AsyncStorage.setItem(`playlist:${playlist_nake}`,JSON.stringify({"playlist_name":playlist_nake,"playlist_thumbnail":"file:///data/user/0/com.myorg.caesaraimusic/files/image_1719686373879.jpg","playlist_size":index+1}))
             await AsyncStorage.setItem(`playlist-track-order:${playlist_nake}-${song_data.name}`,JSON.stringify({"name":song_data.name,"order":index}))
-            console.log(index,"/",total)
+            //console.log(index,"/",total)
         })  
         await Promise.all(promises)
         //await AsyncStorage.removeItem("summer_songs")

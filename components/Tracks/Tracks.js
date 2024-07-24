@@ -51,7 +51,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         navigate("/artistprofile",{state:album_tracks})
     }
     const storeonlineplaylist = async () =>{
-        console.log("playlist",album_tracks)
+        //console.log("playlist",album_tracks)
         if ("playlist_thumbnail" in album_tracks[0]){   
             console.log("playlistname")
             const promisestore = album_tracks.map(async (playlist_track) =>{

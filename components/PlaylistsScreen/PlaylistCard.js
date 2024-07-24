@@ -8,17 +8,17 @@ import TrackPlayer from "react-native-track-player";
 
 export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist,handleModal}){
     const [playliststate,setPlaylistState] = useState(playlist)
-    console.log(playliststate)
+
 
 
 
     const navigate = useNavigate();
     const getalbumtracks = async (route) =>{
-        console.log(playlist)
+        console.log("playlist_hey")
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playliststate.playlist_name}`))}))
         const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
-        console.log(playlist_tracks)
+        //console.log(playlist_tracks)
         navigate(route, { state: {playlist_details:playlist,playlist_tracks:playlist_tracks}});
 
     }

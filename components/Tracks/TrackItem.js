@@ -106,6 +106,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const downloadsong = async () =>{
         setIsDownloading(true)
         const [youtube_link,title] = await getstreaminglink(album_track_state)
+        console.log("downloadhello",youtube_link)
         await downloadFile(youtube_link,album_track_state.name,title,album_track)
         setIsDownloaded(true)
         let number_of_downloaded = 0

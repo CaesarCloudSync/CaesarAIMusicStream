@@ -19,7 +19,7 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("playlist:"))}))
         const playlistitems = items.map((item) =>{return(JSON.parse(item[1]))})
-        console.log("playlist",playlistitems)
+        //console.log("playlist",playlistitems)
         setPlaylists(playlistitems)
     }
 
@@ -37,7 +37,7 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
     }
 
     const filterData = (item,index) =>{
-        console.log(item,"hi")
+
 
         // {"playlist_name": "Jam", "playlist_size": 1, "playlist_thumbnail": "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8"} 
         if (userInput === ""){
