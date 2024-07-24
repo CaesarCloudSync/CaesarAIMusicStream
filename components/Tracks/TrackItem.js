@@ -39,7 +39,11 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     })
     const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
         if (success){
-            if(playlist_details){navartistprofileplaylist()}
+            if(playlist_details){
+                if (!album_track_state.ytcustom){
+                    navartistprofileplaylist()
+                }
+            }
         }
     })
     const longPress = Gesture.LongPress().onStart(async (_event,success) =>{
