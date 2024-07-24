@@ -81,19 +81,29 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
 
 
     const getplaylist = async () =>{
+        console.log("hamdid")
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track:`))}))
         const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
-        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track-order`))}))
-        const playlist_tracks_order = items_order.map((item) =>{return(JSON.parse(item[1]))})
+        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`downloaded-track-order:`))}))
+
+        const playlist_tracks_order = items_order.map((item) =>{return(JSON.parse(item[1]))});
 
         function customSort(a, b) {
             //console.log(album_order)
-            const orderA = playlist_tracks_order.find(item => item.name === a.name).order;
+            try{
+                const orderA = playlist_tracks_order.find(item => item.name === a.name).order;
     
-            const orderB = playlist_tracks_order.find(item => item.name === b.name).order;
+                const orderB = playlist_tracks_order.find(item => item.name === b.name).order;
+                return orderA - orderB;
+            }
+            catch{
+                //console.log(a)
+            }
+
+  
         
-            return orderA - orderB;
+            
         }
 
        

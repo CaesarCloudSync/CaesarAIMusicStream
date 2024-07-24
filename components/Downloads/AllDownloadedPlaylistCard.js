@@ -11,7 +11,7 @@ export default function AllDownloadedPlaylistCard(){
     const [num_of_tracks,setNumOfTracks] = useState("");
     const getfiles = async () =>{
         const filedirs = await RNFS.readDir(RNFS.DocumentDirectoryPath);
-        console.log(filedirs)
+        //console.log(filedirs)
         navigate("/downloaded-playlist-tracks")
     }
     const get_num_of_tracks = async () =>{
