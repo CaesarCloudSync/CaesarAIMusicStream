@@ -133,7 +133,14 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
         if (stored_album_tracks){
             const album_tracks_stored = JSON.parse(stored_album_tracks)
-            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
+            let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+            if (shuffled_tracks){
+                await AsyncStorage.setItem("current-tracks",shuffled_tracks)
+            }
+            else{
+                await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
+            }
+
             //console.log(album_tracks_stored[0].album_name,album_tracks_state[0].name)
             if (album_tracks_stored[0].album_name !== album_tracks_state[0].album_name){
                 
@@ -177,12 +184,23 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":playlist_details.playlist_thumbnail,"playlist_size":playlist_details.playlist_size -1}))
         await AsyncStorage.removeItem(`playlist-track:${playlist_details.playlist_name}-${album_track_state.name}`)
         await AsyncStorage.removeItem(`playlist-track-order:${playlist_details.playlist_name}-${album_track_state.name}`)
+
+        const shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+        if (shuffled_tracks){
+            const shuffled_tracks_stored = JSON.parse(shuffled_tracks);
+            const new_shuffled_tracks_stored = shuffled_tracks_stored.filter(obj => album_track_state.name !== obj.name);
+            await AsyncStorage.setItem(`shuffled-tracks:${playlist_details.playlist_name}`,JSON.stringify(new_shuffled_tracks_stored))
+            await AsyncStorage.setItem(`current-tracks`,JSON.stringify(new_shuffled_tracks_stored))
+            
+
+        }
         if (playlisttrackremoved === false){
             setPlaylistTrackRemoved(true)
         }
         else{
             setPlaylistTrackRemoved(false)
         }
+
 
     }
     const check_downloaded = async () =>{

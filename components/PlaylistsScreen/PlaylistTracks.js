@@ -58,10 +58,11 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         .sort((a, b) => a.sort - b.sort)
         .map(({ value }) => value)
         //console.log(shuffled)
-        setAlbumTracks(shuffled_tracks)
+  
         await TrackPlayer.reset();
         setHasBeenShuffled(true)
         await AsyncStorage.setItem(`shuffled-tracks:${playlist_details.playlist_name}`,JSON.stringify(shuffled_tracks))
+        await getplaylist();
         
     }
     const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
@@ -149,6 +150,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         })
         const final_playlist_tracks = netInfo.isInternetReachable === false ? (await Promise.all(final_promises)).filter((track) =>{return(track !== undefined)}) : playlist_tracks  
         let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+        console.log("shuffled",shuffled_tracks)
         if (shuffled_tracks){
             setHasBeenShuffled(true);
             let shuffled_tracks_json = JSON.parse(shuffled_tracks)
@@ -177,6 +179,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         setHasBeenShuffled(false);
         await AsyncStorage.removeItem(`shuffled-tracks:${playlist_details.playlist_name}`)
         await getplaylist();
+        await TrackPlayer.reset();
     }
 
     return(
