@@ -20,6 +20,7 @@ import PlaylistModal from "../PlaylistModal/playlistmodal"
 import { GestureDetector,Gesture } from "react-native-gesture-handler"
 import { useNetInfo } from "@react-native-community/netinfo"
 import CustomYTModal from "../CustomYTModal/customytmodal"
+ 
 export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
 
     const progress = useProgress();
@@ -49,6 +50,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
     const[isfilterTyping,setIsFilterTyping] =useState(false);
     const [showCustomYTInput,setShowCustomYTInput] = useState(false);
+    const [hasbeenshuffled,setHasBeenShuffled] = useState(false);
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
     const shuffletracks = async () =>{
         const shuffled_tracks = album_tracks
@@ -58,6 +60,8 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         //console.log(shuffled)
         setAlbumTracks(shuffled_tracks)
         await TrackPlayer.reset();
+        setHasBeenShuffled(true)
+        await AsyncStorage.setItem(`shuffled-tracks:${playlist_details.playlist_name}`,JSON.stringify(shuffled_tracks))
         
     }
     const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
@@ -144,12 +148,20 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
             }
         })
         const final_playlist_tracks = netInfo.isInternetReachable === false ? (await Promise.all(final_promises)).filter((track) =>{return(track !== undefined)}) : playlist_tracks  
-
+        let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+        if (shuffled_tracks){
+            setHasBeenShuffled(true);
+            let shuffled_tracks_json = JSON.parse(shuffled_tracks)
+            setAlbumTracks(shuffled_tracks_json)
+        }
+        else{
         setAlbumTracks(final_playlist_tracks)
+        }
   
         let playlist_detts = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`)
 
-        setPlaylistDetails(playlist_details)
+        setPlaylistDetails(playlist_details);
+
     }
     useEffect(() =>{
         
@@ -160,6 +172,11 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         const response = await requestGalleryWithPermission();
         await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":response["uri"],"playlist_size":playlist_details.playlist_size}))
         setPlaylistDetails({...playlist_details,playlist_thumbnail: response["uri"]})
+    }
+    const unlockshuffle = async () =>{
+        setHasBeenShuffled(false);
+        await AsyncStorage.removeItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+        await getplaylist();
     }
 
     return(
@@ -204,6 +221,13 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
                     </View>
                     <Text style={{color:"grey",fontSize:15}}>{playlist_details.playlist_size} Tracks</Text>
             </View>
+            {hasbeenshuffled === true &&
+            <View style={{alignItems:"flex-end",marginRight:20}}>
+                <TouchableOpacity onLongPress={() =>{unlockshuffle();}}>
+                <AntDesign name="lock" size={24} style={{color:"green"}}></AntDesign>
+                </TouchableOpacity>
+            </View>
+            }
             <View style={{flexDirection:"row"}}>
             <AntDesign style={{position:"relative",top:18}} name="filter"/>
             <TextInput style={{width:"100%"}} placeholder="Enter Here" onEndEditing={() =>{setIsFilterTyping(false)}} onTouchStart={() =>{setIsFilterTyping(true)}} onChangeText={(text) =>{setFilterInput(text);}}/>
