@@ -133,9 +133,14 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
         if (stored_album_tracks){
             const album_tracks_stored = JSON.parse(stored_album_tracks)
-            let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
-            if (shuffled_tracks){
-                await AsyncStorage.setItem("current-tracks",shuffled_tracks)
+            if (playlist_details){
+                let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+                if (shuffled_tracks){
+                    await AsyncStorage.setItem("current-tracks",shuffled_tracks)
+                }
+                else{
+                    await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
+                }
             }
             else{
                 await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
@@ -149,9 +154,14 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
         }
         else{
-            let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
-            if (shuffled_tracks){
-                await AsyncStorage.setItem("current-tracks",shuffled_tracks)
+            if (playlist_details){
+                let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+                if (shuffled_tracks){
+                    await AsyncStorage.setItem("current-tracks",shuffled_tracks)
+                }
+                else{
+                    await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
+                }
             }
             else{
                 await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
