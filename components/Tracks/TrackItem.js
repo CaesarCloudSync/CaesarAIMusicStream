@@ -149,11 +149,17 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
         }
         else{
-            await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
+            let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
+            if (shuffled_tracks){
+                await AsyncStorage.setItem("current-tracks",shuffled_tracks)
+            }
+            else{
+                await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
+            }
         }
 
         let currentTrackInd = await  TrackPlayer.getCurrentTrack()
-        console.log("current",currentTrackInd)
+        console.log("current_eh",currentTrackInd)
         let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
         if (currentTrack !== null){
             let next_track_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1

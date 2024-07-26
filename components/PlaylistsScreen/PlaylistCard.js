@@ -34,6 +34,13 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
             await AsyncStorage.setItem(`playlist:${playliststate.playlist_name}`,JSON.stringify({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks}))
             await AsyncStorage.setItem(`playlist-track-order:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
             setPlaylistState({...playliststate,"playlist_size":num_of_tracks})
+            const shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playliststate.playlist_name}`)
+           
+            if (shuffled_tracks){
+                const shuffled_tracks_stored = JSON.parse(shuffled_tracks);
+                shuffled_tracks_stored.push(trackforplaylist)
+                await AsyncStorage.setItem(`shuffled-tracks:${playliststate.playlist_name}`,JSON.stringify(shuffled_tracks_stored))
+            }
             handleModal()
             if (playlistchanged === false){
                 setPlaylistChanged(true)
