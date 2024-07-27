@@ -11,7 +11,7 @@ export function FavouriteAlbums({favouritecards,playlists,access_token,recentalb
                     //console.log(album)
                     return(
 
-                        <CarouselItem key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type} recentalbums={recentalbums} setRecentAlbums={setRecentAlbums}/>
+                        <CarouselItem key={index}  toptrack={album.name} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type} recentalbums={recentalbums} setRecentAlbums={setRecentAlbums}/>
                     
                     )
                 })}
@@ -95,7 +95,7 @@ export function FavouriteSearchAlbums({favouritecards,albums,access_token,artist
                         //console.log(album)
                         return(
 
-                            <CarouselItem search={true} key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
+                            <CarouselItem search={true} key={index} toptrack={album.name}  access_token={access_token} favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}/>
                         
                         )
                     })}

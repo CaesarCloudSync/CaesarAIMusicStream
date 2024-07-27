@@ -14,7 +14,7 @@ export default function ArtistProfile({seek, setSeek}){
     const [access_token,setAccessToken] = useState("")
     const location = useLocation();
     const navigate = useNavigate();
-    const [album_tracks,setAlbumTracks] = useState(location.state);
+    const [album_tracks,setAlbumTracks] = useState(location.state?.album_tracks);
     const [all_album_tracks,setAllAlbumTracks] = useState([]);
     const [artistThumbnail,setArtistThumbnail] = useState("");
     const [compilations,setCompilations] = useState([]);

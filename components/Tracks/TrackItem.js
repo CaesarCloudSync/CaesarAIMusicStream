@@ -30,7 +30,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const [downloadwasremoved,setDownloadWasRemoved] = useState(false)
     const navartistprofileplaylist = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks_state[0].artist_name}`,JSON.stringify({"artist_id":album_tracks_state[0].artist_id}))
-        navigate("/artistprofile",{state:[album_track_state]})
+        navigate("/artistprofile",{state:{"album_tracks":[album_track_state]}})
     }
     const singleTap = Gesture.Tap().onEnd((_event,success) =>{
         if (success){

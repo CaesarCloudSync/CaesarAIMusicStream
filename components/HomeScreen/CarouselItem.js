@@ -54,7 +54,8 @@ export default function CarouselItem({spotifyid,access_token,favouritecards,thum
         const resp = await fetch(`https://api.spotify.com/v1/albums/${spotifyid}`, {headers: headers})
         const feedresult = await resp.json()
         let album_tracks = feedresult.tracks.items.map((track) =>{return({"album_id":feedresult.id,"album_name":album_name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
-        navigate(route, { state: album_tracks });
+
+        navigate(route, { state: {"current_single":toptrack,"album_tracks":album_tracks}});
         //console.log(access_token)
 
     }

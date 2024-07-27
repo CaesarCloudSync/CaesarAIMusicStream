@@ -73,7 +73,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
         else if (!("playlist_name" in currentTrack)){
           const stored_album_tracks = JSON.parse(await AsyncStorage.getItem("current-tracks"))
           let album_tracks = stored_album_tracks.map((track) =>{return({"album_id":stored_album_tracks[0].album_id,"album_name":currentTrack.album_name,"name":track.name,"id":track.id,"artist":track.artist,"artist_id":track.artist_id,"thumbnail":currentTrack.thumbnail,"track_number":track.track_number,"duration_ms":track.duration_ms})})
-          navigate("/tracks", { state: album_tracks });
+          navigate("/tracks", { state: {"album_tracks":album_tracks} });
 
         }
         else{
@@ -83,7 +83,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
           const feedresult = await resp.json()
           //console.log(feedresult.tracks.items[0])
           let album_tracks = feedresult.tracks.items.map((trackitem) =>{let track = trackitem.track;return({"playlist_thumbnail":currentTrack.playlist_thumbnail,"playlist_id":feedresult.id,"playlist_name":currentTrack.playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})})
-          navigate("/tracks", { state: album_tracks });
+          navigate("/tracks", { state: {"album_tracks":album_tracks}});
 
         }
 

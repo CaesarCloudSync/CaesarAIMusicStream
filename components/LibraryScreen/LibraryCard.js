@@ -36,7 +36,7 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
 
     const navigate = useNavigate();
     const getalbumtracks = async (route) =>{
-        navigate(route, { state: album});
+        navigate(route, { state: {"album_tracks":album}});
 
     }
     const removefromlibrary = async () =>{

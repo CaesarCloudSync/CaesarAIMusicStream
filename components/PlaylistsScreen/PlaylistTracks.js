@@ -91,7 +91,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
     const navartistprofile = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
-        navigate("/artistprofile",{state:album_tracks})
+        navigate("/artistprofile",{state:{"album_tracks":album_tracks}})
     }
     const editplaylistname = async () =>{
 

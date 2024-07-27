@@ -30,8 +30,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
-    const [album_tracks,setAlbumTracks] = useState(location.state);
+    const [album_tracks,setAlbumTracks] = useState(location.state?.album_tracks);
+    const [current_single,setCurrentSingle] = useState(location.state?.current_single)
     const [loadingaudio,setLoadingAudio] = useState(false)
+    //console.log(current_single,"currentsingle")
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
     const [final_tracks,setFinalTracks] =useState([])
@@ -43,12 +45,12 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [downloadalbumisfull,setDownloadedAlbumIsFull] = useState(false);
     const [removealldownloadsdone,setRemoveAllDownloadsDone] = useState(false);
+    const refContainer = useRef();
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
-
 
     const navartistprofile = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
-        navigate("/artistprofile",{state:album_tracks})
+        navigate("/artistprofile",{state:{"album_tracks":album_tracks}})
     }
     const storeonlineplaylist = async () =>{
         //console.log("playlist",album_tracks)
@@ -124,6 +126,18 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         setIsDownloaded(true)
 
     }
+    useEffect(()=>{   
+        if(refContainer.current){
+            console.log(current_single,"hammoncc")
+            const current_single_index = album_tracks.findIndex(track => track.name == current_single);
+            console.log(current_single_index,"hammon_ind")
+         
+            if (current_single_index !== -1){
+                refContainer.current.scrollToIndex({ animated: true, index: current_single_index ,viewPosition:0});
+            }
+
+        }    
+    },[])
     const removealldownloads = async ()=>{
         const promises = album_tracks.map(async (album_track) =>{
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
@@ -186,9 +200,17 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             
             </TouchableOpacity>
             <FlatList 
+            initialScrollIndex={0}
+            ref={refContainer}
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
             renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind} setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull} removealldownloadsdone={removealldownloadsdone}/>}
+            onScrollToIndexFailed={info => {
+                const wait = new Promise(resolve => setTimeout(resolve, 500));
+                wait.then(() => {
+                  refContainer.current?.scrollToIndex({ index: info.index, animated: true });
+                });
+              }}
             />
             <ShowCurrentTrack tracks={true}/>
             <ShowQueue/>
