@@ -12,7 +12,9 @@ import { autoplaynextsong } from "../controls/controls";
 import { getstreaminglink } from "../Tracks/getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { skipToTrack } from "../controls/controls";
+import Entypo from "react-native-vector-icons/Entypo"
 export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVisible,setQueue}) {
+  const [queuepositionsrc,setQueuePositionSrc] = useState("");
     const playnextqueue = async (nextsong) =>{
         const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
         const album_tracks = JSON.parse(stored_album_tracks)
@@ -53,6 +55,24 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         }
         
     }
+  const handlequeuechange = async (index) =>{
+
+    if (queuepositionsrc === "" ){
+      setQueuePositionSrc(index);
+    } 
+    else{
+      if (queuepositionsrc !== index){
+        console.log("src",queuepositionsrc,"dest:",index)
+        setQueuePositionSrc("");
+      }
+      else{
+        setQueuePositionSrc("");
+      }
+
+    }
+
+
+  }
   return (
     <View style={styles.flexView}>
       <StatusBar />
@@ -83,18 +103,25 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
             renderItem={({item, index}) => {
                 return(
 
-            <TouchableOpacity onLongPress={() =>{removefromqueue(item)}} onPress={() =>{playnextqueue(item)}} style={{flex:1,flexDirection:"row",alignItems:"center"}}>
-            <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:item.thumbnail}}></Image>
+            <View style={{flex:1,flexDirection:"row",alignItems:"center"}}>
+              <TouchableOpacity style={{flexDirection:"row",width:325}} onLongPress={() =>{removefromqueue(item)}} onPress={() =>{playnextqueue(item)}} >
+              <Image style={{borderRadius:5,width: 60, height: 60}} source={{uri:item.thumbnail}}></Image>
 
-            <View style={{padding:6}}>
+              <View style={{padding:6}}>
 
-            </View>
-            <View style={{}}>
-                <Text style={{color:"white"}}>{item.name}</Text>
-                <Text style={{color:"grey"}}>{item.artist}</Text>
-            </View>
+              </View>
+              <View style={{top:13}}>
+                  <Text style={{color:"white"}}>{item.name}</Text>
+                  <Text style={{color:"grey"}}>{item.artist}</Text>
+              </View>
+              </TouchableOpacity>
 
+            <TouchableOpacity onPress={() =>{handlequeuechange(index)}} style={{marginLeft:30}}>
+              <Entypo name="dots-three-vertical" color={queuepositionsrc === index ? "green" :"white"}></Entypo>
             </TouchableOpacity>
+        
+
+            </View>
                 )
             }
 
