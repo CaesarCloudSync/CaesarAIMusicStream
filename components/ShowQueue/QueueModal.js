@@ -55,6 +55,15 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         }
         
     }
+    const swapElements = (arr, pos1, pos2) => {
+      const temp = arr[pos1];
+    
+      arr[pos1] = arr[pos2];
+    
+      arr[pos2] = temp;
+    
+      return arr;
+    };
   const handlequeuechange = async (index) =>{
 
     if (queuepositionsrc === "" ){
@@ -63,6 +72,8 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
     else{
       if (queuepositionsrc !== index){
         console.log("src",queuepositionsrc,"dest:",index)
+        const reordered_queue = swapElements(queue,queuepositionsrc,index);
+        await AsyncStorage.setItem("queue",JSON.stringify(reordered_queue))
         setQueuePositionSrc("");
       }
       else{
@@ -117,7 +128,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
               </TouchableOpacity>
 
             <TouchableOpacity onPress={() =>{handlequeuechange(index)}} style={{marginLeft:30}}>
-              <Entypo name="dots-three-vertical" color={queuepositionsrc === index ? "green" :"white"}></Entypo>
+              <Entypo size={19} name="dots-three-vertical" color={queuepositionsrc === index ? "green" :"white"}></Entypo>
             </TouchableOpacity>
         
 
