@@ -72,9 +72,57 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             navigate("/playlists")
         }
     }
+    // Function to generate an array with multiples of 100
+    function generateMultiplesOf100(length) {
+        const result = [];
+        for (let i = 0; i < length / 50; i++) {
+        result.push((i * 50) + 50);
+        }
+        return result;
+    }
+    
+
+    const getplaylisttracks = async () =>{
+        const access_token = await get_access_token();
+        const headers = {Authorization: `Bearer ${access_token}`}
+        const resp = await fetch(`https://api.spotify.com/v1/playlists/${album_tracks[0].playlist_id}`, {headers: headers})
+        const feedresult = await resp.json()
+        const overall_playlist_size = feedresult.tracks.total
+        const floor_offset = (Math.floor(overall_playlist_size / 50) * 50) -50
+        const num_of_offset = generateMultiplesOf100(floor_offset)
+        console.log("num_of_offset",num_of_offset)
+        let num_of_songs = 0;
+        console.log("overall_playlist_size",overall_playlist_size)
+        const promises = num_of_offset.map(async (offset,index) =>{
+            console.log(offset)
+            const headers = {Authorization: `Bearer ${access_token}`}
+            
+            const resp = await fetch(`https://api.spotify.com/v1/playlists/${album_tracks[0].playlist_id}/tracks?offset=${offset}`, {headers: headers})
+            const feedresult = await resp.json()
+            console.log(feedresult,"hello") // hello
+            //console.log(feedresult.tracks.items[0])
+            let new_album_tracks = feedresult.items.map((trackitem) =>{let track = trackitem.track;return({"playlist_thumbnail":album_tracks[0].playlist_thumbnail,"playlist_id":feedresult.id,"playlist_name":album_tracks[0].playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+            let new_tracks = album_tracks.concat(new_album_tracks)
+            num_of_songs += new_tracks.length
+            console.log("num_of_songs",num_of_songs)
+            setAlbumTracks(new_tracks)
+            
+        })
+        await Promise.all(promises)
+        
+
+
+
+        //navigate(route, { state: album_tracks });
+        //console.log(access_token)*/
+
+    }
     useEffect(() =>{
+        if ("playlist_thumbnail" in album_tracks[0]){
+            getplaylisttracks()
+        }
         //
-    },[isModalVisible])
+    },[])
     const check_all_downloaded = async () =>{
         let number_of_downloaded = 0
         const promises = album_tracks.map(async(album_track) =>{

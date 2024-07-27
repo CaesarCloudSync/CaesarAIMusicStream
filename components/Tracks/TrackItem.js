@@ -279,7 +279,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         check_downloaded()
     },[downloadwasremoved,removealldownloadsdone])
     useEffect(() =>{
-        console.log("current-download",index,downloadedsongind)
+        //console.log("current-download",index,downloadedsongind)
         if (index === downloadedsongind +1){
             setIsDownloaded(true)
         }
