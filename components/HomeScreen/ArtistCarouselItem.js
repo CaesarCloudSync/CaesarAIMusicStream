@@ -34,7 +34,7 @@ export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favo
     const navartistprofile = async () =>{
         
         
-        navigate("/artistprofile",{state:[{"artist_id":artist_id}]})
+        navigate("/artistprofile",{state:{"album_tracks":[{"artist_id":artist_id}]}})
     }
     //console.log(artist_id)
       
