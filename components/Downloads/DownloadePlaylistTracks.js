@@ -3,7 +3,6 @@ import { View,Text, FlatList,Image, TouchableOpacity,AppState} from "react-nativ
 import { useLocation,useNavigate } from "react-router-native"
 import TrackItem from "../Tracks/TrackItem"
 import AntDesign from "react-native-vector-icons/AntDesign"
-import { getaudio } from "./getstreamlinks";
 import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress,RepeatMode} from "react-native-track-player";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";

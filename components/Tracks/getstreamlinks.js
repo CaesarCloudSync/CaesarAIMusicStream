@@ -19,20 +19,32 @@ export const addTrack = async (streaming_link,album_track) =>{
     //await TrackPlayer.setRepeatMode(RepeatMode.Queue);
     await TrackPlayer.play()
 }
-export const getyoutubelink  = async (album_track,download=false) =>{
+export const getyoutubelink  = async (album_track,download=false,init_index=0) =>{
     let searchquery = `${album_track.name.replace("&","and")} by ${album_track.artist.replace("¥$","Kanye West")}`//hoodie szn a boogie wit da hoodie album 20 tracks
     const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`)
     let videos = response.data.result
-    let video_link = download === true ? videos[0].link :videos[0].link //videos[1].link
-    let title = videos[0].title
+    let video_link = download === true ? videos[init_index].link :videos[init_index].link //videos[1].link
+    let title = videos[init_index].title
     return [video_link,title]
 }
-export const getstreaminglink =async (album_track) =>{
-    const [video_link,title] = await getyoutubelink(album_track,download=false);
+export const getaudiolink = async (album_track,init_index=0) =>{
+    const [video_link,title] = await getyoutubelink(album_track,download=false,init_index);
     const response = await axios.get(`https://caesaraimusicstreamyt-qqbn26mgpa-nw.a.run.app/getaudio?url=${video_link}`)
     let songurl = response.data.streaming_url
-    
     return [songurl,title]
+}
+export const getstreaminglink =async (album_track) =>{
+    let [streaming_link,title] = await getaudiolink(album_track)
+    let start_index = 1;
+    while (streaming_link === undefined){
+        if (start_index === 3){
+            break
+        }
+        [streaming_link,title] = await getaudiolink(album_track,init_index=start_index);
+        start_index += 1
+    }
+    
+    return [streaming_link,title]
 }
 export  const getaudio = async (album_track,setCurrentTrack) =>{
         let [streaming_link,title] = await getstreaminglink(album_track)

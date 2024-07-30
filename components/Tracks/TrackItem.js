@@ -2,7 +2,6 @@ import { View,Text,Image,TouchableOpacity, Alert } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import AntDesign from "react-native-vector-icons/AntDesign"
-import { getaudio } from "./getstreamlinks";
 import { useEffect, useState } from "react";
 import { getTableNames } from "../SQLDB/SQLDB";
 import Entypo from "react-native-vector-icons/Entypo"
