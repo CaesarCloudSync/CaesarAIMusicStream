@@ -2,7 +2,7 @@ import { View,Text, ScrollView, FlatList,Image,SafeAreaView} from "react-native"
 
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
-
+import GenreItem from "./GenreItem";
 import TrackProgress from "../TrackProgress/TrackProgress";
 import FavouriteItem from "./FavouriteItem";
 import { get_access_token } from "../access_token/getaccesstoken";
@@ -17,7 +17,8 @@ export default function Home({seek, setSeek}){
     const [initialfeed,setInitialFeed] = useState([]);
     const [initialrnb,setInitialRNB] = useState([]);
     const [initialhiphop,setInitialHipHop] = useState([]);
-    const [access_token,setAccessToken] = useState("")
+    const [access_token,setAccessToken] = useState("");
+    const [genres,setGenres] = useState([]);
 
 
     const getintialfeed = async (access_token) =>{
@@ -33,8 +34,8 @@ export default function Home({seek, setSeek}){
         setInitialFeed(feedresult.albums.items)
 
 }
-const chunkcards = (arr) =>{
-    const chunkSize = 6;
+const chunkcards = (arr,chunksizeval=6) =>{
+    const chunkSize = chunksizeval;
     const chunks = [];
 
     for (let i = 0; i < arr.length; i += chunkSize) {
@@ -66,6 +67,15 @@ const getinitialhiphop = async (access_token) =>{
     
     setInitialHipHop(chunks)
     //console.log(feedresult)
+
+}
+const getgenrefeed = async (access_token) =>{
+    const headers = {Authorization: `Bearer ${access_token}`}
+    const resp = await fetch('https://api.spotify.com/v1/recommendations/available-genre-seeds', {headers: headers})
+    const feedresult = await resp.json()
+    const chunks = chunkcards(feedresult.genres,chunksizeval=20)
+    setGenres(chunks)
+   
 
 }
 const createxpiration = async () =>{
@@ -158,6 +168,7 @@ function parseISOString(s) {
         else{
             setInitialHipHop(JSON.parse(cache_hiphop))
         }
+        await getgenrefeed(access_token)
         
 
         
@@ -221,7 +232,28 @@ function parseISOString(s) {
                 })
 
                 }
+                {genres.length > 0 && access_token !== "" &&
+                genres.map((genrelist) =>{
+                    return(
+                        <SafeAreaView style={{flex: 1,marginTop:10}}>
+                     
+                        <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+                            
+                            <FlatList
+                            data={genrelist}
+                            horizontal={true}
+                            renderItem={({item,index}) =>
+                        <GenreItem genre={item}/>}
+                            />
+                            
+        
+                        </View>
+                    </SafeAreaView>
+                    )
 
+                })
+
+                }
 
 
  
