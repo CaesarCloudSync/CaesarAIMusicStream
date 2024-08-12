@@ -65,7 +65,15 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${album_tracks[0].playlist_name}`))}))
             const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
             let num_of_tracks = playlist_tracks.length
-            await AsyncStorage.setItem(`playlist:${album_tracks[0].playlist_name}`,JSON.stringify({"playlist_name":album_tracks[0].playlist_name,"playlist_thumbnail":album_tracks[0].playlist_thumbnail,"playlist_size":num_of_tracks}))
+            const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${convertToValidFilename(album_tracks[0].playlist_name)}.jpg`;
+            await RNFS.downloadFile({
+              fromUrl:album_tracks[0].playlist_thumbnail,
+              toFile: thumbnail_filePath,
+              background: true, // Enable downloading in the background (iOS only)
+              discretionary: true, // Allow the OS to control the timing and speed (iOS only)
+          
+            })
+            await AsyncStorage.setItem(`playlist:${album_tracks[0].playlist_name}`,JSON.stringify({"playlist_name":album_tracks[0].playlist_name,"playlist_thumbnail":`file://${thumbnail_filePath}`,"playlist_size":num_of_tracks}))
             const promiseorder = album_tracks.map(async (playlist_track,ind) =>{
                 await AsyncStorage.setItem(`playlist-track-order:${playlist_track.playlist_name}-${playlist_track.name}`,JSON.stringify({"name":playlist_track.name,"order":ind}))
             })
