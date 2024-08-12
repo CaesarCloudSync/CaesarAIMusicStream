@@ -5,6 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 import { useState } from "react";
 import TrackPlayer from "react-native-track-player";
+import RNFS from "react-native-fs";
+import { convertToValidFilename } from "../tool/tools";
 
 export default function PlaylistCard({playlist,index,setPlaylistChanged,playlistchanged,trackforplaylist,handleModal}){
     const [playliststate,setPlaylistState] = useState(playlist)
