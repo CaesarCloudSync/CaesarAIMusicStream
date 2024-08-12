@@ -264,14 +264,7 @@ function parseISOString(s) {
                             <FlatList
                             data={genrelist}
                             horizontal={true}
-                            renderItem={({item,index}) =>
-                            {
-                                console.log(index,randomcolors[index])
-                                return(
-                                    <GenreItem genre={item} randomcolor={randomcolors[index]}/>
-                                )
-                            }
-                        }
+                            renderItem={({item,index}) =><GenreItem genre={item} randomcolor={randomcolors[index]}/>}
                             />
                             
         
