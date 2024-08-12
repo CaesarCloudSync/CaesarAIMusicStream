@@ -19,6 +19,7 @@ export default function Home({seek, setSeek}){
     const [initialhiphop,setInitialHipHop] = useState([]);
     const [access_token,setAccessToken] = useState("");
     const [genres,setGenres] = useState([]);
+    const [randomcolors,setRandomColors] = useState([]);
 
 
     const getintialfeed = async (access_token) =>{
@@ -69,15 +70,36 @@ const getinitialhiphop = async (access_token) =>{
     //console.log(feedresult)
 
 }
+const generaterandomcolors = (array) =>{
+    const colors = [];
+
+    for (let i = 0; i < array.length; i++) {
+    const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+    colors.push(randomColor);
+    }
+
+    return colors
+}
 const getgenrefeed = async (access_token) =>{
     const headers = {Authorization: `Bearer ${access_token}`}
     const resp = await fetch('https://api.spotify.com/v1/recommendations/available-genre-seeds', {headers: headers})
     const feedresult = await resp.json()
-    const chunks = chunkcards(feedresult.genres,chunksizeval=20)
+    const chunks = chunkcards(feedresult.genres,chunksizeval=20);
+    const randomcolors = [
+        "#3F00BA", "#3200C6", "#2500D2", "#D90025", "#CC0031",
+        "#7F007C", "#720088", "#A50056", "#990063", "#8C006F",
+        "#3F00BA", "#3200C6", "#650094", "#5900A1", "#4C00AD",
+        "#008000", "#006600", "#004C00", "#003300", "#001900"
+    ]
+    
+    
+    console.log(randomcolors.length)
+    setRandomColors(randomcolors)
     setGenres(chunks)
    
 
 }
+
 const createxpiration = async () =>{
     const storageExpirationTimeInMinutes = 120; // in this case, we only want to keep the data for 30min
     console.log(storageExpirationTimeInMinutes)
@@ -233,7 +255,7 @@ function parseISOString(s) {
 
                 }
                 {genres.length > 0 && access_token !== "" &&
-                genres.map((genrelist) =>{
+                genres.map((genrelist,indexlist) =>{
                     return(
                         <SafeAreaView style={{flex: 1,marginTop:10}}>
                      
@@ -243,7 +265,13 @@ function parseISOString(s) {
                             data={genrelist}
                             horizontal={true}
                             renderItem={({item,index}) =>
-                        <GenreItem genre={item}/>}
+                            {
+                                console.log(index,randomcolors[index])
+                                return(
+                                    <GenreItem genre={item} randomcolor={randomcolors[index]}/>
+                                )
+                            }
+                        }
                             />
                             
         
