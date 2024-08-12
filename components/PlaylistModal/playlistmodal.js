@@ -29,7 +29,15 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
     const createplaylist = async () =>{
         trackforplaylist["playlist_local"] = "true"
         trackforplaylist["playlist_name"] = trackforplaylist.name
-        await AsyncStorage.setItem(`playlist:${trackforplaylist.name}`,JSON.stringify({"playlist_name":trackforplaylist.name,"playlist_thumbnail":trackforplaylist.thumbnail,"playlist_size":1}))
+        const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${convertToValidFilename(trackforplaylist.name)}.jpg`;
+        await RNFS.downloadFile({
+          fromUrl:trackforplaylist.thumbnail,
+          toFile: thumbnail_filePath,
+          background: true, // Enable downloading in the background (iOS only)
+          discretionary: true, // Allow the OS to control the timing and speed (iOS only)
+      
+        })
+        await AsyncStorage.setItem(`playlist:${trackforplaylist.name}`,JSON.stringify({"playlist_name":trackforplaylist.name,"playlist_thumbnail":`file://${thumbnail_filePath}`,"playlist_size":1}))
         await AsyncStorage.setItem(`playlist-track:${trackforplaylist.name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
         await AsyncStorage.setItem(`playlist-track-order:${trackforplaylist.name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":0}))
         navigate("/playlists")
