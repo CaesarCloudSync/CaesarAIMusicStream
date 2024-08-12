@@ -21,6 +21,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import PlaylistScreen from './components/PlaylistsScreen/PlaylistScreen';
 import PlaylistTracks from './components/PlaylistsScreen/PlaylistTracks';
 import DownloadedPlaylistTracks from './components/Downloads/DownloadePlaylistTracks';
+import GenrePage from './components/GenrePage/GenrePage';
 function App() { 
 
  
@@ -72,6 +73,7 @@ useEffect(() => {
 
     <Routes>
     <Route exact path="/" element={<Home seek={seek} setSeek={setSeek}/>}></Route>
+    <Route exact path="/genrepage" element={<GenrePage seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/search" element={<Search seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>
     <Route path="/tracks" element={<Tracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>

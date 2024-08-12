@@ -137,6 +137,47 @@ export function FavouriteSearchAlbums({favouritecards,albums,access_token,artist
     )
 }
 
+export function FavouriteGenreRecommendations({favouritecards,artists,playlists,access_token}){
+    return(
+        <ScrollView removeClippedSubviews={true} key={playlists[0].name} style={{marginTop:10}}>
+
+
+        <Text style={{marginLeft:10,fontSize:16}}>Playlists</Text>
+        <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+            
+
+            
+                {playlists.map((playlist,index) =>{
+                    //console.log(album)
+                    return(
+
+                        <PlaylistCarouselItem key={index}  access_token={access_token} favouritecards={favouritecards} playlistid={playlist.id}thumbnail={playlist.images[0].url} playlist_name={playlist.name}  total_tracks={playlist.total_tracks} album_type={playlist.album_type}/>
+                    
+                    )
+                })}
+            
+
+        </View>
+
+        <Text style={{marginLeft:10,fontSize:16}}>Artists</Text>
+        <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+             {artists.map((artist,index) =>{
+                        if (artist.images.length !== 0){
+                            return(
+                        
+                                <ArtistCarouselItem key={index} favouritecards={favouritecards} artist_id={artist.artist_id}thumbnail={artist.images[0].url} artist_name={artist.name} />
+                            
+                            )
+                        }
+
+
+                    })}
+             </View>
+
+    </ScrollView>
+    )
+}
+
 export function FavouriteRecommendations({favouritecards,playlists,access_token}){
     return(
         <SafeAreaView style={{flex: 1,marginTop:10}}>
