@@ -58,7 +58,12 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
     const removeplaylist = async () =>{
         //console.log( await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes("playlist:"))})))
         // {"playlist_name": "Jam", "playlist_size": 1, "playlist_thumbnail": "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8"} 
-        await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(playliststate.playlist_name)}.jpg`)
+        try{
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(playliststate.playlist_name)}.jpg`)
+        }
+        catch{
+            
+        }
         await AsyncStorage.removeItem(`playlist:${playliststate.playlist_name}`)
         let keys = await AsyncStorage.getAllKeys()
         await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes(`playlist-track:${playliststate.playlist_name}`))})) 
