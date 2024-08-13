@@ -85,16 +85,9 @@ const getgenrefeed = async (access_token) =>{
     const resp = await fetch('https://api.spotify.com/v1/recommendations/available-genre-seeds', {headers: headers})
     const feedresult = await resp.json()
     const chunks = chunkcards(feedresult.genres,chunksizeval=20);
-    const randomcolors = [
-        "#3F00BA", "#3200C6", "#2500D2", "#D90025", "#CC0031",
-        "#7F007C", "#720088", "#A50056", "#990063", "#8C006F",
-        "#3F00BA", "#3200C6", "#650094", "#5900A1", "#4C00AD",
-        "#008000", "#006600", "#004C00", "#003300", "#001900"
-    ]
-    
-    
-    console.log(randomcolors.length)
-    setRandomColors(randomcolors)
+
+    await AsyncStorage.setItem("genres",JSON.stringify(chunks))
+
     setGenres(chunks)
    
 
@@ -190,7 +183,20 @@ function parseISOString(s) {
         else{
             setInitialHipHop(JSON.parse(cache_hiphop))
         }
-        await getgenrefeed(access_token)
+        let cache_genre = await AsyncStorage.getItem("genres")
+        const randomcolors = [
+            "#3F00BA", "#3200C6", "#2500D2", "#D90025", "#CC0031",
+            "#7F007C", "#720088", "#A50056", "#990063", "#8C006F",
+            "#3F00BA", "#3200C6", "#650094", "#5900A1", "#4C00AD",
+            "#008000", "#006600", "#004C00", "#003300", "#001900"
+        ]
+        setRandomColors(randomcolors)
+        if (!cache_genre){
+            await getgenrefeed(access_token)
+        }
+        else{
+            setGenres(JSON.parse(cache_genre))
+        }
         
 
         

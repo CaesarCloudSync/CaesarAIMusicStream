@@ -25,11 +25,13 @@ export default function GenrePage({seek,setSeek}){
         const headers = {Authorization: `Bearer ${access_token}`}
         //console.log(text)
         
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=${genre}&limit=50&type=artist,album,track,playlist`, {headers: headers})
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=${genre}&limit=50&type=artist,playlist`, {headers: headers})
         const feedresult = await resp.json()
 
         const artists = feedresult.artists.items.map((artist) =>{console.log(artist.images);return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
-        const playlists = feedresult.playlists.items.map((playlist) =>{return({"id":playlist.id,"name":playlist.name,"images":[{"url":playlist.images[0].url}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
+        console.log(feedresult.playlists.items)
+        const playlists = feedresult.playlists.items.map((playlist) =>{let image = playlist.images[0] !== undefined ? playlist.images[0].url : "none";return({"id":playlist.id,"name":playlist.name,"images":[{"url":image}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
+        console.log("endo")
         setPlaylists(playlists)
         //console.log(artists)
         setArtists(artists)

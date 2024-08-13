@@ -138,6 +138,7 @@ export function FavouriteSearchAlbums({favouritecards,albums,access_token,artist
 }
 
 export function FavouriteGenreRecommendations({favouritecards,artists,playlists,access_token}){
+
     return(
         <ScrollView removeClippedSubviews={true} key={playlists[0].name} style={{marginTop:10}}>
 
