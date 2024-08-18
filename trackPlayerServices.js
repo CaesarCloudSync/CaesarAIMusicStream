@@ -17,8 +17,42 @@ import axios from 'axios';
 
 //import { Buffer } from "buffer";
 import RNFS from 'react-native-fs';
+import { VolumeManager } from 'react-native-volume-manager';
+import init from 'react_native_mqtt';
+init({
+    size: 10000,
+    storageBackend: AsyncStorage,
+    defaultExpires: 1000 * 3600 * 24,
+    enableCache: true,
+    sync : {}
+  });
+  
+  // 创建客户端实例
+  const options = {
+    host: 'broker.emqx.io',
+    port: 8083,
+    path: '/testTopic',
+    id: 'id_' + parseInt(Math.random()*100000)
+  };
+let client = new Paho.MQTT.Client(options.host, options.port, options.path);
+const sendmusicconnect = async () =>{
+  
 
+  if (!client.isConnected()){
+    console.log("music_conncted_connect")
+    client.connect({
+        onSuccess:onConnect,
+        useSSL: false,
+        timeout: 1000,
+        onFailure: onFailure
+      });
+  }
+  else{
+    console.log("music_conncted_send")
+    await sendMessage();
+  }
 
+}
 export async function setupPlayer() {
   let isSetup = false;
   try {
@@ -135,6 +169,13 @@ export async function playbackService() {
 
    
   });
+  const volumeListener = VolumeManager.addVolumeListener((result) => {
+    console.log(result.volume);
+  
+    // On Android, additional volume types are available:
+    // music, system, ring, alarm, notification
+  });
+  
   notifee.onForegroundEvent(async ({ type, detail }) => {
     if (type === EventType.ACTION_PRESS && detail.pressAction.id) {
       console.log('User pressed an action with the id: ',detail.pressAction.id);
@@ -166,9 +207,16 @@ export async function playbackService() {
   ;
   });
 
-  TrackPlayer.addEventListener(Event.RemotePlay, () => {
+  TrackPlayer.addEventListener(Event.RemotePlay, async () => {
     console.log('Event.RemotePlay');
-    TrackPlayer.play();
+    let music_connected =  await AsyncStorage.getItem("music_connected")
+    if (music_connected){
+
+    }
+    else{
+      TrackPlayer.play();
+    }
+   
   });
 
   TrackPlayer.addEventListener(Event.RemoteNext, () => {
