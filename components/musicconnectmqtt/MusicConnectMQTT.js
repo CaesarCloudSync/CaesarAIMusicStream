@@ -38,9 +38,9 @@ export default function MusicConnectMQTT (){
 
   const isMount = useIsMount();
   const [status,setStatus] = useState(client.isConnected() === false ? "" :"connected");
-  const [subscribedTopic,setSubscribedTopic] = useState("");
+  const [subscribedTopic,setSubscribedTopic] = useState("caesaraimusicstreamconnect/song-end");
   const [message,setMessage] = useState("");
-  const [messageList,setMessageList] = useState("");
+  const [messageList,setMessageList] = useState([]);
   const [topic,setTopic] = useState('caesaraimusicstreamconnect/current-track');
   const { position, duration } = useProgress(200);
 
@@ -54,7 +54,9 @@ export default function MusicConnectMQTT (){
 
     setStatus("connected")
     console.log('onConnectHello');
+    subscribeTopic()
     sendMessage()
+   
     await AsyncStorage.setItem("music_connected","true")
 
     //sendMessage()
@@ -77,11 +79,11 @@ export default function MusicConnectMQTT (){
     client.connect({
       onSuccess:onConnect,
       useSSL: false,
-      timeout: 3,
+      timeout: 1000,
       onFailure: onFailure
     });
   } catch(err){
-    console.log(err)
+    //console.log(err)
     if (err.toString().includes("Invalid state already connected")){
       setStatus("connected")
     }
@@ -96,8 +98,8 @@ export default function MusicConnectMQTT (){
     }
   }
   // 收到消息
-  function onMessageArrived(message ) {
-    console.log('onMessageArrived:' + message.payloadString);
+  function onMessageArrived(message) {
+    console.log('onMessageArrived:',message.payloadString);
     let newmessageList = messageList;
     newmessageList.unshift(message.payloadString);
     setMessage( newmessageList)
@@ -108,16 +110,12 @@ export default function MusicConnectMQTT (){
   }
   // 主题订阅
   function subscribeTopic (){
-    setSubscribedTopic(
-      { subscribedTopic: subscribedTopic },
-      () => {
-        client.subscribe(subscribedTopic, { qos: 0 });
-      }
-    );
+    console.log("subscribing","caesaraimusicstreamconnect/song-end")
+    client.subscribe("caesaraimusicstreamconnect/song-end");
   }
   // 取消订阅
   function unSubscribeTopic () {
-    client.unsubscribe(subscribedTopic);
+    client.unsubscribe("caesaraimusicstreamconnect/song-end");
     setSubscribedTopic("")
   }
   function onChangeMessage(text) {

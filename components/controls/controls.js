@@ -21,6 +21,19 @@ init({
     id: 'id_' + parseInt(Math.random()*100000)
   };
 let client = new Paho.MQTT.Client(options.host, options.port, options.path);
+client.onConnectionLost = onConnectionLost;
+client.onMessageArrived = onMessageArrived;
+function onConnectionLost (responseObject){
+    if (responseObject.errorCode !== 0) {
+      console.log('onConnectionLost:' + responseObject.errorMessage);
+    }
+  }
+  // 收到消息
+  function onMessageArrived(message) {
+    console.log('onMessageArrived:Back',message.payloadString);
+    autoplaynextsong()
+    // this.MessageListRef.scrollToEnd({animated: false});
+  }
 const sendMessage = async  () =>{
     const topic = 'caesaraimusicstreamconnect/current-track'
     let music_connect_next_song = await AsyncStorage.getItem("music_connect_next_track")
@@ -30,10 +43,15 @@ const sendMessage = async  () =>{
     client.send(messagesend);
     await TrackPlayer.pause();
 }
+function subscribeTopic (){
+    console.log("subscribing","caesaraimusicstreamconnect/song-end")
+    client.subscribe("caesaraimusicstreamconnect/song-end");
+  }
 async function onConnect (){
 
     console.log('onConnectHello');
     await sendMessage();
+    subscribeTopic()
 
     //sendMessage()
 
@@ -158,7 +176,7 @@ const sendmusicconnect = async () =>{
         client.connect({
             onSuccess:onConnect,
             useSSL: false,
-            timeout: 3,
+            timeout: 1000,
             onFailure: onFailure
           });
       }
