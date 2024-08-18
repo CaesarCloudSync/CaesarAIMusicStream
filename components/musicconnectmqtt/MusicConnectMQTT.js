@@ -32,9 +32,10 @@ client = new Paho.MQTT.Client(options.host, options.port, options.path);
 export default function MusicConnectMQTT ({messageprop}){
   const [status,setStatus] = useState("");
   const [subscribedTopic,setSubscribedTopic] = useState("");
-  const [message,setMessage] = useState(JSON.stringify(messageprop));
+  const [message,setMessage] = useState(messageprop);
   const [messageList,setMessageList] = useState("");
   const [topic,setTopic] = useState('caesaraimusicstreamconnect/current-track');
+  const { position, duration } = useProgress(200);
   client.onConnectionLost = onConnectionLost;
   client.onMessageArrived = onMessageArrived;
   
@@ -102,20 +103,18 @@ export default function MusicConnectMQTT ({messageprop}){
   }
   // 消息发布
   function sendMessage (){
-    var messagesend = new Paho.MQTT.Message(message);
+    message.progress = position
+    var messagesend = new Paho.MQTT.Message(JSON.stringify(message));
     messagesend.destinationName = topic;
     client.send(messagesend);
   }
   useEffect(() => {
-    const intervalID = setInterval(() =>  {
-      console.log(status)
-        if (status === "connected"){
-          sendMessage()
-        }
-    }, 1000);
-
-    return () => clearInterval(intervalID);
-}, [status]);
+    console.log(status)
+    if (status === "connected"){
+      console.log(position,"position")
+      sendMessage()
+    }
+}, [position]);
 
 
     return (
