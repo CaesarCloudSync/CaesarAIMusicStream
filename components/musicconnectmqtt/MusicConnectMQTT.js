@@ -13,6 +13,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import init from 'react_native_mqtt';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useProgress } from 'react-native-track-player';
+import debounce from "lodash.debounce";
+
+
 init({
   size: 10000,
   storageBackend: AsyncStorage,
@@ -36,6 +39,9 @@ export default function MusicConnectMQTT ({messageprop}){
   const [messageList,setMessageList] = useState("");
   const [topic,setTopic] = useState('caesaraimusicstreamconnect/current-track');
   const { position, duration } = useProgress(200);
+
+
+  
   client.onConnectionLost = onConnectionLost;
   client.onMessageArrived = onMessageArrived;
   
@@ -108,13 +114,13 @@ export default function MusicConnectMQTT ({messageprop}){
     messagesend.destinationName = topic;
     client.send(messagesend);
   }
-  useEffect(() => {
-    console.log(status)
-    if (status === "connected"){
-      console.log(position,"position")
-      sendMessage()
-    }
-}, [position]);
+
+useEffect(() =>{
+  if (status === "connected"){
+    console.log(position,"hello")
+    sendMessage()
+  }
+},[position])
 
 
     return (
