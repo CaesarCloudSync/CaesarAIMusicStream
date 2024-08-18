@@ -30,14 +30,14 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
         sync : {}
       });
       const options = {
-        protocol:"ws",
         host: 'broker.emqx.io',
         port: 8083,
         path: '/testTopic',
-        id: 'id_' + parseInt(Math.random()*100000)
+        id: 'emqx_react_' + Math.random().toString(16).substring(2, 8)
       };
       function onConnect() {
         console.log("onConnect");
+        client.subscribe("testtopic",{ qos: 0 })
         setConnectStatus(true)
       }
       function onFailure() {
@@ -56,7 +56,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
       }
 
 
-    let client = new Paho.MQTT.Client(options.host, options.port, options.path,ty);
+    let client = new Paho.MQTT.Client(options.host, options.port, options.id);
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
  
@@ -132,11 +132,21 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
 
      const mqttConnect = () =>{
 
-      client.connect({ onSuccess:onConnect, useSSL:false, onFailure: onFailure });
+      client.connect({ onSuccess:onConnect, useSSL:false, onFailure: onFailure});
+      //client.subscribe("testtopic",{ qos: 0 })
      }
      const mqttDisconnect  = () =>{
-   
-      //client.disconnect();
+      if (client.isConnected()) {
+        try {
+          client.disconnect()
+          client.unsubscribe("testtopic")
+        } catch (error) {
+          console.log('disconnect error:', error)
+        }
+      }
+    
+      
+
 
       setConnectStatus(false)
      }

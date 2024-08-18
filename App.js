@@ -22,6 +22,7 @@ import PlaylistScreen from './components/PlaylistsScreen/PlaylistScreen';
 import PlaylistTracks from './components/PlaylistsScreen/PlaylistTracks';
 import DownloadedPlaylistTracks from './components/Downloads/DownloadePlaylistTracks';
 import GenrePage from './components/GenrePage/GenrePage';
+import MQTTTest from './components/mqtt_test/MQTTTest';
 function App() { 
 
  
@@ -72,7 +73,7 @@ useEffect(() => {
       
 
     <Routes>
-    <Route exact path="/" element={<Home seek={seek} setSeek={setSeek}/>}></Route>
+    <Route exact path="/" element={<MQTTTest></MQTTTest>}></Route>
     <Route exact path="/genrepage" element={<GenrePage seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/search" element={<Search seek={seek} setSeek={setSeek}/>}></Route>
     <Route path="/library" element={<LibraryScreen/>}></Route>

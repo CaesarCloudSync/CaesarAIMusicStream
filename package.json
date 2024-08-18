@@ -17,6 +17,7 @@
     "@react-native-picker/picker": "^2.4.10",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
+    "@rneui/base": "^4.0.0-rc.8",
     "@ungap/url-search-params": "^0.2.2",
     "axios": "^1.6.8",
     "paho-mqtt": "^1.1.0",
