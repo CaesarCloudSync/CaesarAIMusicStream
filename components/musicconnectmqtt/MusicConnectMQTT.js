@@ -14,7 +14,7 @@ import init from 'react_native_mqtt';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useProgress } from 'react-native-track-player';
 import debounce from "lodash.debounce";
-
+import TrackPlayer from 'react-native-track-player';
 
 init({
   size: 10000,
@@ -32,12 +32,12 @@ const options = {
   id: 'id_' + parseInt(Math.random()*100000)
 };
 client = new Paho.MQTT.Client(options.host, options.port, options.path);
-export default function MusicConnectMQTT ({messageprop}){
+export default function MusicConnectMQTT (){
 
 
   const [status,setStatus] = useState(client.isConnected() === false ? "" :"connected");
   const [subscribedTopic,setSubscribedTopic] = useState("");
-  const [message,setMessage] = useState(messageprop);
+  const [message,setMessage] = useState("");
   const [messageList,setMessageList] = useState("");
   const [topic,setTopic] = useState('caesaraimusicstreamconnect/current-track');
   const { position, duration } = useProgress(200);
@@ -52,6 +52,12 @@ export default function MusicConnectMQTT ({messageprop}){
 
     setStatus("connected")
     console.log('onConnectHello');
+    try{
+      sendMessage()
+    }
+    catch{
+      
+    }
     //sendMessage()
 
     //this.subscribeTopic()
@@ -111,13 +117,13 @@ export default function MusicConnectMQTT ({messageprop}){
     setMessage(text)
   }
   // 消息发布
-  function sendMessage (){
-    message.progress = position
-    var messagesend = new Paho.MQTT.Message(JSON.stringify(message));
+  async function sendMessage (){
+    let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+    let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
+    var messagesend = new Paho.MQTT.Message(JSON.stringify(currentTrack));
     messagesend.destinationName = topic;
     client.send(messagesend);
   }
-
 
 
 

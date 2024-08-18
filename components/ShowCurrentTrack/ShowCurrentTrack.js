@@ -105,7 +105,7 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
             <Text >{currentTrack.title}</Text>
             <Text>{currentTrack.artist}</Text>
             </View>
-            <MusicConnectMQTT messageprop={currentTrack}/>
+            <MusicConnectMQTT />
 
           </TouchableOpacity>
         );
