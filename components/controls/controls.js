@@ -91,9 +91,25 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await TrackPlayer.play()
         }
     }
-    nextsong.url = streaming_link
+    // Thumbnail Doesn't take into accoun ytcustom
     let music_connected =  await AsyncStorage.getItem("music_connected")
     if (music_connected){
+
+    if (streaming_link.includes("file://")){
+        let [music_connected_link ,title]= await getstreaminglink(nextsong)
+        nextsong.url = music_connected_link
+    }
+    else{
+        nextsong.url = streaming_link
+    }
+
+    if (thumbnail.includes("file://")){
+        let music_connected_thumbnail = await get_thumbnail(nextsong.album_id);
+        nextsong.thumbnail = music_connected_thumbnail
+    }
+    else{
+        nextsong.thumbnail = thumbnail   
+    }
     await AsyncStorage.setItem("music_connect_next_track",JSON.stringify(nextsong))
     await sendmusicconnect()
     }
@@ -101,13 +117,34 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     }
     else{
         var elementPos = queue.findIndex(track => track.id == nextsong.id && track.url !== "dummy")
-        nextsong.url = queue[elementPos].url
+        
         await TrackPlayer.skip(elementPos)
-        await TrackPlayer.play()
+        
         let music_connected =  await AsyncStorage.getItem("music_connected")
         if (music_connected){
+        let streaming_link = queue[elementPos].url
+        let thumbnail = queue[elementPos].thumbnail
+
+        if (streaming_link.includes("file://")){
+            let [music_connected_link ,title]= await getstreaminglink(nextsong)
+            nextsong.url = music_connected_link
+        }
+        else{
+            nextsong.url = streaming_link
+        }
+
+        if (thumbnail.includes("file://")){
+            let music_connected_thumbnail = await get_thumbnail(nextsong.album_id);
+            nextsong.thumbnail = music_connected_thumbnail
+        }
+        else{
+            nextsong.thumbnail = thumbnail   
+        }
         await AsyncStorage.setItem("music_connect_next_track",JSON.stringify(nextsong))
         await sendmusicconnect()
+        }
+        else{
+            await TrackPlayer.play()
         }
      
 

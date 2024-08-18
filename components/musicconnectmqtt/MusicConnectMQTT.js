@@ -16,6 +16,8 @@ import { useProgress } from 'react-native-track-player';
 import debounce from "lodash.debounce";
 import TrackPlayer from 'react-native-track-player';
 
+import { useIsMount } from './useIsMount';
+
 init({
   size: 10000,
   storageBackend: AsyncStorage,
@@ -34,7 +36,7 @@ const options = {
 client = new Paho.MQTT.Client(options.host, options.port, options.path);
 export default function MusicConnectMQTT (){
 
-
+  const isMount = useIsMount();
   const [status,setStatus] = useState(client.isConnected() === false ? "" :"connected");
   const [subscribedTopic,setSubscribedTopic] = useState("");
   const [message,setMessage] = useState("");
@@ -127,7 +129,12 @@ export default function MusicConnectMQTT (){
   const checkmusicconnect = async () =>{
     let  music_connected = await AsyncStorage.getItem("music_connected")
     if (status === "" && music_connected === "true"){
-      connect()
+      
+      if (isMount) {
+        console.log('First Render');
+      } else {
+        connect()
+      }
     }
   }
   useEffect(() =>{
