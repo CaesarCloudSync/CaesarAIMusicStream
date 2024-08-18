@@ -119,7 +119,6 @@ export default function MusicConnectMQTT ({messageprop}){
 
 useEffect(() =>{
   if (status === "connected"){
-    console.log(position,"hello")
     sendMessage()
   }
 },[position])
