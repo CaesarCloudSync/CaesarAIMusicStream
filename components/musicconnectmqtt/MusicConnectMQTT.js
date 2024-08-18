@@ -134,28 +134,8 @@ export default function MusicConnectMQTT (){
   }
   const checkmusicconnect = async () =>{
     let  music_connected = await AsyncStorage.getItem("music_connected")
-    if (status === "" , music_connected === "true"){
-      
-      if (isMount) {
-        console.log('First Render');
-        if (music_connected === "true"){
-          setStatus("connected")
-        }
-      } else {
-        try{
-          //console.log("second render")
-          if (!client.isConnected()){
-            
-            connect()
-          }
-          else{
-            setStatus("connected")
-          }
-        }
-        catch{
-
-        }
-      }
+    if (music_connected === "true"){
+      setStatus("connected")
     }
   }
   useEffect(() =>{
