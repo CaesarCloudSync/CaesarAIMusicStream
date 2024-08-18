@@ -17,7 +17,7 @@ init({
     path: '/testTopic',
     id: 'id_' + parseInt(Math.random()*100000)
   };
-let client = new Paho.MQTT.Client(options.host, options.port, options.path);
+export let client = new Paho.MQTT.Client(options.host, options.port, options.path);
 client.onConnectionLost = onConnectionLost;
 client.onMessageArrived = onMessageArrived;
 function onConnectionLost (responseObject){
@@ -32,23 +32,31 @@ function onConnectionLost (responseObject){
     // this.MessageListRef.scrollToEnd({animated: false});
   }
 const sendMessage = async  () =>{
-    const topic = 'caesaraimusicstreamconnect/current-track'
-    let music_connect_next_song = await AsyncStorage.getItem("music_connect_next_track")
+    let current_payloadkey = await AsyncStorage.getItem("current_payloadkey")
+    let current_topic = await AsyncStorage.getItem("current_topic")
+    let topic =!current_topic ? 'caesaraimusicstreamconnect/current-track'  : current_topic 
+    let payloadkey = !current_payloadkey ? "music_connect_next_track" : current_payloadkey
+    let music_connect_next_song = await AsyncStorage.getItem(payloadkey)
     console.log("sendingmessage",music_connect_next_song)
     var messagesend = new Paho.MQTT.Message(music_connect_next_song);
     messagesend.destinationName = topic;
     client.send(messagesend);
     await TrackPlayer.pause();
 }
-function subscribeTopic (){
-    console.log("subscribing","caesaraimusicstreamconnect/song-end")
-    client.subscribe("caesaraimusicstreamconnect/song-end");
+
+
+async function subscribeTopic (){
+    //console.log("subscribing","caesaraimusicstreamconnect/song-end")
+    
+    let current_subscribe_topic = await AsyncStorage.getItem("current_subscribe_topic")
+    let subscribe_topic = !current_subscribe_topic ? "caesaraimusicstreamconnect/song-end" : current_subscribe_topic
+    client.subscribe(subscribe_topic);
   }
 async function onConnect (){
 
     console.log('onConnectHello');
     await sendMessage();
-    subscribeTopic()
+    await subscribeTopic()
 
     //sendMessage()
 
@@ -77,3 +85,5 @@ async function onConnect (){
       }
 
 }
+
+

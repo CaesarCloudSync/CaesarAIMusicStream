@@ -18,41 +18,7 @@ import axios from 'axios';
 //import { Buffer } from "buffer";
 import RNFS from 'react-native-fs';
 import { VolumeManager } from 'react-native-volume-manager';
-import init from 'react_native_mqtt';
-init({
-    size: 10000,
-    storageBackend: AsyncStorage,
-    defaultExpires: 1000 * 3600 * 24,
-    enableCache: true,
-    sync : {}
-  });
-  
-  // 创建客户端实例
-  const options = {
-    host: 'broker.emqx.io',
-    port: 8083,
-    path: '/testTopic',
-    id: 'id_' + parseInt(Math.random()*100000)
-  };
-let client = new Paho.MQTT.Client(options.host, options.port, options.path);
-const sendmusicconnect = async () =>{
-  
-
-  if (!client.isConnected()){
-    console.log("music_conncted_connect")
-    client.connect({
-        onSuccess:onConnect,
-        useSSL: false,
-        timeout: 1000,
-        onFailure: onFailure
-      });
-  }
-  else{
-    console.log("music_conncted_send")
-    await sendMessage();
-  }
-
-}
+import { sendmusicconnect } from './components/mqttclient/mqttclient';
 export async function setupPlayer() {
   let isSetup = false;
   try {
@@ -207,10 +173,21 @@ export async function playbackService() {
   ;
   });
 
+
   TrackPlayer.addEventListener(Event.RemotePlay, async () => {
     console.log('Event.RemotePlay');
     let music_connected =  await AsyncStorage.getItem("music_connected")
     if (music_connected){
+      console.log("play","music_connect")
+      await AsyncStorage.setItem("current_payloadkey","music_connect_play")
+      await AsyncStorage.setItem("current_topic","caesaraimusicstreamconnect/play")
+      await AsyncStorage.setItem("music_connect_play","play");
+      await AsyncStorage.setItem("current_subscribe_topic","caesaraimusicstreamconnect/sub-play")
+      await sendmusicconnect()
+      await AsyncStorage.removeItem("current_payloadkey")
+      await AsyncStorage.removeItem("current_topic")
+      await AsyncStorage.removeItem("music_connect_play");
+      await AsyncStorage.removeItem("current_subscribe_topic")
 
     }
     else{
