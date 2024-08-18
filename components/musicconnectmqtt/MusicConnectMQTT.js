@@ -23,17 +23,19 @@ init({
   enableCache: true,
   sync : {}
 });
+
+// 创建客户端实例
 const options = {
   host: 'broker.emqx.io',
   port: 8083,
   path: '/testTopic',
   id: 'id_' + parseInt(Math.random()*100000)
 };
-// 创建客户端实例
 client = new Paho.MQTT.Client(options.host, options.port, options.path);
-
 export default function MusicConnectMQTT ({messageprop}){
-  const [status,setStatus] = useState("");
+
+
+  const [status,setStatus] = useState(client.isConnected() === false ? "" :"connected");
   const [subscribedTopic,setSubscribedTopic] = useState("");
   const [message,setMessage] = useState(messageprop);
   const [messageList,setMessageList] = useState("");
