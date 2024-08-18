@@ -52,12 +52,8 @@ export default function MusicConnectMQTT (){
 
     setStatus("connected")
     console.log('onConnectHello');
-    try{
-      sendMessage()
-    }
-    catch{
-      
-    }
+    sendMessage()
+
     //sendMessage()
 
     //this.subscribeTopic()
@@ -124,6 +120,7 @@ export default function MusicConnectMQTT (){
     messagesend.destinationName = topic;
     client.send(messagesend);
   }
+
 
 
 
