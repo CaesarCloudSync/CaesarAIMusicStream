@@ -73,12 +73,20 @@ export default function MusicConnectMQTT (){
       'isFetching' 
 
     );
+    try{
     client.connect({
       onSuccess:onConnect,
       useSSL: false,
       timeout: 3,
       onFailure: onFailure
     });
+  } catch(err){
+    console.log(err)
+    if (err.toString().includes("Invalid state already connected")){
+      setStatus("connected")
+    }
+
+  }
     
   }
   // 连接丢失
@@ -128,12 +136,27 @@ export default function MusicConnectMQTT (){
   }
   const checkmusicconnect = async () =>{
     let  music_connected = await AsyncStorage.getItem("music_connected")
-    if (status === "" && music_connected === "true"){
+    if (status === "" , music_connected === "true"){
       
       if (isMount) {
         console.log('First Render');
+        if (music_connected === "true"){
+          setStatus("connected")
+        }
       } else {
-        connect()
+        try{
+          console.log("second render")
+          if (!client.isConnected()){
+            
+            connect()
+          }
+          else{
+            setStatus("connected")
+          }
+        }
+        catch{
+
+        }
       }
     }
   }
