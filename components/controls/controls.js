@@ -43,7 +43,6 @@ async function onConnect (){
   function onFailure (err) {
     console.log('Connect failed!');
     console.log(err);
-    setStatus("failed")
   }
 const get_thumbnail = async (album_id) =>{
     const access_token = await get_access_token();
