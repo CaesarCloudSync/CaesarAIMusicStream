@@ -145,7 +145,7 @@ export default function MusicConnectMQTT (){
         }
       } else {
         try{
-          console.log("second render")
+          //console.log("second render")
           if (!client.isConnected()){
             
             connect()
