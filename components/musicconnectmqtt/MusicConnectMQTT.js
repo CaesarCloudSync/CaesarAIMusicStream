@@ -5,12 +5,14 @@ import {
   Text,
   StyleSheet,
   FlatList,
+  TouchableOpacity,
 } from 'react-native';
 
 import { Input, Button} from '@rneui/base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import init from 'react_native_mqtt';
-
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useProgress } from 'react-native-track-player';
 init({
   size: 10000,
   storageBackend: AsyncStorage,
@@ -27,23 +29,27 @@ const options = {
 // 创建客户端实例
 client = new Paho.MQTT.Client(options.host, options.port, options.path);
 
-class MQTTTest extends Component {
+class MusicConnectMQTT extends Component {
   constructor(props){
     super(props)
+    console.log(props.progress)
+       
     this.state={
-      topic: 'testTopic',
+      topic: 'caesaraimusicstreamconnect/current-track',
       subscribedTopic: '',
-      message: '',
+      message: JSON.stringify(props.message),
       messageList: [],
       status: ''
     };
     client.onConnectionLost = this.onConnectionLost;
     client.onMessageArrived = this.onMessageArrived;
   }
+  
   // 连接成功
   onConnect = () => {
     console.log('onConnect');
     this.setState({ status: 'connected' });
+    //this.subscribeTopic()
   }
   // 连接失败
   onFailure = (err) => {
@@ -62,6 +68,7 @@ class MQTTTest extends Component {
           timeout: 3,
           onFailure: this.onFailure
         });
+        
       }
     );
   }
@@ -85,7 +92,7 @@ class MQTTTest extends Component {
   // 主题订阅
   subscribeTopic = () => {
     this.setState(
-      { subscribedTopic: this.state.topic },
+      { subscribedTopic: this.state.subscribedTopic },
       () => {
         client.subscribe(this.state.subscribedTopic, { qos: 0 });
       }
@@ -101,114 +108,52 @@ class MQTTTest extends Component {
   }
   // 消息发布
   sendMessage = () =>{
-    var message = new Paho.MQTT.Message(options.id + ':' + this.state.message);
-    message.destinationName = this.state.subscribedTopic;
+    var message = new Paho.MQTT.Message(this.state.message);
+    message.destinationName = this.state.topic;
     client.send(message);
   }
-  renderRow = ({ item, index }) => {
-    idMessage = item.split(':');
-    console.log('>>>ITEM', item);
-    return(
-      <View 
-        style={[
-          styles.componentMessage,
-          idMessage[0] == options.id ?
-            styles.myMessageComponent
-          :
-            (idMessage.length == 1 ? styles.introMessage : styles.messageComponent),
-        ]}
-      >
-        <Text style={idMessage.length == 1 ? styles.textIntro : styles.textMessage}>
-          {item}
-        </Text>
-      </View>
-    )
+  componentDidMount() {
+    this.interval = setInterval(() => 
+    {
+        if (this.state.status === "connected"){
+            this.sendMessage()
+        }
+    }
+    
+    , 1000);
   }
-  _keyExtractor = (item, index) => item + index;
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
   render() {
     const { status, messageList } = this.state;
     return (
-      <View style={styles.container}>
-        <Text
-          style={{
-            marginBottom: 50,
-            textAlign: 'center',
-            color: this.state.status === 'connected' ? 'green' : 'black'
-          }}
-        >
-          ClientID: {options.id}
-        </Text>
+      <View style={{justifyContent:"center",alignItems:"center"}}>
+
         {
           this.state.status === 'connected' ?
             <View>
-              <Button
-                type='solid'
-                title='DISCONNECT'
-                onPress={() => {
+            <TouchableOpacity  onPress={() => {
                   client.disconnect();
                   this.setState({ status: '', subscribedTopic: '' });
-                }}
-                buttonStyle={{ marginBottom:50, backgroundColor: '#397af8' }}
-                icon={{ name: 'lan-disconnect', type: 'material-community', color: 'white' }}
-              />
+      
+                }}>
+            <MaterialIcons color={"green"} size={20} name='devices'></MaterialIcons>
+            </TouchableOpacity>
+
             </View>
           :
-            <Button
-              type='solid'
-              title='CONNECT'
-              onPress={this.connect}
-              buttonStyle={{
-                marginBottom:50,
-                backgroundColor: status === 'failed' ? 'red' : '#397af8'
-              }}
-              icon={{ name: 'lan-connect', type: 'material-community', color: 'white' }}
-              loading={status === 'isFetching' ? true : false}
-              disabled={status === 'isFetching' ? true : false}
-            />
+          <TouchableOpacity  onPress={this.connect}>
+             <MaterialIcons size={20} name='devices'></MaterialIcons>
+            </TouchableOpacity>
+
+
         }
 
       </View>
     );
   }
 }
-// messageList
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 70,
-  },
-  messageBox:{
-    margin: 16,
-    flex: 1,
-  },
-  myMessageComponent:{
-    backgroundColor: '#000000',
-    borderRadius: 3,
-    padding: 5,
-    marginBottom: 5,
-  },
-  messageComponent:{
-    marginBottom: 5,
-    backgroundColor: '#0075e2',
-    padding: 5,
-    borderRadius: 3,
-  },
-  introMessage:{
-  },
-  textInput:{
-    height: 40,
-    margin: 5,
-    borderWidth: 1,
-    padding: 5,
-  },
-  textIntro:{
-    color: 'black',
-    fontSize: 12,
-  },
-  textMessage:{
-    color: 'white',
-    fontSize: 16,
-  },
-});
+//         {this.state.status === "connected" && <Button onPress={() =>{this.sendMessage()}} title={"publish"}></Button>}
 
-export default MQTTTest;
+export default MusicConnectMQTT;

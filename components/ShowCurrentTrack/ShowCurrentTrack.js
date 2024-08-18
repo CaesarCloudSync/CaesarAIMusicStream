@@ -19,48 +19,8 @@ import { setupPlayer } from '../../trackPlayerServices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { autoplaynextsong,autoplayprevioussong } from '../controls/controls';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import init from 'react_native_mqtt';
+import MusicConnectMQTT from '../musicconnectmqtt/MusicConnectMQTT';
 export default function ShowCurrentTrack({searchscreen,tracks}) {
-  const [connectStatus,setConnectStatus] = useState(false);
-      init({
-        size: 10000,
-        storageBackend: AsyncStorage,
-        defaultExpires: 1000 * 3600 * 24,
-        enableCache: true,
-        sync : {}
-      });
-      const options = {
-        host: 'broker.emqx.io',
-        port: 8083,
-        path: '/testTopic',
-        id: 'emqx_react_' + Math.random().toString(16).substring(2, 8)
-      };
-      function onConnect() {
-        console.log("onConnect");
-        client.subscribe("testtopic",{ qos: 0 })
-        setConnectStatus(true)
-      }
-      function onFailure() {
-        console.log("onFailure");
-        setConnectStatus(false)
-      }
-
-      function onConnectionLost(responseObject) {
-        if (responseObject.errorCode !== 0) {
-          console.log("onConnectionLost:"+responseObject.errorMessage);
-        }
-      }
-
-      function onMessageArrived(message) {
-        console.log("onMessageArrived:"+message.payloadString);
-      }
-
-
-    let client = new Paho.MQTT.Client(options.host, options.port, options.id);
-    client.onConnectionLost = onConnectionLost;
-    client.onMessageArrived = onMessageArrived;
- 
-
 
     //console.log("hi")
     const progress = useProgress();
@@ -130,26 +90,9 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
 
       }
 
-     const mqttConnect = () =>{
-
-      client.connect({ onSuccess:onConnect, useSSL:false, onFailure: onFailure});
-      //client.subscribe("testtopic",{ qos: 0 })
-     }
-     const mqttDisconnect  = () =>{
-      if (client.isConnected()) {
-        try {
-          client.disconnect()
-          client.unsubscribe("testtopic")
-        } catch (error) {
-          console.log('disconnect error:', error)
-        }
-      }
-    
-      
 
 
-      setConnectStatus(false)
-     }
+
       if ( currentTrack !== null){
         return(
           <TouchableOpacity onPress={() =>{getalbumtracks()}} style={{flexDirection:"row",backgroundColor:"#141212",margin:!searchscreen ? 5: 0,marginLeft:30}} >
@@ -162,9 +105,8 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
             <Text >{currentTrack.title}</Text>
             <Text>{currentTrack.artist}</Text>
             </View>
-            <TouchableOpacity onPress={() =>{ if (connectStatus === false){mqttConnect()}else{mqttDisconnect()}  }} style={{justifyContent:"center",alignItems:"flex-start"}}>
-            <MaterialIcons size={20} color={connectStatus === false ? "white" : "green"} name='devices'></MaterialIcons>
-            </TouchableOpacity>
+            <MusicConnectMQTT message={currentTrack}/>
+
           </TouchableOpacity>
         );
       }
