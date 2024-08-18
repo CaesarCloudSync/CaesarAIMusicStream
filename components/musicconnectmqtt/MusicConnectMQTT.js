@@ -1,5 +1,5 @@
 /* @flow */
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -29,113 +29,104 @@ const options = {
 // 创建客户端实例
 client = new Paho.MQTT.Client(options.host, options.port, options.path);
 
-class MusicConnectMQTT extends Component {
-  constructor(props){
-    super(props)
-    console.log(props.progress)
-       
-    this.state={
-      topic: 'caesaraimusicstreamconnect/current-track',
-      subscribedTopic: '',
-      message: JSON.stringify(props.message),
-      messageList: [],
-      status: ''
-    };
-    client.onConnectionLost = this.onConnectionLost;
-    client.onMessageArrived = this.onMessageArrived;
-  }
+export default function MusicConnectMQTT ({messageprop}){
+  const [status,setStatus] = useState("");
+  const [subscribedTopic,setSubscribedTopic] = useState("");
+  const [message,setMessage] = useState(JSON.stringify(messageprop));
+  const [messageList,setMessageList] = useState("");
+  const [topic,setTopic] = useState('caesaraimusicstreamconnect/current-track');
+  client.onConnectionLost = onConnectionLost;
+  client.onMessageArrived = onMessageArrived;
   
   // 连接成功
-  onConnect = () => {
-    console.log('onConnect');
-    this.setState({ status: 'connected' });
+  function onConnect (){
+
+    setStatus("connected")
+    console.log('onConnectHello');
+
     //this.subscribeTopic()
   }
   // 连接失败
-  onFailure = (err) => {
+  function onFailure (err) {
     console.log('Connect failed!');
     console.log(err);
-    this.setState({ status: 'failed' });
+    setStatus("failed")
   }
   // 连接 MQTT 服务器
-  connect = () => {
-    this.setState(
-      { status: 'isFetching' },
-      () => {
-        client.connect({
-          onSuccess: this.onConnect,
-          useSSL: false,
-          timeout: 3,
-          onFailure: this.onFailure
-        });
-        
-      }
+  function connect () {
+    setStatus(
+      'isFetching' 
+
     );
+    client.connect({
+      onSuccess:onConnect,
+      useSSL: false,
+      timeout: 3,
+      onFailure: onFailure
+    });
+    
   }
   // 连接丢失
-  onConnectionLost=(responseObject)=>{
+  function onConnectionLost (responseObject){
     if (responseObject.errorCode !== 0) {
       console.log('onConnectionLost:' + responseObject.errorMessage);
     }
   }
   // 收到消息
-  onMessageArrived = (message )=> {
+  function onMessageArrived(message ) {
     console.log('onMessageArrived:' + message.payloadString);
-    newmessageList = this.state.messageList;
+    let newmessageList = messageList;
     newmessageList.unshift(message.payloadString);
-    this.setState({ messageList: newmessageList });
+    setMessage( newmessageList)
     // this.MessageListRef.scrollToEnd({animated: false});
   }
-  onChangeTopic = (text) => {
-    this.setState({ topic: text });
+  function onChangeTopic (text){
+    setTopic(text)
   }
   // 主题订阅
-  subscribeTopic = () => {
-    this.setState(
-      { subscribedTopic: this.state.subscribedTopic },
+  function subscribeTopic (){
+    setSubscribedTopic(
+      { subscribedTopic: subscribedTopic },
       () => {
-        client.subscribe(this.state.subscribedTopic, { qos: 0 });
+        client.subscribe(subscribedTopic, { qos: 0 });
       }
     );
   }
   // 取消订阅
-  unSubscribeTopic = () => {
-    client.unsubscribe(this.state.subscribedTopic);
-    this.setState({ subscribedTopic: '' });
+  function unSubscribeTopic () {
+    client.unsubscribe(subscribedTopic);
+    setSubscribedTopic("")
   }
-  onChangeMessage = (text) => {
-    this.setState({ message: text });
+  function onChangeMessage(text) {
+    setMessage(text)
   }
   // 消息发布
-  sendMessage = () =>{
-    var message = new Paho.MQTT.Message(this.state.message);
-    message.destinationName = this.state.topic;
-    client.send(message);
+  function sendMessage (){
+    var messagesend = new Paho.MQTT.Message(message);
+    messagesend.destinationName = topic;
+    client.send(messagesend);
   }
-  componentDidMount() {
-    this.interval = setInterval(() => 
-    {
-        if (this.state.status === "connected"){
-            this.sendMessage()
+  useEffect(() => {
+    const intervalID = setInterval(() =>  {
+      console.log(status)
+        if (status === "connected"){
+          sendMessage()
         }
-    }
-    
-    , 1000);
-  }
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-  render() {
-    const { status, messageList } = this.state;
+    }, 1000);
+
+    return () => clearInterval(intervalID);
+}, [status]);
+
+
     return (
       <View style={{justifyContent:"center",alignItems:"center"}}>
 
         {
-          this.state.status === 'connected' ?
+          status === 'connected' ?
             <View>
             <TouchableOpacity  onPress={() => {
                   client.disconnect();
-                  this.setState({ status: '', subscribedTopic: '' });
+                  setStatus("");setSubscribedTopic("");
       
                 }}>
             <MaterialIcons color={"green"} size={20} name='devices'></MaterialIcons>
@@ -143,7 +134,7 @@ class MusicConnectMQTT extends Component {
 
             </View>
           :
-          <TouchableOpacity  onPress={this.connect}>
+          <TouchableOpacity  onPress={connect}>
              <MaterialIcons size={20} name='devices'></MaterialIcons>
             </TouchableOpacity>
 
@@ -153,7 +144,6 @@ class MusicConnectMQTT extends Component {
       </View>
     );
   }
-}
+
 //         {this.state.status === "connected" && <Button onPress={() =>{this.sendMessage()}} title={"publish"}></Button>}
 
-export default MusicConnectMQTT;
