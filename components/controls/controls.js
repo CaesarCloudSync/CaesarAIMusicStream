@@ -28,6 +28,7 @@ const sendMessage = async  () =>{
     var messagesend = new Paho.MQTT.Message(music_connect_next_song);
     messagesend.destinationName = topic;
     client.send(messagesend);
+    await TrackPlayer.pause();
 }
 async function onConnect (){
 
@@ -65,13 +66,19 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             await TrackPlayer.add([{playlist_thumbnail:nextsong.playlist_thumbnail,playlist_id:nextsong.playlist_id,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
             await TrackPlayer.add([{playlist_thumbnail:nextsong.playlist_thumbnail,playlist_id:nextsong.playlist_id,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id + "dummy",url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
             await TrackPlayer.skip(queue.length)
+            let music_connected =  await AsyncStorage.getItem("music_connected")
+            if (!music_connected){
             await TrackPlayer.play()
+            }
         }
         else if ("playlist_local" in nextsong){
             await TrackPlayer.add([{playlist_local:nextsong.playlist_local,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
             await TrackPlayer.add([{playlist_local:nextsong.playlist_local,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id + "dummy",url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
             await TrackPlayer.skip(queue.length)
+            let music_connected =  await AsyncStorage.getItem("music_connected")
+            if (!music_connected){
             await TrackPlayer.play()
+            }
 
         }
         else{
@@ -80,11 +87,17 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await TrackPlayer.add([{index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
         await TrackPlayer.add([{index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id + "dummy",url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online"}]);
         await TrackPlayer.skip(queue.length)
+        let music_connected =  await AsyncStorage.getItem("music_connected")
+        if (!music_connected){
         await TrackPlayer.play()
+        }
     }
     nextsong.url = streaming_link
+    let music_connected =  await AsyncStorage.getItem("music_connected")
+    if (music_connected){
     await AsyncStorage.setItem("music_connect_next_track",JSON.stringify(nextsong))
     await sendmusicconnect()
+    }
 
     }
     else{
@@ -92,8 +105,11 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         nextsong.url = queue[elementPos].url
         await TrackPlayer.skip(elementPos)
         await TrackPlayer.play()
+        let music_connected =  await AsyncStorage.getItem("music_connected")
+        if (music_connected){
         await AsyncStorage.setItem("music_connect_next_track",JSON.stringify(nextsong))
         await sendmusicconnect()
+        }
      
 
     }

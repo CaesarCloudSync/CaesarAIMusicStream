@@ -48,11 +48,12 @@ export default function MusicConnectMQTT (){
   client.onMessageArrived = onMessageArrived;
   
   // 连接成功
-  function onConnect (){
+  async function onConnect (){
 
     setStatus("connected")
     console.log('onConnectHello');
     sendMessage()
+    await AsyncStorage.setItem("music_connected","true")
 
     //sendMessage()
 
@@ -120,6 +121,18 @@ export default function MusicConnectMQTT (){
     messagesend.destinationName = topic;
     client.send(messagesend);
   }
+  const removemusicconnect = async () =>{
+    await AsyncStorage.removeItem("music_connected")
+  }
+  const checkmusicconnect = async () =>{
+    let  music_connected = await AsyncStorage.getItem("music_connected")
+    if (status === "" && music_connected === "true"){
+      connect()
+    }
+  }
+  useEffect(() =>{
+    checkmusicconnect()
+  },[status])
 
 
 
@@ -132,8 +145,15 @@ export default function MusicConnectMQTT (){
           status === 'connected' ?
             <View>
             <TouchableOpacity  onPress={() => {
-                  client.disconnect();
+                  try{
+                    client.disconnect();
+                  }
+                  catch{
+
+                  }
                   setStatus("");setSubscribedTopic("");
+                  removemusicconnect()
+                 
       
                 }}>
             <MaterialIcons color={"green"} size={20} name='devices'></MaterialIcons>
