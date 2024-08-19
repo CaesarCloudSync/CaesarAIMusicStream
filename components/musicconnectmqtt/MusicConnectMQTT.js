@@ -15,6 +15,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useProgress } from 'react-native-track-player';
 import debounce from "lodash.debounce";
 import TrackPlayer from 'react-native-track-player';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 import { useIsMount } from './useIsMount';
 
@@ -35,9 +36,9 @@ const options = {
 };
 client = new Paho.MQTT.Client(options.host, options.port, options.path);
 export default function MusicConnectMQTT (){
-
+  const netInfo = useNetInfo()
   const isMount = useIsMount();
-  const [status,setStatus] = useState(client.isConnected() === false ? "" :"connected");
+  const [status,setStatus] = useState("");
   const [subscribedTopic,setSubscribedTopic] = useState("caesaraimusicstreamconnect/song-end");
   const [message,setMessage] = useState("");
   const [messageList,setMessageList] = useState([]);
@@ -134,13 +135,15 @@ export default function MusicConnectMQTT (){
   }
   const checkmusicconnect = async () =>{
     let  music_connected = await AsyncStorage.getItem("music_connected")
-    if (music_connected === "true"){
+    console.log(netInfo.isInternetReachable === true)
+    if (music_connected === "true" && netInfo.isInternetReachable === true){
       setStatus("connected")
     }
   }
   useEffect(() =>{
     checkmusicconnect()
-  },[status])
+  },[status,netInfo])
+
 
 
 
@@ -169,7 +172,7 @@ export default function MusicConnectMQTT (){
 
             </View>
           :
-          <TouchableOpacity  onPress={connect}>
+          <TouchableOpacity  onPress={() =>{if (netInfo.isInternetReachable){connect()}}}>
              <MaterialIcons size={20} name='devices'></MaterialIcons>
             </TouchableOpacity>
 
