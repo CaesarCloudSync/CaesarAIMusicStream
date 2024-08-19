@@ -24,7 +24,7 @@ export default function TrackProgress({seek,setSeek,style}) {
       return `${mins}:${secs}`;
     }
     const seekToPosition = async (value) =>{
-      console.log("seek_value",value.toString())
+      //console.log("seek_value",value.toString())
       let music_connected =  await AsyncStorage.getItem("music_connected")
       if (music_connected){
         await AsyncStorage.setItem("current_payloadkey","music_connect_seek")
