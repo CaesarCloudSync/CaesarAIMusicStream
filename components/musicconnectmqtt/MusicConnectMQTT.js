@@ -29,10 +29,12 @@ init({
 
 // 创建客户端实例
 const options = {
-  host: 'broker.emqx.io',
-  port: 8083,
+  host: 'cc53739c14c847c3b542121d3f3007bc.s1.eu.hivemq.cloud',
+  port: 8884,
   path: '/testTopic',
-  id: 'id_' + parseInt(Math.random()*100000)
+  id: 'id_' + parseInt(Math.random()*100000),
+  username: 'emqx_test',
+  password: 'Emqx_test23',
 };
 client = new Paho.MQTT.Client(options.host, options.port, options.path);
 export default function MusicConnectMQTT (){
@@ -79,7 +81,9 @@ export default function MusicConnectMQTT (){
     try{
     client.connect({
       onSuccess:onConnect,
-      useSSL: false,
+      userName: options.username,
+      password: options.password,
+      useSSL: true,
       timeout: 1000,
       onFailure: onFailure
     });
