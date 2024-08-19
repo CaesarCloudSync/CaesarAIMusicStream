@@ -71,8 +71,13 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     }
 
     if (thumbnail.includes("file://")){
-        let music_connected_thumbnail = await get_thumbnail(nextsong.album_id);
-        nextsong.thumbnail = music_connected_thumbnail
+        if (!nextsong.ytcustom){
+            let music_connected_thumbnail = await get_thumbnail(nextsong.album_id);
+            nextsong.thumbnail = music_connected_thumbnail
+        }
+        else{
+            nextsong.thumbnail = ""
+        }
     }
     else{
         nextsong.thumbnail = thumbnail   
