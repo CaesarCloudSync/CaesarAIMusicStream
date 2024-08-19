@@ -213,7 +213,7 @@ export async function playbackService() {
       await AsyncStorage.removeItem("current_subscribe_topic")
       
       await TrackPlayer.setVolume(0)
-      await TrackPlayer.setRate(0.00000000001)
+      //await TrackPlayer.setRate(0.00000000001)
       await TrackPlayer.pause();
       
    
@@ -245,7 +245,7 @@ export async function playbackService() {
       await AsyncStorage.removeItem("current_subscribe_topic")
 
       await TrackPlayer.setVolume(0)
-      await TrackPlayer.setRate(0.00000000001)
+      //await TrackPlayer.setRate(0.00000000001)
       await TrackPlayer.play();
       
     

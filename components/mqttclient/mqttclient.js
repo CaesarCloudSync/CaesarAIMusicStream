@@ -46,7 +46,7 @@ const sendMessage = async  () =>{
     console.log(topic )
     if (!topic.includes("/pause")){
         await TrackPlayer.setVolume(0)
-        await TrackPlayer.setRate(0.00000000001)
+        //await TrackPlayer.setRate(0.00000000001)
         await TrackPlayer.play()
     }
 
