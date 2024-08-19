@@ -41,7 +41,14 @@ const sendMessage = async  () =>{
     var messagesend = new Paho.MQTT.Message(music_connect_next_song);
     messagesend.destinationName = topic;
     client.send(messagesend);
-    await TrackPlayer.pause();
+    console.log(topic )
+    if (!topic.includes("/pause")){
+        await TrackPlayer.setVolume(0)
+        await TrackPlayer.setRate(0.00000000001)
+        await TrackPlayer.play()
+    }
+
+    //await TrackPlayer.pause();
 }
 
 

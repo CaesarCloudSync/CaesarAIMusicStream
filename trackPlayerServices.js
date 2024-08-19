@@ -164,9 +164,31 @@ export async function playbackService() {
       
     }
   });
-  TrackPlayer.addEventListener(Event.RemotePause, () => {
+  TrackPlayer.addEventListener(Event.RemotePause,async  () => {
     console.log('Event.RemotePause');
     TrackPlayer.pause();
+    let music_connected =  await AsyncStorage.getItem("music_connected")
+    if (music_connected){
+      console.log("pause","music_connect")
+      await AsyncStorage.setItem("current_payloadkey","music_connect_pause")
+      await AsyncStorage.setItem("current_topic","caesaraimusicstreamconnect/pause")
+      await AsyncStorage.setItem("music_connect_pause","pause");
+      await AsyncStorage.setItem("current_subscribe_topic","caesaraimusicstreamconnect/sub-pause")
+      await sendmusicconnect()
+      await AsyncStorage.removeItem("current_payloadkey")
+      await AsyncStorage.removeItem("current_topic")
+      await AsyncStorage.removeItem("music_connect_pause");
+      await AsyncStorage.removeItem("current_subscribe_topic")
+      await TrackPlayer.setVolume(0)
+      await TrackPlayer.setRate(0.00000000001)
+      await TrackPlayer.pause();
+      
+   
+      
+    }
+    else{
+      TrackPlayer.pause();
+    }
   });
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
     console.log('Event.PlaybackQueueEnded');
@@ -188,7 +210,12 @@ export async function playbackService() {
       await AsyncStorage.removeItem("current_topic")
       await AsyncStorage.removeItem("music_connect_play");
       await AsyncStorage.removeItem("current_subscribe_topic")
-
+      await TrackPlayer.setVolume(0)
+      await TrackPlayer.setRate(0.00000000001)
+      await TrackPlayer.play();
+      
+    
+      
     }
     else{
       TrackPlayer.play();

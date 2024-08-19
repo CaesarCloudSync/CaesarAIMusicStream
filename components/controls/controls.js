@@ -49,6 +49,8 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await TrackPlayer.skip(queue.length)
         let music_connected =  await AsyncStorage.getItem("music_connected")
         if (!music_connected){
+        TrackPlayer.setVolume(1)
+        TrackPlayer.setRate(1)
         await TrackPlayer.play()
         }
     }
@@ -105,6 +107,8 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await sendmusicconnect()
         }
         else{
+            TrackPlayer.setVolume(1)
+            TrackPlayer.setRate(1)
             await TrackPlayer.play()
         }
      
@@ -113,7 +117,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
 }
 
 export const autoplaynextsong = async () =>{
-    
+
 
     const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
     const album_tracks = JSON.parse(stored_album_tracks)
