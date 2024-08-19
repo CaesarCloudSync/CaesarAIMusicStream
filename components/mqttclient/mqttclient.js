@@ -86,7 +86,7 @@ async function onConnect (){
             userName: options.username,
             password: options.password,
             useSSL: true,
-            timeout: 1000,
+            timeout: 1000000000,
             onFailure: onFailure
           });
       }
