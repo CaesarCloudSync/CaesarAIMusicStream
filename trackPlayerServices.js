@@ -135,8 +135,40 @@ export async function playbackService() {
 
    
   });
-  const volumeListener = VolumeManager.addVolumeListener((result) => {
-    console.log(result.volume);
+  function throttleAsync(func, delay) {
+    let lastCall = 0;
+    let lastPromise = null;
+
+    return async function(...args) {
+        const now = new Date().getTime();
+
+        if (now - lastCall < delay) {
+            if (lastPromise) return lastPromise;
+        }
+
+        lastCall = now;
+        lastPromise = func(...args);
+        return lastPromise;
+    };
+}
+  function HandlVolume (){
+    
+  }
+  const volumeListener = VolumeManager.addVolumeListener(async (result) => {
+    
+    console.log(result.volume.toString(),typeof result.volume.toString());
+    // TODO This code works it just needs to be throttle to reduce the load sent on the mqtt
+    /* 
+    await AsyncStorage.setItem("current_payloadkey","music_connect_volume")
+    await AsyncStorage.setItem("current_topic","caesaraimusicstreamconnect/volume")
+    await AsyncStorage.setItem("music_connect_volume",result.volume.toString());
+    await AsyncStorage.setItem("current_subscribe_topic","caesaraimusicstreamconnect/sub-volume")
+    await sendmusicconnect()
+    await AsyncStorage.removeItem("current_payloadkey")
+    await AsyncStorage.removeItem("current_topic")
+    await AsyncStorage.removeItem("music_connect_volume");
+    await AsyncStorage.removeItem("current_subscribe_topic")
+    */
   
     // On Android, additional volume types are available:
     // music, system, ring, alarm, notification
@@ -179,6 +211,7 @@ export async function playbackService() {
       await AsyncStorage.removeItem("current_topic")
       await AsyncStorage.removeItem("music_connect_pause");
       await AsyncStorage.removeItem("current_subscribe_topic")
+      
       await TrackPlayer.setVolume(0)
       await TrackPlayer.setRate(0.00000000001)
       await TrackPlayer.pause();
@@ -210,6 +243,7 @@ export async function playbackService() {
       await AsyncStorage.removeItem("current_topic")
       await AsyncStorage.removeItem("music_connect_play");
       await AsyncStorage.removeItem("current_subscribe_topic")
+
       await TrackPlayer.setVolume(0)
       await TrackPlayer.setRate(0.00000000001)
       await TrackPlayer.play();
