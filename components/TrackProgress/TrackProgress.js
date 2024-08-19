@@ -11,6 +11,8 @@ import {
 import TrackPlayer from 'react-native-track-player';
 import { useState } from 'react';
 import Slider from '@react-native-community/slider';
+import { sendmusicconnect } from '../mqttclient/mqttclient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function TrackProgress({seek,setSeek,style}) {
   const [isSeeking, setIsSeeking] = useState(false);
   
@@ -20,6 +22,25 @@ export default function TrackProgress({seek,setSeek,style}) {
       let mins = (parseInt(seconds / 60)).toString().padStart(2, '0');
       let secs = (Math.trunc(seconds) % 60).toString().padStart(2, '0');
       return `${mins}:${secs}`;
+    }
+    const seekToPosition = async (value) =>{
+      console.log("seek_value",value.toString())
+      let music_connected =  await AsyncStorage.getItem("music_connected")
+      if (music_connected){
+        await AsyncStorage.setItem("current_payloadkey","music_connect_seek")
+        await AsyncStorage.setItem("current_topic","caesaraimusicstreamconnect/seek")
+        await AsyncStorage.setItem("music_connect_seek",value.toString());
+        await AsyncStorage.setItem("current_subscribe_topic","caesaraimusicstreamconnect/sub-seek")
+        await sendmusicconnect()
+        await AsyncStorage.removeItem("current_payloadkey")
+        await AsyncStorage.removeItem("current_topic")
+        await AsyncStorage.removeItem("music_connect_seek");
+        await AsyncStorage.removeItem("current_subscribe_topic")
+      }
+
+      await TrackPlayer.seekTo(value);
+      await TrackPlayer.play();
+
     }
   
     return(
@@ -38,8 +59,7 @@ export default function TrackProgress({seek,setSeek,style}) {
         setSeek(value);
       }}
       onSlidingComplete={(value) => {
-        TrackPlayer.seekTo(value);
-        TrackPlayer.play();
+        seekToPosition(value)
       }}
     />
         <Text style={styles.trackProgress}>
