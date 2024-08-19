@@ -5,6 +5,7 @@ import RNFS from "react-native-fs";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { convertToValidFilename } from "../tool/tools";
 import { sendmusicconnect } from "../mqttclient/mqttclient";
+import { VolumeManager } from 'react-native-volume-manager';
 const get_thumbnail = async (album_id) =>{
     const access_token = await get_access_token();
     const headers = {Authorization: `Bearer ${access_token}`}
@@ -28,8 +29,8 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             await TrackPlayer.skip(queue.length)
             let music_connected =  await AsyncStorage.getItem("music_connected")
             if (!music_connected){
-            TrackPlayer.setVolume(1)
-            TrackPlayer.setRate(1)
+            //TrackPlayer.setVolume(1)
+            //TrackPlayer.setRate(1)
             await TrackPlayer.play()
             }
         }
@@ -39,8 +40,8 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             await TrackPlayer.skip(queue.length)
             let music_connected =  await AsyncStorage.getItem("music_connected")
             if (!music_connected){
-            TrackPlayer.setVolume(1)
-            TrackPlayer.setRate(1)
+            //TrackPlayer.setVolume(1)
+            //TrackPlayer.setRate(1)
             await TrackPlayer.play()
             }
 
@@ -53,8 +54,8 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await TrackPlayer.skip(queue.length)
         let music_connected =  await AsyncStorage.getItem("music_connected")
         if (!music_connected){
-        TrackPlayer.setVolume(1)
-        TrackPlayer.setRate(1)
+        //TrackPlayer.setVolume(1)
+        //TrackPlayer.setRate(1)
         await TrackPlayer.play()
         }
     }
@@ -82,6 +83,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     else{
         nextsong.thumbnail = thumbnail   
     }
+    nextsong.volume = (await VolumeManager.getVolume()).volume
     await AsyncStorage.setItem("music_connect_next_track",JSON.stringify(nextsong))
     await sendmusicconnect()
     }
@@ -112,12 +114,13 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         else{
             nextsong.thumbnail = thumbnail   
         }
+        nextsong.volume = (await VolumeManager.getVolume()).volume
         await AsyncStorage.setItem("music_connect_next_track",JSON.stringify(nextsong))
         await sendmusicconnect()
         }
         else{
-            TrackPlayer.setVolume(1)
-            TrackPlayer.setRate(1)
+            //TrackPlayer.setVolume(1)
+            //TrackPlayer.setRate(1)
             await TrackPlayer.play()
         }
      
