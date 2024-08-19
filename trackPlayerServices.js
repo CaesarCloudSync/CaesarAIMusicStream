@@ -151,23 +151,40 @@ export async function playbackService() {
         return lastPromise;
     };
 }
-  function HandlVolume (){
-    
+
+  function throttle(callback, delay = 1000) {
+    let shouldWait = false;
+  
+    return (...args) => {
+      if (shouldWait) return;
+  
+      callback(...args);
+      shouldWait = true;
+      setTimeout(() => {
+        shouldWait = false;
+      }, delay);
+    };
   }
-  const volumeListener = VolumeManager.addVolumeListener(async (result) => {
-    
-    console.log(result.volume.toString(),typeof result.volume.toString());
-    // TODO This code works it just needs to be throttle to reduce the load sent on the mqtt
-    /* 
+  const handlevolumeconnect= throttle(async (volume) => {
+    console.log("hello",volume)
     await AsyncStorage.setItem("current_payloadkey","music_connect_volume")
     await AsyncStorage.setItem("current_topic","caesaraimusicstreamconnect/volume")
-    await AsyncStorage.setItem("music_connect_volume",result.volume.toString());
+    await AsyncStorage.setItem("music_connect_volume",volume.toString());
     await AsyncStorage.setItem("current_subscribe_topic","caesaraimusicstreamconnect/sub-volume")
     await sendmusicconnect()
     await AsyncStorage.removeItem("current_payloadkey")
     await AsyncStorage.removeItem("current_topic")
     await AsyncStorage.removeItem("music_connect_volume");
     await AsyncStorage.removeItem("current_subscribe_topic")
+  }, 1000);
+  const volumeListener = VolumeManager.addVolumeListener(async (result) => {
+    let volume = result.volume
+    handlevolumeconnect(volume)
+    
+    //console.log(result.volume.toString(),typeof result.volume.toString());
+    // TODO This code works it just needs to be throttle to reduce the load sent on the mqtt
+    /* 
+
     */
   
     // On Android, additional volume types are available:
