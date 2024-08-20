@@ -52,7 +52,7 @@ export default function CustomYTModal({playlist_details,setPlaylistDetails,isMod
                 Alert.alert(result.error)
             }
             else{
-                let trackforplaylist = {"album_id": result.ytid, "album_name":result.album_name, "artist": result.artist, "artist_id": result.artist_id, "duration_ms": result.duration_ms, "id": result.ytid, "name": result.title, "playlist_local": "true", "playlist_name": playlist_details.playlist_name, "thumbnail": result.thumbnail, "track_number": 1,"ytcustom":"true"}
+                let trackforplaylist = {"album_id": result.ytid, "album_name":result.album_name, "artist": result.artist, "artist_id": result.artist_id, "duration_ms": result.duration_ms, "id": result.ytid, "name": result.title, "playlist_local": "true", "playlist_name": playlist_details.playlist_name, "thumbnail": result.thumbnail, "track_number": 1,"ytcustom":ytlink}
                 console.log(trackforplaylist)
                 await addtracktoplaylist(trackforplaylist)
             }
