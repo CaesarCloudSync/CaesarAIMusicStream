@@ -179,7 +179,10 @@ export async function playbackService() {
   }, 1000);
   const volumeListener = VolumeManager.addVolumeListener(async (result) => {
     let volume = result.volume
-    handlevolumeconnect(volume)
+    let music_connected =  await AsyncStorage.getItem("music_connected")
+    if (music_connected){
+      handlevolumeconnect(volume)
+    }
     
     //console.log(result.volume.toString(),typeof result.volume.toString());
     // TODO This code works it just needs to be throttle to reduce the load sent on the mqtt
