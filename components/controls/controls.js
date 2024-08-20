@@ -86,6 +86,13 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     nextsong.volume = (await VolumeManager.getVolume()).volume
     await AsyncStorage.setItem("music_connect_next_track",JSON.stringify(nextsong))
     await sendmusicconnect()
+    
+    }
+    
+    const queue_current_track = await AsyncStorage.getItem(`queue-current-track-${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`);
+    if (queue_current_track){
+        await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
+        await AsyncStorage.setItem("current-tracks",queue_current_track);
     }
 
     }
@@ -122,6 +129,11 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             await TrackPlayer.setVolume(1)
             //TrackPlayer.setRate(1)
             await TrackPlayer.play()
+        }
+        const queue_current_track = await AsyncStorage.getItem(`queue-current-track-${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`);
+        if (queue_current_track){
+            await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
+            await AsyncStorage.setItem("current-tracks",queue_current_track);
         }
      
 

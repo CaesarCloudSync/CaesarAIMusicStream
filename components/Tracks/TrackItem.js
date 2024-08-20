@@ -83,7 +83,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             await AsyncStorage.setItem("track_after_queue",JSON.stringify(next_track_index))
         }
 
-        await AsyncStorage.setItem("queue",JSON.stringify([album_tracks_state[index]]))
+        await AsyncStorage.setItem("queue",JSON.stringify([album_tracks_state[index]]));
         
         }
         else{
@@ -92,10 +92,12 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             queue_json.push(album_tracks_state[index])
 
             await AsyncStorage.setItem("queue",JSON.stringify(queue_json))
+            
         }
         setAddedToQueue(true)
         await timeout(1200);
         setAddingQueue(false)
+        await AsyncStorage.setItem(`queue-current-track-${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,JSON.stringify(album_tracks_state));
 
         //addtolibrary()
         /*setTimeout(() =>{
