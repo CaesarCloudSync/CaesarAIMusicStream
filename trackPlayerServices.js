@@ -122,7 +122,7 @@ export async function playbackService() {
       if (progress.duration !== 0){
         console.log(progress,"hi")
         if ((progress.duration - progress.position) < 2){
-          autoplaynextsong()
+          handleautoplaynextsong()
           //await TrackPlayer.setRepeatMode(RepeatMode.Off);
 
       
@@ -135,22 +135,11 @@ export async function playbackService() {
 
    
   });
-  function throttleAsync(func, delay) {
-    let lastCall = 0;
-    let lastPromise = null;
 
-    return async function(...args) {
-        const now = new Date().getTime();
+  const handleautoplaynextsong = throttle( async () =>{
+      await autoplaynextsong()
 
-        if (now - lastCall < delay) {
-            if (lastPromise) return lastPromise;
-        }
-
-        lastCall = now;
-        lastPromise = func(...args);
-        return lastPromise;
-    };
-}
+  },2000)
 
   function throttle(callback, delay = 1000) {
     let shouldWait = false;
