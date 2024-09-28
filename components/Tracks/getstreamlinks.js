@@ -20,9 +20,11 @@ export const addTrack = async (streaming_link,album_track) =>{
     await TrackPlayer.play()
 }
 export const getyoutubelink  = async (album_track,download=false,init_index=0) =>{
-    let searchquery = `${album_track.name.replace("&","and")} by ${album_track.artist.replace("¥$","Kanye West")}`//hoodie szn a boogie wit da hoodie album 20 tracks
+    let searchquery = `${album_track.name.replace("&","and").replace("#","")} by ${album_track.artist.replace("¥$","Kanye West")}`//hoodie szn a boogie wit da hoodie album 20 tracks
+    console.log("searchquery",searchquery)
     const response = await axios.get(`https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`)
     let videos = response.data.result
+    console.log("videos",videos)
     let video_link = download === true ? videos[init_index].link :videos[init_index].link //videos[1].link
     let title = videos[init_index].title
     return [video_link,title]

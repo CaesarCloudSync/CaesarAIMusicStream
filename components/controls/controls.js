@@ -141,7 +141,11 @@ export const skipToTrack = async (nextsong,player_ind)=>{
 }
 
 export const autoplaynextsong = async () =>{
-
+    // TODO Clean up functions - Chase Shakurs new song caused youtubesearch to go zero which caused album_tracks[index].link = undefined
+    //await AsyncStorage.removeItem("current-tracks")
+    // await AsyncStorage.removeItem("current-track")
+    //await AsyncStorage.removeItem("track_after_queue")
+    //await AsyncStorage.removeItem("queue")
 
     const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
     const album_tracks = JSON.parse(stored_album_tracks)

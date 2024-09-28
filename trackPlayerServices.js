@@ -122,7 +122,8 @@ export async function playbackService() {
       if (progress.duration !== 0){
         console.log(progress,"hi")
         if ((progress.duration - progress.position) < 2){
-          handleautoplaynextsong()
+          //andleautoplaynextsong()
+          await autoplaynextsong()
           //await TrackPlayer.setRepeatMode(RepeatMode.Off);
 
       
