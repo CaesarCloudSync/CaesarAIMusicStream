@@ -28,3 +28,11 @@ Contains three royalty free music tracks from [Pixabay](https://pixabay.com/musi
 ## License
 
 [MIT](LICENSE)
+
+# Streaming Links
+https://caesaraimusicstreamyt-still-bush-4772.fly.dev
+
+https://caesaraimusicstreamyt-qqbn26mgpa-nw.a.run.app/getaudio?url=${video_link}
+
+# Get Youtube Link
+https://caesaraiyoutube-qqbn26mgpa-uc.a.run.app/searchfeed?query=${searchquery}&amount=50`
