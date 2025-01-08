@@ -30,7 +30,7 @@ Contains three royalty free music tracks from [Pixabay](https://pixabay.com/musi
 [MIT](LICENSE)
 
 # Streaming Links
-https://caesaraimusicstreamyt-still-bush-4772.fly.dev
+https://caesaraimusicstreamyttunnel-amarilawa.uk1.pitunnel.net
 
 https://caesaraimusicstreamyt-qqbn26mgpa-nw.a.run.app/getaudio?url=${video_link}
 
