@@ -6,7 +6,7 @@ import GenreItem from "./GenreItem";
 import TrackProgress from "../TrackProgress/TrackProgress";
 import FavouriteItem from "./FavouriteItem";
 import { get_access_token } from "../access_token/getaccesstoken";
-import {FavouriteAlbums,FavouriteRecommendations} from "./FavouriteRenders";
+import {FavouriteAlbums,FavouriteRecommendations, FavouriteRecommendationsHomeScreen} from "./FavouriteRenders";
 import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -48,11 +48,9 @@ const chunkcards = (arr,chunksizeval=6) =>{
 const getinitialrnb = async (access_token) =>{
 
     const headers = {Authorization: `Bearer ${access_token}`}
-    const resp = await fetch('https://api.spotify.com/v1/recommendations?limit=50&seed_genres=r-n-b&seed_artists=2h93pZq0e7k5yf4dywlkpM,31W5EY0aAly4Qieq6OFu6I,2jku7tDXc6XoB6MO2hFuqg', {headers: headers})
+    const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?offset=15&limit=48', {headers: headers})
     const feedresult = await resp.json()
-   // console.log(feedresult)
-    const chunks = chunkcards(feedresult.tracks)
-   //console.log(chunks)
+    const chunks = chunkcards(feedresult.albums.items)
     await AsyncStorage.setItem("initial_rnb",JSON.stringify(chunks))
     setInitialRNB(chunks)
     //console.log(feedresult)
@@ -60,12 +58,11 @@ const getinitialrnb = async (access_token) =>{
 }
 const getinitialhiphop = async (access_token) =>{
     const headers = {Authorization: `Bearer ${access_token}`}
-    const resp = await fetch('https://api.spotify.com/v1/recommendations?limit=50&seed_genres=hip-hop&seed_artists=2P5sC9cVZDToPxyomzF1UH,5K4W6rqBFWDnAN6FQUkS6x,6U3ybJ9UHNKEdsH7ktGBZ7', {headers: headers})
+    const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?offset=60&limit=48', {headers: headers})
     const feedresult = await resp.json()
-   // console.log(feedresult)
-    const chunks = chunkcards(feedresult.tracks)
+    const chunks = chunkcards(feedresult.albums.items)
     await AsyncStorage.setItem("initial_hiphop",JSON.stringify(chunks))
-    
+   
     setInitialHipHop(chunks)
     //console.log(feedresult)
 
@@ -169,13 +166,16 @@ function parseISOString(s) {
             //console.log(cache_initial)
             setInitialFeed(JSON.parse(cache_initial))
         }
+        //await AsyncStorage.removeItem("initial_rnb")
         let cache_rnb = await AsyncStorage.getItem("initial_rnb")
+        console.log(JSON.parse(cache_rnb)[0][0].id)
         if (!cache_rnb){
             await getinitialrnb(access_token)
         }
         else{
             setInitialRNB(JSON.parse(cache_rnb))
         }
+        //await AsyncStorage.removeItem("initial_hiphop")
         let cache_hiphop = await AsyncStorage.getItem("initial_hiphop")
         if (!cache_hiphop){
             await getinitialhiphop(access_token)
@@ -183,6 +183,7 @@ function parseISOString(s) {
         else{
             setInitialHipHop(JSON.parse(cache_hiphop))
         }
+        await AsyncStorage.removeItem("genres")
         let cache_genre = await AsyncStorage.getItem("genres")
         const randomcolors = [
             "#3F00BA", "#3200C6", "#2500D2", "#D90025", "#CC0031",
@@ -191,6 +192,7 @@ function parseISOString(s) {
             "#008000", "#006600", "#004C00", "#003300", "#001900"
         ]
         setRandomColors(randomcolors)
+        
         if (!cache_genre){
             await getgenrefeed(access_token)
         }
@@ -244,7 +246,7 @@ function parseISOString(s) {
                 {initialrnb.length > 0 && access_token !== ""  && 
                 initialrnb.map((rnbcarousel) =>{
                     return(
-                        <FavouriteRecommendations access_token={access_token}  playlists={rnbcarousel}/>
+                        <FavouriteRecommendationsHomeScreen access_token={access_token}  playlists={rnbcarousel}/>
                     )
                 })
 
@@ -255,7 +257,7 @@ function parseISOString(s) {
                 {initialhiphop.length > 0 && access_token !== ""   && 
                 initialhiphop.map((hiphopcarousel) =>{
                     return(
-                        <FavouriteRecommendations access_token={access_token}  playlists={hiphopcarousel}/>
+                        <FavouriteRecommendationsHomeScreen access_token={access_token}  playlists={hiphopcarousel}/>
                     )
                 })
 

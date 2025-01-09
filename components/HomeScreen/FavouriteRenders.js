@@ -195,3 +195,20 @@ export function FavouriteRecommendations({favouritecards,playlists,access_token}
     </SafeAreaView>
     )
 }
+
+export function FavouriteRecommendationsHomeScreen({favouritecards,playlists,access_token}){
+    return(
+        <SafeAreaView style={{flex: 1,marginTop:10}}>
+        <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+            
+            <FlatList
+            data={playlists}
+            horizontal={true}
+            renderItem={({item,index}) =><CarouselItem key={index} access_token={access_token} favouritecards={favouritecards} spotifyid={item.id}thumbnail={item.images[0].url} album_name={item.name} artist_name={item.artists[0].name} total_tracks={item.total_tracks} release_date={item.release_date} album_type={item.album_type}/>}
+            />
+            
+
+        </View>
+    </SafeAreaView>
+    )
+}
