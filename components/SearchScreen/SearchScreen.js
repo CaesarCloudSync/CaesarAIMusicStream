@@ -74,8 +74,9 @@ export default function Search({seek, setSeek}){
         const artists = feedresult.artists.items.map((artist) =>{console.log(artist.images);return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
         const tracks = feedresult.tracks.items
         const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
-        //const playlists = feedresult.playlists.items.map((playlist) =>{return({"id":playlist.id,"name":playlist.name,"images":[{"url":playlist.images[0].url}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
-        //setPlaylists(playlists)
+        const playlists = feedresult.playlists.items.filter((playlist) =>{return(playlist !== null)}).map((playlist) =>{return({"id":playlist.id,"name":playlist.name,"images":[{"url":playlist.images[0].url}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
+        console.log(playlists,"playlists")
+        setPlaylists(playlists)
         setSongs(result)
         //console.log(artists)
         setTracks(tracks)
