@@ -11,6 +11,7 @@ import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { json } from "react-router-native";
+import { genreslist } from "./genres";
 import ShowQueue from "../ShowQueue/showqueue";
 export default function Home({seek, setSeek}){
     const netInfo = useNetInfo();
@@ -77,18 +78,7 @@ const generaterandomcolors = (array) =>{
 
     return colors
 }
-const getgenrefeed = async (access_token) =>{
-    const headers = {Authorization: `Bearer ${access_token}`}
-    const resp = await fetch('https://api.spotify.com/v1/recommendations/available-genre-seeds', {headers: headers})
-    const feedresult = await resp.json()
-    const chunks = chunkcards(feedresult.genres,chunksizeval=20);
 
-    await AsyncStorage.setItem("genres",JSON.stringify(chunks))
-
-    setGenres(chunks)
-   
-
-}
 
 const createxpiration = async () =>{
     const storageExpirationTimeInMinutes = 120; // in this case, we only want to keep the data for 30min
@@ -168,7 +158,7 @@ function parseISOString(s) {
         }
         //await AsyncStorage.removeItem("initial_rnb")
         let cache_rnb = await AsyncStorage.getItem("initial_rnb")
-        console.log(JSON.parse(cache_rnb)[0][0].id)
+  
         if (!cache_rnb){
             await getinitialrnb(access_token)
         }
@@ -183,8 +173,7 @@ function parseISOString(s) {
         else{
             setInitialHipHop(JSON.parse(cache_hiphop))
         }
-        await AsyncStorage.removeItem("genres")
-        let cache_genre = await AsyncStorage.getItem("genres")
+
         const randomcolors = [
             "#3F00BA", "#3200C6", "#2500D2", "#D90025", "#CC0031",
             "#7F007C", "#720088", "#A50056", "#990063", "#8C006F",
@@ -192,13 +181,8 @@ function parseISOString(s) {
             "#008000", "#006600", "#004C00", "#003300", "#001900"
         ]
         setRandomColors(randomcolors)
-        
-        if (!cache_genre){
-            await getgenrefeed(access_token)
-        }
-        else{
-            setGenres(JSON.parse(cache_genre))
-        }
+        const chunks = chunkcards(genreslist,chunksizeval=20);
+        setGenres(chunks)
         
 
         

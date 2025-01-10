@@ -29,9 +29,9 @@ export default function GenrePage({seek,setSeek}){
         const feedresult = await resp.json()
 
         const artists = feedresult.artists.items.map((artist) =>{console.log(artist.images);return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
-        console.log(feedresult.playlists.items)
-        const playlists = feedresult.playlists.items.map((playlist) =>{let image = playlist.images[0] !== undefined ? playlist.images[0].url : "none";return({"id":playlist.id,"name":playlist.name,"images":[{"url":image}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
-        console.log("endo")
+       
+        //console.log(feedresult.playlists.items[0])
+        const playlists = feedresult.playlists.items.filter((playlist) =>{return(playlist !== null)}).map((playlist) =>{let image = playlist.images[0].url;return({"id":playlist.id,"name":playlist.name,"images":[{"url":image}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
         setPlaylists(playlists)
         //console.log(artists)
         setArtists(artists)
