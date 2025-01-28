@@ -31,7 +31,7 @@ export const getyoutubelink  = async (album_track,download=false,init_index=0) =
 }
 export const getaudiolink = async (album_track,init_index=0) =>{
     const [video_link,title] = await getyoutubelink(album_track,download=false,init_index);
-    const response = await axios.get(`https://caesaraimusicstreamyttunnel-amarilawa.uk1.pitunnel.net/getaudio?url=${video_link}`)
+    const response = await axios.get(`https://caesaraimusicstreamyt-662756251108.europe-west2.run.app/getaudio?url=${video_link}`)
     let songurl = response.data.streaming_url
     return [songurl,title]
 }

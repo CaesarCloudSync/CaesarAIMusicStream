@@ -30,7 +30,7 @@ Contains three royalty free music tracks from [Pixabay](https://pixabay.com/musi
 [MIT](LICENSE)
 
 # Streaming Links
-https://caesaraimusicstreamyttunnel-amarilawa.uk1.pitunnel.net
+https://caesaraimusicstreamyt-662756251108.europe-west2.run.app
 
 https://caesaraimusicstreamyt-qqbn26mgpa-nw.a.run.app/getaudio?url=${video_link}
 
