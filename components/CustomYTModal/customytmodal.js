@@ -45,7 +45,7 @@ export default function CustomYTModal({playlist_details,setPlaylistDetails,isMod
       
         if (userInput.includes("https")){
             let ytlink = userInput.replace("m.","")
-            const response = await axios.get(`https://hub.caesaraihub.org/caesaraimusicstreamyt/8080/getytaudio?url=${ytlink}`)
+            const response = await axios.get(`https://music.caesaraihub.org/getytaudio?url=${ytlink}`)
             let result = response.data
           
             if ("error" in result){
