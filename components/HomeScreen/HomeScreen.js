@@ -13,6 +13,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { json } from "react-router-native";
 import { genreslist } from "./genres";
 import ShowQueue from "../ShowQueue/showqueue";
+import axios from "axios";
+
+
 export default function Home({seek, setSeek}){
     const netInfo = useNetInfo();
     const [initialfeed,setInitialFeed] = useState([]);
@@ -95,6 +98,23 @@ const createxpiration = async () =>{
       dt.toISOString()
     );
 }
+
+const backupsongdata = async () => {
+  try {
+    console.log("backing up data")
+    const keys = await AsyncStorage.getAllKeys();
+    const stores = await AsyncStorage.multiGet(keys);
+    const allData = Object.fromEntries(stores);
+    console.log(allData);
+    const response = await axios.post('http://127.0.0.1:8080/api/v1/musicbackup',{"music":allData})
+    const result = response.data;
+    console.log(result);
+    return "backup success";
+  } catch (error) {
+    console.error('Error fetching data from AsyncStorage:', error);
+  }
+};
+
 function parseISOString(s) {
     var b = s.split(/\D+/);
     return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
@@ -144,12 +164,13 @@ function parseISOString(s) {
 
         const access_token = await get_access_token();
         setAccessToken(access_token)
-        
+        await AsyncStorage.removeItem("initial_feed")
         let cache_initial = await AsyncStorage.getItem("initial_feed")
         if (!cache_initial){
             console.log("hellom")
             await getintialfeed(access_token)
             await createxpiration()
+            await backupsongdata()
         
         }
         else{
