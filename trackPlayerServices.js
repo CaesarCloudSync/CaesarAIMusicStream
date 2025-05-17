@@ -121,12 +121,19 @@ export async function playbackService() {
       console.log(progress)
       if (progress.duration !== 0){
         console.log(progress,"hi")
+        const current_autonext = await AsyncStorage.getItem("current_autonext")
         if ((progress.duration - progress.position) < 2){
           //andleautoplaynextsong()
-          await autoplaynextsong()
+          await AsyncStorage.setItem("current_autonext","true")
+          if (!current_autonext){
+            await autoplaynextsong()
+          }
           //await TrackPlayer.setRepeatMode(RepeatMode.Off);
 
       
+        }
+        else{
+          await AsyncStorage.removeItem("current_autonext")
         }
       
         }
