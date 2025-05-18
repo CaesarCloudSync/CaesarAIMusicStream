@@ -11,7 +11,7 @@ import { TouchableOpacity,Image} from "react-native";
 import { autoplaynextsong } from "../controls/controls";
 import { getstreaminglink } from "../Tracks/getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { skipToTrack } from "../controls/controls";
+import { skipToTrack,preloadTrack } from "../controls/controls";
 import Entypo from "react-native-vector-icons/Entypo"
 export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVisible,setQueue}) {
   const [queuepositionsrc,setQueuePositionSrc] = useState("");
@@ -26,9 +26,15 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
         //console.log(currentTrack.index,currentTrack)
         let player_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1 
+        let preload_next_ind_in_album = (currentTrackIndexInaAlbum +2) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +2
 
 
         await skipToTrack(nextsong,player_ind)
+        let preload_nextsong = album_tracks[preload_next_ind_in_album]
+        //console.log("preload_nextsong",preload_nextsong)
+        if (preload_nextsong){
+            await preloadTrack(preload_nextsong)
+        }
 
 
        // let final_queue_json = player_queue.filter(obj => nextsong.name !== obj.title);

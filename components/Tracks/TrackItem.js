@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
 import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gesture-handler";
 
-import { skipToTrack } from "../controls/controls";
+import { skipToTrack,preloadTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
 import axios from "axios";
@@ -174,18 +174,29 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
         if (currentTrack !== null){
             let next_track_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1
+            let preload_next_ind_in_album = (currentTrack.index +2) >= num_of_tracks ? 0 : currentTrack.index+2
             console.log("next",next_track_ind,num_of_tracks)
         
             let nextsong = album_track_state
     
             await skipToTrack(nextsong,next_track_ind)
+            let preload_nextsong = album_tracks[preload_next_ind_in_album]
+            //console.log("preload_nextsong",preload_nextsong)
+            if (preload_nextsong){
+                await preloadTrack(preload_nextsong)
+            }
         }
         else{
             let next_track_ind = 0
+            let preload_next_ind_in_album = 1
         
             let nextsong = album_track_state
 
             await skipToTrack(nextsong,next_track_ind)
+            let preload_nextsong = album_tracks[preload_next_ind_in_album]
+            if (preload_nextsong){
+                await preloadTrack(preload_nextsong)
+            }
         }
 
         
