@@ -290,6 +290,13 @@ export async function playbackService() {
     })
   });
 
+    TrackPlayer.addEventListener('remote-seek', ({position}) => {
+    console.log('Event.Seek');
+    TrackPlayer.seekTo(position);
+      
+
+  });
+
   TrackPlayer.addEventListener(Event.RemotePrevious, () => {
     console.log('Event.RemotePrevious');
   
