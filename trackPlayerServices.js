@@ -32,6 +32,7 @@ export async function setupPlayer() {
         appKilledPlaybackBehavior:
           AppKilledPlaybackBehavior.ContinuePlayback,
       },
+     // icon: require('./assets/CaesarAILogoNotification.png'),
       capabilities: [
         Capability.Play,
         Capability.Pause,
