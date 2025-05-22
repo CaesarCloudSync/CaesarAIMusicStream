@@ -152,7 +152,7 @@ export const autoplaynextsong = async () =>{
     //console.log(album_tracks[0])
     let num_of_tracks = album_tracks.length -1
     //console.log(num_of_tracks)
-    let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+    let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
     //console.log("current",currentTrackInd)
     let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
     //console.log(currentTrack.index,currentTrack)
@@ -218,7 +218,7 @@ export const autoplayprevioussong = async () =>{
     const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
     const album_tracks = JSON.parse(stored_album_tracks)
     let num_of_tracks = album_tracks.length
-    let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+    let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
     //console.log("current",currentTrackInd)
     let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
     //console.log(currentTrack.index,currentTrack.title,currentTrackInd)

@@ -72,7 +72,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         setAddingQueue(true)
         const queue = await AsyncStorage.getItem("queue")
         if (!queue){
-        let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+        let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
+        console.log("current_eh",currentTrackInd)
+        if (currentTrackInd !== undefined){
         let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
         const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
         if (stored_album_tracks){
@@ -81,6 +83,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             let next_track_index =  currentTrackIndexInaAlbum+1 == current_album_tracks.length  ? 0 : currentTrackIndexInaAlbum+1
             //console.log(album_tracks_state.length,next_track_index,currentTrackIndexInaAlbum+1,"hack")
             await AsyncStorage.setItem("track_after_queue",JSON.stringify(next_track_index))
+        }
         }
 
         await AsyncStorage.setItem("queue",JSON.stringify([album_tracks_state[index]]));
@@ -169,18 +172,21 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             }
         }
 
-        let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+        let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
         console.log("current_eh",currentTrackInd)
+        if (currentTrackInd !== undefined){
         let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
-        if (currentTrack !== null){
+       
             let next_track_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1
             console.log("next",next_track_ind,num_of_tracks)
         
             let nextsong = album_track_state
     
             await skipToTrack(nextsong,next_track_ind)
-        }
-        else{
+        
+
+    }
+            else{
             let next_track_ind = 0
         
             let nextsong = album_track_state

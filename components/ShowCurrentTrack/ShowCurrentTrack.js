@@ -26,17 +26,19 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
     const progress = useProgress();
     const navigate = useNavigate()
     const [currentTrack,setCurrentTrack] = useState(null)
-    const getCurrentTrack = async () =>{
+    const getActiveTrackIndex = async () =>{
       let queue = await TrackPlayer.getQueue();
 
-      let isSetup = await setupPlayer();
-      const currentTrackIndex = await TrackPlayer.getCurrentTrack()
+      //let isSetup = await setupPlayer();
+      const currentTrackIndex = await TrackPlayer.getActiveTrackIndex()
+      if (currentTrackIndex !==  undefined){
       const currentTrack = await TrackPlayer.getTrack(currentTrackIndex)
       //console.log(currentTrack,"crrentTrack")
 
       setCurrentTrack(currentTrack)
 
     }
+  }
 
   const autonextsong = async () =>{
       if (progress.duration !== 0){
@@ -50,13 +52,13 @@ export default function ShowCurrentTrack({searchscreen,tracks}) {
   }
 
 
-    useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
-      await getCurrentTrack();
+    useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async (event) => {
+      await getActiveTrackIndex();
       });
 
       useEffect(()=>{
         
-        getCurrentTrack();
+        getActiveTrackIndex();
     
 
       },[])

@@ -22,7 +22,7 @@ import { sendmusicconnect } from './components/mqttclient/mqttclient';
 export async function setupPlayer() {
   let isSetup = false;
   try {
-    await TrackPlayer.getCurrentTrack();
+    await TrackPlayer.getActiveTrackIndex();
     isSetup = true;
   }
   catch {
@@ -112,7 +112,7 @@ export async function playbackService() {
   TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, async (progress) => {
     console.log('Event.PlaybackProgressUpdated');
     
-    let currentTrackInd = await TrackPlayer.getCurrentTrack();
+    let currentTrackInd = await TrackPlayer.getActiveTrackIndex();
     let currentTrack = await TrackPlayer.getTrack(currentTrackInd);
     if (currentTrack.mediastatus !== "online"){
 
@@ -277,7 +277,7 @@ export async function playbackService() {
   TrackPlayer.addEventListener(Event.RemoteNext, () => {
     console.log('Event.RemoteNext');
       
-    TrackPlayer.getCurrentTrack().then((currentTrackInd) =>{
+    TrackPlayer.getActiveTrackIndex().then((currentTrackInd) =>{
       TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
         if (currentTrack.mediastatus !== "online"){
           TrackPlayer.skipToNext();
@@ -292,7 +292,7 @@ export async function playbackService() {
   TrackPlayer.addEventListener(Event.RemotePrevious, () => {
     console.log('Event.RemotePrevious');
   
-    TrackPlayer.getCurrentTrack().then((currentTrackInd) =>{
+    TrackPlayer.getActiveTrackIndex().then((currentTrackInd) =>{
       TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
         if (currentTrack.mediastatus !== "online"){
           TrackPlayer.skipToPrevious();

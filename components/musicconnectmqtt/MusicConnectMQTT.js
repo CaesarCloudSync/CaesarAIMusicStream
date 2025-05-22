@@ -128,7 +128,7 @@ export default function MusicConnectMQTT (){
   }
   // 消息发布
   async function sendMessage (){
-    let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+    let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
     let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
     var messagesend = new Paho.MQTT.Message(JSON.stringify(currentTrack));
     messagesend.destinationName = topic;

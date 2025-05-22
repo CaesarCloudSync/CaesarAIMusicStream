@@ -21,7 +21,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         //console.log(album_tracks[0])
         let num_of_tracks = album_tracks.length
         //console.log(num_of_tracks)
-        let currentTrackInd = await  TrackPlayer.getCurrentTrack()
+        let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
         //console.log("current",currentTrackInd)
         let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
         //console.log(currentTrack.index,currentTrack)
