@@ -3,7 +3,7 @@ A CaesarAIMusic song player
 
 ## Preview
 
-![](media/preview-android.gif)
+![](media/preview-android.mp4)
 
 ## How to run the app?
 
