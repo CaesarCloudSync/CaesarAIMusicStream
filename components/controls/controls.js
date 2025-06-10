@@ -6,6 +6,7 @@ import { get_access_token } from "../access_token/getaccesstoken";
 import { convertToValidFilename } from "../tool/tools";
 import { sendmusicconnect } from "../mqttclient/mqttclient";
 import { VolumeManager } from 'react-native-volume-manager';
+import { MUSICSDCARDPATH } from "../constants/constants";
 const get_thumbnail = async (album_id) =>{
     const access_token = await get_access_token();
     const headers = {Authorization: `Bearer ${access_token}`}
@@ -20,7 +21,8 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     let next_exists_queue = queue.filter((track) =>{return (track.id === nextsong.id)})
     if (next_exists_queue.length === 0){
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
-        let [streaming_link,title] = !track_downloaded  ? await getstreaminglink(nextsong) :  [`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
+        //console.log(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.ExternalStorageDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`)
+        let [streaming_link,title] = !track_downloaded  ? await getstreaminglink(nextsong) :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
         let thumbnail = !track_downloaded  ? nextsong.ytcustom ? nextsong.thumbnail :await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.jpg`
 
         if ("playlist_thumbnail" in nextsong && !("playlist_local" in nextsong)){
@@ -41,7 +43,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             let music_connected =  await AsyncStorage.getItem("music_connected")
             if (!music_connected){
             await TrackPlayer.setVolume(1)
-            //TrackPlayer.setRate(1)
+            //TrackPlayer.setRate(1)mp3
             await TrackPlayer.play()
             }
 

@@ -13,6 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { json } from "react-router-native";
 import { genreslist } from "./genres";
 import ShowQueue from "../ShowQueue/showqueue";
+import { Button } from "react-native-elements";
+
 export default function Home({seek, setSeek}){
     const netInfo = useNetInfo();
     const [initialfeed,setInitialFeed] = useState([]);
@@ -23,7 +25,8 @@ export default function Home({seek, setSeek}){
     const [randomcolors,setRandomColors] = useState([]);
 
 
-    const getintialfeed = async (access_token) =>{
+
+const getintialfeed = async (access_token) =>{
 
         //console.log(result)
         // https://api.spotify.com/v1/browse/new-releases

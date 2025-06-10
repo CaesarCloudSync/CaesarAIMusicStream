@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
 import axios from "axios";
 import { convertToValidFilename } from "../tool/tools";
+import { MUSICSDCARDPATH } from "../constants/constants";
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
@@ -245,7 +246,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     }
     const removedownload = async ()=>{
         try{
-            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.mp3`)
+            await RNFS.unlink(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.mp3`)
             await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg`)
         }
         catch{
