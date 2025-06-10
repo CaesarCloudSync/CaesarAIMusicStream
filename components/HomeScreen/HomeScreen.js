@@ -14,7 +14,7 @@ import { json } from "react-router-native";
 import { genreslist } from "./genres";
 import ShowQueue from "../ShowQueue/showqueue";
 import { Button } from "react-native-elements";
-
+import { getdownloadedmetadata } from "../scripts/MusicInternalToSDCard";
 export default function Home({seek, setSeek}){
     const netInfo = useNetInfo();
     const [initialfeed,setInitialFeed] = useState([]);

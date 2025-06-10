@@ -1,6 +1,7 @@
 import RNFS from "react-native-fs";
 import { convertToValidFilename } from "../tool/tools";
 import { PermissionsAndroid } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // Request storage permissions
 async function requestStoragePermission() {
   try {
@@ -79,9 +80,20 @@ async function copyMusicToSDCard(fileName) {
     const getcopysongs = async (downloaded_song) =>{
         const track_downloaded = downloaded_song.replace("downloaded-track:","")
         await copyMusicToSDCard(`${track_downloaded}.mp3`)
+        
     }
+    async function deleteFromInternal(fileName) {
+          const sourcePath = `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(fileName)}.mp3`; // App-specific files directory
+          //console.log(sourcePath)
+          await RNFS.unlink(sourcePath)
+        
+    }
+    const getdeletesongsinternal = async (downloaded_song) =>{
+        const track_downloaded = downloaded_song.replace("downloaded-track:","")
+        await deleteFromInternal(track_downloaded)
 
-    const getdownloadedmetadata = async () =>{
+    }
+    export const getdownloadedmetadata = async () =>{
         let keys = await AsyncStorage.getAllKeys()
         const downloaded_songs = keys.filter((key) =>{return(key.includes(`downloaded-track:`))});
         // Remove the prefix
@@ -91,18 +103,18 @@ async function copyMusicToSDCard(fileName) {
         console.log("Starting...")
         const promises = downloaded_songs.map(async (downloaded_song) => {
         try {
-            await getcopysongs(downloaded_song); // Assuming getcopysongs is async
+            await getdeletesongsinternal(downloaded_song); // Assuming getcopysongs is async
             track_downloaded++; // Increment counter on success
-            console.log(`Songs downloaded: ${track_downloaded}/${downloaded_songs.length}`);
+            console.log(`Songs deleted: ${track_downloaded}/${downloaded_songs.length} - file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(downloaded_song)}.mp3`);
         } catch (error) {
             failed_downloads++; // Increment failed downloads counter
-            console.error(`Failed to download song ${downloaded_song}: ${error.message}`);
+            console.error(`Failed to delete song ${downloaded_song}: ${error.message}`);
         }
         });
 
         try {
         await Promise.all(promises);
-        console.log(`Download complete! Total songs downloaded: ${track_downloaded}/${downloaded_songs.length}`);
+        console.log(`Deletion complete! Total songs deleted: ${track_downloaded}/${downloaded_songs.length}`);
         if (failed_downloads > 0) {
             console.log(`Failed downloads: ${failed_downloads}/${downloaded_songs.length}`);
         }
