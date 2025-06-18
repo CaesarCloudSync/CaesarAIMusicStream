@@ -54,7 +54,7 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
             return(<PlaylistCard key={index} playlist={item} index={index} playlistchanged={playlistchanged} setPlaylistChanged={setPlaylistChanged} trackforplaylist={trackforplaylist} handleModal={handleModal} />)
         }
        
-        if (item.playlist_name.toLowerCase().includes(userInput.toLowerCase())){
+        if (item.playlist_naPlaylsitme.toLowerCase().includes(userInput.toLowerCase())){
             return(
                 <PlaylistCard key={index} playlist={item} index={index} playlistchanged={playlistchanged} setPlaylistChanged={setPlaylistChanged} trackforplaylist={trackforplaylist} handleModal={handleModal} />
             )
@@ -77,6 +77,9 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
                 </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={() =>{createplaylist()}} style={{height:60,justifyContent:"center",borderWidth:1,borderColor:"white",borderRadius:5,padding:5}}>
+                <   Text style={{"color":"white"}}>+ New Playlist</Text>
+                </TouchableOpacity>
+                                <TouchableOpacity onPress={() =>{createplaylist()}} style={{height:60,justifyContent:"center",borderWidth:1,borderColor:"white",borderRadius:5,padding:5}}>
                 <   Text style={{"color":"white"}}>+ New Playlist</Text>
                 </TouchableOpacity>
 
