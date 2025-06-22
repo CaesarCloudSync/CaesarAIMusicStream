@@ -6,8 +6,9 @@ import { Link } from "react-router-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TrackPlayer from 'react-native-track-player';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
+import { useNavigate } from 'react-router-native';
 export default function NavigationFooter({currentpage,setShowCustomYTInput}){
-
+    const navigate = useNavigate();
     async function openLink() {
         try {
           const isAvailable = await InAppBrowser.isAvailable()
@@ -82,7 +83,7 @@ export default function NavigationFooter({currentpage,setShowCustomYTInput}){
         </View>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
             <Link   underlayColor={"transparent"} >
-                <TouchableOpacity onLongPress={() =>{if (setShowCustomYTInput){openLink()}}}>
+                <TouchableOpacity onLongPress={() =>{if (setShowCustomYTInput){openLink()}else{navigate("/settings")}}}>
               
                     <Image style={{borderRadius:5,width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
                     
@@ -116,6 +117,7 @@ export default function NavigationFooter({currentpage,setShowCustomYTInput}){
                 </View>
             </Link>
         </View>
+        
         
 
 
