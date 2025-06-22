@@ -95,7 +95,11 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
         </View>
         <Text style={styles.sectionTitle}>Network</Text>
         <View>
+    
         <Text style={styles.label}>Proxy Server URL</Text>
+          <Text style={{marginBottom:20}} >https://www.freeproxy.world/</Text>
+
+        
         <TextInput
           style={styles.input}
           value={proxyUrl}
@@ -106,9 +110,11 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
           autoCapitalize="none"
           keyboardType="url"
         />
+        
         <TouchableOpacity style={[styles.button,{"backgroundColor":proxyEnabled ? "green": "#222222"}]} onPress={toggleProxy}>
             <Text style={styles.buttonText}>{proxyEnabled ? "Active":"Not Active"}</Text>
         </TouchableOpacity>
+               
         </View>
 
 
