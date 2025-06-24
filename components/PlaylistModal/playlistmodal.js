@@ -29,8 +29,6 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
         getplaylist()
     },[playlistchanged])
     const createplaylist = async () =>{
-        trackforplaylist[0]["playlist_local"] = "true"
-        trackforplaylist[0]["playlist_name"] = trackforplaylist[0].name
         const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${convertToValidFilename(trackforplaylist[0].name)}.jpg`;
         await RNFS.downloadFile({
           fromUrl:trackforplaylist[0].thumbnail,
@@ -41,6 +39,8 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
         })
         await AsyncStorage.setItem(`playlist:${trackforplaylist[0].name}`,JSON.stringify({"playlist_name":trackforplaylist[0].name,"playlist_thumbnail":`file://${thumbnail_filePath}`,"playlist_size":trackforplaylist.length}))
         const promises = trackforplaylist.map(async (track,index) => {
+            track["playlist_local"] = "true"
+            track["playlist_name"] = trackforplaylist[0].name
             await AsyncStorage.setItem(`playlist-track:${trackforplaylist[0].name}-${track.name}`,JSON.stringify(track))
             await AsyncStorage.setItem(`playlist-track-order:${trackforplaylist[0].name}-${track.name}`,JSON.stringify({"name":track.name,"order":index}))
         })
