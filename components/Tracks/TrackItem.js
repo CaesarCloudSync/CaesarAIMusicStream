@@ -65,24 +65,45 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             setSongIsAvailable(true)
         }
     }
-    
-    const togglemultiplaylistselect = async () =>{
+    const togglemultiplaylistselectlongPress = Gesture.LongPress().onStart(async (_event,success) =>{
+        //console.log("long press",album_track_state,trackforplaylist,multiplaylistselect)
+      
         if (multiplaylistselect === false){
+            console.log("add to multiselect",album_track_state,trackforplaylist)
             setMultiplePlaylistSelect(true)
             setTrackForPlaylist([album_track_state]);
         }
         else{
-            if (trackforplaylist.length === 1){
+            console.log("remove from multiselect",album_track_state,trackforplaylist)
                 setMultiplePlaylistSelect(false)
                 setTrackForPlaylist([]);
-            }
-            else{
-                setTrackForPlaylist(trackforplaylist.filter(item => item.name !== album_track_state.name));
-            }
+            
 
         } 
+        
+    })
+    const showplaylistoptionsdoubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
+        console.log("show playlist options",album_track_state,trackforplaylist)
+        handleModal();
 
-    }
+        })
+    const toggleaddplaylistselectsinglePress = Gesture.Tap().onEnd(async (_event,success) =>{
+
+    
+         if (multiplaylistselect === false){
+            showplaylistoptions()
+        }
+         
+         else{
+            if (trackforplaylist !== undefined && trackforplaylist.some(item => item.name === album_track_state.name) ){
+                setTrackForPlaylist(trackforplaylist.filter(item => item.name !== album_track_state.name));
+            }
+            else{
+                addplaylisttomultiselect()
+            }
+            }
+       
+    })
 
 
     function timeout(ms) {
@@ -350,9 +371,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                     <TouchableOpacity onLongPress={() =>{removedownload()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onLongPress={() =>{togglemultiplaylistselect()}} onPress={() =>{if (multiplaylistselect === false){showplaylistoptions()}else{addplaylisttomultiselect()}}}>
-                        <MaterialIcons name="playlist-add" size={24} color={trackforplaylist.some(item => item.name === album_track_state.name) ? "#7097d6":"white"} />
-                    </TouchableOpacity>
+                    <GestureDetector gesture={Gesture.Exclusive(showplaylistoptionsdoubleTap,togglemultiplaylistselectlongPress,toggleaddplaylistselectsinglePress)} onPress={() =>{}}>
+                        <MaterialIcons name="playlist-add" size={24} color={trackforplaylist !== undefined && trackforplaylist.some(item => item.name === album_track_state.name) && multiplaylistselect === true ? "#7097d6":"white"} />
+                    </GestureDetector>
                     
                     {addingqueue === true &&
                     <View style={{width:35,height:25,backgroundColor:"green"}}>
@@ -367,3 +388,4 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     )
     
 }
+// 

@@ -29,19 +29,22 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
         getplaylist()
     },[playlistchanged])
     const createplaylist = async () =>{
-        trackforplaylist["playlist_local"] = "true"
-        trackforplaylist["playlist_name"] = trackforplaylist.name
-        const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${convertToValidFilename(trackforplaylist.name)}.jpg`;
+        trackforplaylist[0]["playlist_local"] = "true"
+        trackforplaylist[0]["playlist_name"] = trackforplaylist[0].name
+        const thumbnail_filePath = RNFS.DocumentDirectoryPath + `/${convertToValidFilename(trackforplaylist[0].name)}.jpg`;
         await RNFS.downloadFile({
-          fromUrl:trackforplaylist.thumbnail,
+          fromUrl:trackforplaylist[0].thumbnail,
           toFile: thumbnail_filePath,
           background: true, // Enable downloading in the background (iOS only)
           discretionary: true, // Allow the OS to control the timing and speed (iOS only)
       
         })
-        await AsyncStorage.setItem(`playlist:${trackforplaylist.name}`,JSON.stringify({"playlist_name":trackforplaylist.name,"playlist_thumbnail":`file://${thumbnail_filePath}`,"playlist_size":1}))
-        await AsyncStorage.setItem(`playlist-track:${trackforplaylist.name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
-        await AsyncStorage.setItem(`playlist-track-order:${trackforplaylist.name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":0}))
+        await AsyncStorage.setItem(`playlist:${trackforplaylist[0].name}`,JSON.stringify({"playlist_name":trackforplaylist[0].name,"playlist_thumbnail":`file://${thumbnail_filePath}`,"playlist_size":trackforplaylist.length}))
+        const promises = trackforplaylist.map(async (track,index) => {
+            await AsyncStorage.setItem(`playlist-track:${trackforplaylist[0].name}-${track.name}`,JSON.stringify(track))
+            await AsyncStorage.setItem(`playlist-track-order:${trackforplaylist[0].name}-${track.name}`,JSON.stringify({"name":track.name,"order":index}))
+        })
+        await Promise.all(promises)
         navigate("/playlists")
 
     }
@@ -50,6 +53,7 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
 
 
         // {"playlist_name": "Jam", "playlist_size": 1, "playlist_thumbnail": "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8"} 
+
         if (userInput === ""){
             return(<PlaylistCard key={index} playlist={item} index={index} playlistchanged={playlistchanged} setPlaylistChanged={setPlaylistChanged} trackforplaylist={trackforplaylist} handleModal={handleModal} />)
         }
@@ -61,7 +65,13 @@ export default function PlaylistModal({isModalVisible,setIsModalVisible,trackfor
         } 
 
     }
-
+    const test = async () =>{
+        const playlist = await AsyncStorage.getItem(`playlist:SOMETHING ABOUT`)
+        console.log("playlist",playlist)
+    }
+    useEffect(() =>{
+        test();
+    },[])
 
  
     return(
