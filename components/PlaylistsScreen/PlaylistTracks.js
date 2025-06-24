@@ -27,7 +27,8 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const netInfo = useNetInfo();
 
     const navigate = useNavigate();
-    const [trackforplaylist,setTrackForPlaylist] = useState({});
+    const [trackforplaylist,setTrackForPlaylist] = useState([]);
+    const [multiplaylistselect,setMultiplePlaylistSelect] = useState(false);
     const [editingplaylistname,setEditingPlaylistName] = useState(false);
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
@@ -76,12 +77,12 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
     const filterData = (item,index) =>{
         if (filteruserinput === ""){
-            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />)
+            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} trackforplaylist={trackforplaylist} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect} />)
         }
        
         if (item.name.toLowerCase().includes(filteruserinput.toLowerCase())  || item.artist.toLowerCase().includes(filteruserinput.toLowerCase()) ){
             return(
-                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} />
+                <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} trackforplaylist={trackforplaylist} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect} />
             )
         } 
 
