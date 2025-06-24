@@ -19,7 +19,8 @@ import RNFS from "react-native-fs";
 import axios from "axios";
 import { convertToValidFilename } from "../tool/tools";
 import { MUSICSDCARDPATH } from "../constants/constants";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone}){
+import { set } from "lodash";
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone,multiplaylistselect,setMultiplePlaylistSelect}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
     const [album_track_state,setAlbumTrackState] = useState(album_track)
@@ -28,7 +29,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const [isDownloaded,setIsDownloaded] = useState(false);
     const [downloadwasremoved,setDownloadWasRemoved] = useState(false);
-    const [multiplaylistselect,setMultiplePlaylistSelect] = useState(false);
+   
     const navartistprofileplaylist = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks_state[0].artist_name}`,JSON.stringify({"artist_id":album_tracks_state[0].artist_id}))
         navigate("/artistprofile",{state:{"album_tracks":[album_track_state]}})
@@ -64,18 +65,33 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             setSongIsAvailable(true)
         }
     }
-    const startmultiplaylistselect = async () =>{
+    
+    const togglemultiplaylistselect = async () =>{
         if (multiplaylistselect === false){
             setMultiplePlaylistSelect(true)
+            setTrackForPlaylist([album_track_state]);
         }
         else{
-            setMultiplePlaylistSelect(false)
-        }
+            if (trackforplaylist.length === 1){
+                setMultiplePlaylistSelect(false)
+                setTrackForPlaylist([]);
+            }
+            else{
+                setTrackForPlaylist(trackforplaylist.filter(item => item.name !== album_track_state.name));
+            }
+
+        } 
 
     }
 
+
     function timeout(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    const addplaylisttomultiselect = async () =>{
+        console.log("addplaylist",album_track_state,trackforplaylist)
+        setTrackForPlaylist([...trackforplaylist, album_track_state]);
+        
     }
     const flingleft = Gesture.Fling()
     .direction(Directions.LEFT )
@@ -210,7 +226,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
        
     }
     const showplaylistoptions = async ()=>{
-        setTrackForPlaylist(album_track_state)
+        console.log("playlist details",album_track_state)
+        setTrackForPlaylist([album_track_state])
         handleModal()
     }
     const removetrackfromplaylist = async () =>{
@@ -333,8 +350,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                     <TouchableOpacity onLongPress={() =>{removedownload()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onLongPress={() =>{startmultiplaylistselect()}} onPress={() =>{if (multiplaylistselect === false){showplaylistoptions()}}}>
-                        <MaterialIcons name="playlist-add" size={24} color={multiplaylistselect === false ? "white": "#7097d6"} />
+                    <TouchableOpacity onLongPress={() =>{togglemultiplaylistselect()}} onPress={() =>{if (multiplaylistselect === false){showplaylistoptions()}else{addplaylisttomultiselect()}}}>
+                        <MaterialIcons name="playlist-add" size={24} color={trackforplaylist.some(item => item.name === album_track_state.name) ? "#7097d6":"white"} />
                     </TouchableOpacity>
                     
                     {addingqueue === true &&
