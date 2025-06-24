@@ -25,22 +25,34 @@ export default function PlaylistCard({playlist,index,setPlaylistChanged,playlist
 
     }
     const addtracktoplaylist = async () =>{
-            trackforplaylist["playlist_local"] = "true"
-            trackforplaylist["playlist_name"] =playliststate.playlist_name
+            
+            
          
-            await AsyncStorage.setItem(`playlist-track:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
+            const promises = trackforplaylist.map(async (track,index) => {
+                track["playlist_local"] = "true"
+                track["playlist_name"] =playliststate.playlist_name
+                await AsyncStorage.setItem(`playlist-track:${playliststate.playlist_name}-${track.name}`,JSON.stringify(track))
+            })
+            await Promise.all(promises)
             let keys = await AsyncStorage.getAllKeys()
             const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playliststate.playlist_name}`))}))
             const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
             const num_of_tracks = playlist_tracks.length
             await AsyncStorage.setItem(`playlist:${playliststate.playlist_name}`,JSON.stringify({"playlist_name":playliststate.playlist_name,"playlist_thumbnail":playliststate.playlist_thumbnail,"playlist_size":num_of_tracks}))
-            await AsyncStorage.setItem(`playlist-track-order:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
+            const promises_order = trackforplaylist.map(async (track,index) => {
+                await AsyncStorage.setItem(`playlist-track-order:${playliststate.playlist_name}-${track.name}`,JSON.stringify({"name":track.name,"order":(num_of_tracks + index) -1}))
+            })
+            await Promise.all(promises_order)
             setPlaylistState({...playliststate,"playlist_size":num_of_tracks})
             const shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playliststate.playlist_name}`)
            
             if (shuffled_tracks){
                 const shuffled_tracks_stored = JSON.parse(shuffled_tracks);
-                shuffled_tracks_stored.push(trackforplaylist)
+                trackforplaylist.map((track) => {
+                    shuffled_tracks_stored.push(track)
+
+                })
+                
                 await AsyncStorage.setItem(`shuffled-tracks:${playliststate.playlist_name}`,JSON.stringify(shuffled_tracks_stored))
             }
             handleModal()
