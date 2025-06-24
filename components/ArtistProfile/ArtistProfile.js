@@ -144,7 +144,7 @@ export default function ArtistProfile({seek, setSeek}){
 
             
                             
-            <View style={{flex:0.018,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
+            <View style={{flex:0.010,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
                 <TrackProgress seek={seek} setSeek={setSeek}/>
 
             </View>
