@@ -13,6 +13,8 @@ import RNFS from "react-native-fs";
 import { Image } from "react-native";
 import { convertToValidFilename } from "../tool/tools";
 import { get_access_token } from "../access_token/getaccesstoken";
+import MaterialDesignIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 export default function AddSpotifyPlaylistModal({isModalVisible,setIsModalVisible,playlistchanged,setPlaylistChanged}) {
     const [playlists,setPlaylists] = useState([]);
     const [userInput,setUserInput] = useState("");
@@ -56,6 +58,34 @@ export default function AddSpotifyPlaylistModal({isModalVisible,setIsModalVisibl
             
         }
     }
+        async function openLink() {
+            try {
+              const isAvailable = await InAppBrowser.isAvailable()
+              const url = 'https://open.spotify.com/'
+              if (isAvailable) {
+                InAppBrowser.open(url, {
+                  // iOS Properties
+                  dismissButtonStyle: 'cancel',
+                  preferredBarTintColor: 'gray',
+                  preferredControlTintColor: 'white',
+                  // Android Properties
+                  showTitle: true,
+                  toolbarColor: '#6200EE',
+                  secondaryToolbarColor: 'black',
+                  enableUrlBarHiding: true,
+                  enableDefaultShare: true,
+                  forceCloseOnRedirection: true,
+                }).then((result) => {
+                     //setShowCustomYTInput(true);
+                  //Alert.alert(JSON.stringify(result))
+                })
+              } else Linking.openURL(url)
+            } catch (error) {
+              Alert.alert(error.message)
+            }
+          }
+      
+    
     const storespotifyplaylist = async () =>{
         try{
         const match = userInput.match(/playlist\/([a-zA-Z0-9]+)/);
@@ -97,9 +127,10 @@ export default function AddSpotifyPlaylistModal({isModalVisible,setIsModalVisibl
                 </TouchableOpacity>
                 </View>
                
-                <TouchableOpacity onPress={() =>{}} style={{height:60,justifyContent:"center",borderWidth:1,borderColor:"white",borderRadius:5,padding:5,alignItems:"center"}}>
-                <TextInput style={{width:"93%"}} placeholder="Spotify Playlist URL:" onChangeText={(text) =>{setUserInput(text)}} onSubmitEditing={storespotifyplaylist}/>
-                </TouchableOpacity>
+             
+                <TextInput style={{height:60,justifyContent:"center",borderWidth:1,borderColor:"white",borderRadius:5,padding:5,alignItems:"center",padding:10}} placeholder="Spotify Playlist URL:" onChangeText={(text) =>{setUserInput(text)}} onSubmitEditing={storespotifyplaylist}/>
+                  <Text style={{color:"white",fontSize:10,marginLeft:10}}>Add Playlist owned by a Spotify user.</Text>
+                  <TouchableOpacity style={{alignSelf:"flex-end",marginTop:30}} onPress={()=>{openLink()}}><MaterialDesignIcons name="web" size={20} /></TouchableOpacity>
 
             <FlatList 
 
