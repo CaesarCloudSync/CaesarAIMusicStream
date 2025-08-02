@@ -15,11 +15,14 @@ import ShowQueue from "../ShowQueue/showqueue";
 import AllDownloadedPlaylistCard from "../Downloads/AllDownloadedPlaylistCard";
 import { convertToValidFilename } from "../tool/tools";
 import RNFS from "react-native-fs";
+import Entypo from "react-native-vector-icons/Entypo"
+import AddSpotifyPlaylistModal from "./AddSpotifyModal";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 export default function PlaylistScreen({seek, setSeek}){
     const [userInput,setUserInput] = useState("");
     const [playlistalbums,setPlaylistItems] = useState([]);
     const [playlistchanged,setPlaylistChanged] = useState(false)
-
+    const [isModalVisible,setIsModalVisible] = useState(false);
     const getplaylist = async () =>{
 
         let keys = await AsyncStorage.getAllKeys()
@@ -27,6 +30,7 @@ export default function PlaylistScreen({seek, setSeek}){
         const playlistitems = items.map((item) =>{return(JSON.parse(item[1]))})
         setPlaylistItems(playlistitems)
     }
+    
 
     useEffect(() =>{
         getplaylist()
@@ -170,7 +174,8 @@ export default function PlaylistScreen({seek, setSeek}){
             </View>
             <View style={{flexDirection:"row",margin:10}}>
             <AntDesign style={{position:"relative",top:18}} name="filter"/>
-            <TextInput style={{width:"100%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
+            <TextInput style={{width:"90%"}} placeholder="Enter Here" onChangeText={(text) =>{setUserInput(text)}}/>
+                <Entypo style={{position:"relative",top:14}} name="add-to-list" size={20} onPress={() =>{setIsModalVisible(true)}}/>
             </View>
             {/*Main Scroll Body*/}
             
@@ -190,6 +195,7 @@ export default function PlaylistScreen({seek, setSeek}){
             {/*Navigation Footer*/}
             {playlistalbums.length === 0 && <View style={{flex:1}}></View>} 
            <NavigationFooter currentpage={"playlists"}/>
+           <AddSpotifyPlaylistModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} playlistchanged={playlistchanged} setPlaylistChanged={setPlaylistChanged}  />
 
 
  
