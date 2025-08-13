@@ -160,7 +160,8 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
   // Check if songurl is an M3U8 file
   if (songurl.toLowerCase().endsWith('.m3u8')) {
     // Run M3U8 download logic
-    await downloadM3U8(songurl, filePath, notif_title, notif_id, channelId, album_track, name);
+    Alert.alert("Streaming Link is manifest https://manifest.googlevideo.com/index.m3u8.Have not implemented M3u8 downloading yet.")
+    //await downloadM3U8(songurl, filePath, notif_title, notif_id, channelId, album_track, name);
   } else {
     // Run original download logic
     await RNFS.downloadFile({

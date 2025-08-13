@@ -2,6 +2,7 @@ import RNFS from "react-native-fs";
 import { convertToValidFilename } from "../tool/tools";
 import { PermissionsAndroid } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MUSICSDCARDPATH } from "../constants/constants";
 // Request storage permissions
 async function requestStoragePermission() {
   try {
@@ -38,7 +39,7 @@ async function copyMusicToSDCard(fileName) {
   
  
   const sourcePath = `${RNFS.DocumentDirectoryPath}/${convertToValidFilename(fileName)}`; // App-specific files directory
-  const MUSICSDCARDPATH = '/storage/3131-6639';
+
   const destDir = `${MUSICSDCARDPATH}/Music`; // Destination folder on SD card
   const destPath = `${destDir}/${convertToValidFilename(fileName)}`; // Destination file path
 
