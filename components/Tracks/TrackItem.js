@@ -19,7 +19,8 @@ import RNFS from "react-native-fs";
 import axios from "axios";
 import { convertToValidFilename } from "../tool/tools";
 import { MUSICSDCARDPATH } from "../constants/constants";
-export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone}){
+import { set } from "lodash";
+export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone,multiplaylistselect,setMultiplePlaylistSelect}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
     const [album_track_state,setAlbumTrackState] = useState(album_track)
@@ -27,7 +28,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     const [addedtoqueue,setAddedToQueue] = useState(false);
     const [songIsAvailable,setSongIsAvailable] = useState(true);
     const [isDownloaded,setIsDownloaded] = useState(false);
-    const [downloadwasremoved,setDownloadWasRemoved] = useState(false)
+    const [downloadwasremoved,setDownloadWasRemoved] = useState(false);
+   
     const navartistprofileplaylist = async () =>{
         //await AsyncStorage.setItem(`artist:${album_tracks_state[0].artist_name}`,JSON.stringify({"artist_id":album_tracks_state[0].artist_id}))
         navigate("/artistprofile",{state:{"album_tracks":[album_track_state]}})
@@ -63,9 +65,54 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             setSongIsAvailable(true)
         }
     }
+    const togglemultiplaylistselectlongPress = Gesture.LongPress().onStart(async (_event,success) =>{
+        //console.log("long press",album_track_state,trackforplaylist,multiplaylistselect)
+      
+        if (multiplaylistselect === false){
+            console.log("add to multiselect",album_track_state,trackforplaylist)
+            setMultiplePlaylistSelect(true)
+            setTrackForPlaylist([album_track_state]);
+        }
+        else{
+            console.log("remove from multiselect",album_track_state,trackforplaylist)
+                setMultiplePlaylistSelect(false)
+                setTrackForPlaylist([]);
+            
+
+        } 
+        
+    })
+    const showplaylistoptionsdoubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
+        console.log("show playlist options",album_track_state,trackforplaylist)
+        handleModal();
+
+        })
+    const toggleaddplaylistselectsinglePress = Gesture.Tap().onEnd(async (_event,success) =>{
+
+    
+         if (multiplaylistselect === false){
+            showplaylistoptions()
+        }
+         
+         else{
+            if (trackforplaylist !== undefined && trackforplaylist.some(item => item.name === album_track_state.name) ){
+                setTrackForPlaylist(trackforplaylist.filter(item => item.name !== album_track_state.name));
+            }
+            else{
+                addplaylisttomultiselect()
+            }
+            }
+       
+    })
+
 
     function timeout(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    const addplaylisttomultiselect = async () =>{
+        console.log("addplaylist",album_track_state,trackforplaylist)
+        setTrackForPlaylist([...trackforplaylist, album_track_state]);
+        
     }
     const flingleft = Gesture.Fling()
     .direction(Directions.LEFT )
@@ -200,7 +247,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
        
     }
     const showplaylistoptions = async ()=>{
-        setTrackForPlaylist(album_track_state)
+        console.log("playlist details",album_track_state)
+        setTrackForPlaylist([album_track_state])
         handleModal()
     }
     const removetrackfromplaylist = async () =>{
@@ -323,9 +371,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                     <TouchableOpacity onLongPress={() =>{removedownload()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadsong()}}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() =>{showplaylistoptions()}}>
-                        <MaterialIcons name="playlist-add" size={24} color="white" />
-                    </TouchableOpacity>
+                    <GestureDetector gesture={Gesture.Exclusive(showplaylistoptionsdoubleTap,togglemultiplaylistselectlongPress,toggleaddplaylistselectsinglePress)} onPress={() =>{}}>
+                        <MaterialIcons name="playlist-add" size={24} color={trackforplaylist !== undefined && trackforplaylist.some(item => item.name === album_track_state.name) && multiplaylistselect === true ? "#7097d6":"white"} />
+                    </GestureDetector>
                     
                     {addingqueue === true &&
                     <View style={{width:35,height:25,backgroundColor:"green"}}>
@@ -340,3 +388,4 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     )
     
 }
+// 

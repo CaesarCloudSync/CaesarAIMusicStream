@@ -7,6 +7,7 @@ import TrackPlayer, {
   } from 'react-native-track-player';
 import { Alert } from "react-native";
 import ytdl from "react-native-ytdl";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export const addTrack = async (streaming_link,album_track) =>{
     //files = files.filter((file) =>{return(file.mime === "audio/mpeg" && !file.name.includes(".trashed"))})
     //const CaesarAIMusicLogo = require('../../assets/CaesarAILogo.png')
@@ -31,7 +32,11 @@ export const getyoutubelink  = async (album_track,download=false,init_index=0) =
 }
 export const getaudiolink = async (album_track,init_index=0) =>{
     const [video_link,title] = await getyoutubelink(album_track,download=false,init_index);
-    const response = await axios.get(`https://music.caesaraihub.org/getaudio?url=${video_link}`)
+    const proxy = await AsyncStorage.getItem("PROXY");
+    const proxy_status = await AsyncStorage.getItem("PROXY_STATUS");
+    const proxy_string = proxy_status ? `&proxy=${proxy}` : "";
+    console.log("video_link",`https://music.caesaraihub.org/getaudio?url=${video_link}${proxy_string}`)
+    const response = await axios.get(`https://music.caesaraihub.org/getaudio?url=${video_link}${proxy_string}`)
     let songurl = response.data.streaming_url
     return [songurl,title]
 }

@@ -24,9 +24,10 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
     const [isDownloading,setIsDownloading] = useState(false);
     const [isDownloaded,setIsDownloaded] = useState(false);
+     const [multiplaylistselect,setMultiplePlaylistSelect] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    const [trackforplaylist,setTrackForPlaylist] = useState({});
+    const [trackforplaylist,setTrackForPlaylist] = useState([]);
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
@@ -212,7 +213,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             ref={refContainer}
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind} setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull} removealldownloadsdone={removealldownloadsdone}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind} setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull} removealldownloadsdone={removealldownloadsdone} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect}/>}
             onScrollToIndexFailed={info => {
                 const wait = new Promise(resolve => setTimeout(resolve, 500));
                 wait.then(() => {

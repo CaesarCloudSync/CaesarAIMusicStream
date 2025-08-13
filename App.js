@@ -22,6 +22,7 @@ import PlaylistScreen from './components/PlaylistsScreen/PlaylistScreen';
 import PlaylistTracks from './components/PlaylistsScreen/PlaylistTracks';
 import DownloadedPlaylistTracks from './components/Downloads/DownloadePlaylistTracks';
 import GenrePage from './components/GenrePage/GenrePage';
+import Settings from './components/Settings/Settings';
 function App() { 
 
  
@@ -81,6 +82,7 @@ useEffect(() => {
     <Route path="/playlist-tracks" element={<PlaylistTracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
     <Route path="/downloaded-playlist-tracks" element={<DownloadedPlaylistTracks seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
     <Route  path="/artistprofile" element={<ArtistProfile seek={seek} setSeek={setSeek} />}></Route>
+        <Route  path="/settings" element={<Settings seek={seek} setSeek={setSeek} currentTrack={currentTrack} setCurrentTrack={setCurrentTrack}/>}></Route>
   
     </Routes>
     {/*The NativeRouter*/}
