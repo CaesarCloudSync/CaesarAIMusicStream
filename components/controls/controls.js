@@ -21,8 +21,10 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     let next_exists_queue = queue.filter((track) =>{return (track.id === nextsong.id)})
     if (next_exists_queue.length === 0){
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
+        const preloaded_song =  await AsyncStorage.getItem(`preloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
+
         //console.log(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.ExternalStorageDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`)
-        let [streaming_link,title] = !track_downloaded  ? await getstreaminglink(nextsong) :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
+        let [streaming_link,title] = !track_downloaded  ? preloaded_song ? [preloaded_song,nextsong.name] :await getstreaminglink(nextsong) :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
         let thumbnail = !track_downloaded  ? nextsong.ytcustom ? nextsong.thumbnail :await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.jpg`
         const streaming_type = streaming_link.includes(".m3u8") ? "hls" : "default"
         if ("playlist_thumbnail" in nextsong && !("playlist_local" in nextsong)){
@@ -97,6 +99,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await AsyncStorage.setItem("current-tracks",queue_current_track);
     }
 
+
     }
     else{
         var elementPos = queue.findIndex(track => track.id == nextsong.id && track.url !== "dummy")
@@ -141,6 +144,10 @@ export const skipToTrack = async (nextsong,player_ind)=>{
 
     }
 }
+export const preloadsong = async (album_tracks,nextsong,player_ind) => {
+    
+}
+
 
 export const autoplaynextsong = async () =>{
     // TODO Clean up functions - Chase Shakurs new song caused youtubesearch to go zero which caused album_tracks[index].link = undefined
@@ -189,7 +196,10 @@ export const autoplaynextsong = async () =>{
         const track_after_queue = await AsyncStorage.getItem("track_after_queue");
 
         console.log("next_ind",track_after_queue,next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum)
-        let nextsong = track_after_queue  ? album_tracks[parseInt(track_after_queue)]:album_tracks[next_ind_in_album]
+        let nextsong_index = track_after_queue  ? parseInt(track_after_queue) :next_ind_in_album
+        
+        let nextsong = album_tracks[nextsong_index]
+        
         if (nextsong === undefined){
             await AsyncStorage.removeItem("track_after_queue")
             
