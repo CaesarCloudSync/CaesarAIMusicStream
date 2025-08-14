@@ -7,6 +7,7 @@ import { convertToValidFilename } from "../tool/tools";
 import { sendmusicconnect } from "../mqttclient/mqttclient";
 import { VolumeManager } from 'react-native-volume-manager';
 import { MUSICSDCARDPATH } from "../constants/constants";
+import { abortManager } from "../abortmanager/abortmanager";
 const get_thumbnail = async (album_id) =>{
     const access_token = await get_access_token();
     const headers = {Authorization: `Bearer ${access_token}`}
@@ -44,6 +45,12 @@ export const preloadprev = async (prevsong,queue) => {
 export const loadcurrent = async (nextsong,queue,player_ind) => {
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
         const preloaded_song =  await AsyncStorage.getItem(`preloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
+        const fetch_song_task =  await AsyncStorage.getItem(`fetch-track-task:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
+        console.log("Abort Fetch",fetch_song_task)
+        if (fetch_song_task){
+            console.log("Aborted Request",fetch_song_task)
+            abortManager.abortRequest(fetch_song_task)
+        }
         let [streaming_link,title] = !track_downloaded  ? preloaded_song ? [preloaded_song,nextsong.name] :await getstreaminglink(nextsong)  :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
         let thumbnail = !track_downloaded  ? nextsong.ytcustom ? nextsong.thumbnail :await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.jpg`
                 

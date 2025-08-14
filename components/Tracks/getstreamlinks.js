@@ -8,6 +8,7 @@ import TrackPlayer, {
 import { Alert } from "react-native";
 import ytdl from "react-native-ytdl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { abortManager } from "../abortmanager/abortmanager";
 export const addTrack = async (streaming_link,album_track) =>{
     //files = files.filter((file) =>{return(file.mime === "audio/mpeg" && !file.name.includes(".trashed"))})
     //const CaesarAIMusicLogo = require('../../assets/CaesarAILogo.png')
@@ -36,7 +37,12 @@ export const getaudiolink = async (album_track,init_index=0) =>{
     const proxy_status = await AsyncStorage.getItem("PROXY_STATUS");
     const proxy_string = proxy_status ? `&proxy=${proxy}` : "";
     console.log("video_link",`https://music.caesaraihub.org/getaudio?url=${video_link}${proxy_string}`)
-    const response = await axios.get(`https://music.caesaraihub.org/getaudio?url=${video_link}${proxy_string}`)
+    const controller = abortManager.createRequest(requestId);
+    const requestId = `${album_track.artist}-${album_track.album_name}-${album_track.name}`
+    await AsyncStorage.setItem(`fetch-track-task:${album_track.artist}-${album_track.album_name}-${album_track.name}`,requestId)
+    const response = await axios.get(`https://music.caesaraihub.org/getaudio?url=${video_link}${proxy_string}`,{ signal: controller.signal })
+    await AsyncStorage.removeItem(`fetch-track-task:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
+
     let songurl = response.data.streaming_url
     return [songurl,title]
 }
