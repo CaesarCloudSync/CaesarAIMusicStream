@@ -16,16 +16,37 @@ const get_thumbnail = async (album_id) =>{
     return album_thumbnail_after
 
 }
-export const skipToTrack = async (nextsong,player_ind)=>{
-    let queue = await TrackPlayer.getQueue();
-    let next_exists_queue = queue.filter((track) =>{return (track.id === nextsong.id)})
-    if (next_exists_queue.length === 0){
+export const preloadnext = async (nextsong,queue) => {
+        const next_exists_queue = queue.filter((track) => track.id === nextsong.id);
+        const next_track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`);
+        const next_preloaded_song = await AsyncStorage.getItem(`preloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`);
+        console.log("nextpreload", nextsong);
+        console.log("nextcondition", next_exists_queue, next_track_downloaded, next_preloaded_song);
+        if (next_exists_queue.length === 0 && !next_track_downloaded && !next_preloaded_song) {
+        const [streaming_link, title] = await getstreaminglink(nextsong);
+        await AsyncStorage.setItem(`preloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, streaming_link);
+        return { streaming_link, title };
+        }
+        return null;
+    }
+export const preloadprev = async (prevsong,queue) => {
+        const prev_exists_queue = queue.filter((track) => track.id === prevsong.id);
+        const prev_track_downloaded = await AsyncStorage.getItem(`downloaded-track:${prevsong.artist}-${prevsong.album_name}-${prevsong.name}`);
+        const prev_preloaded_song = await AsyncStorage.getItem(`preloaded-track:${prevsong.artist}-${prevsong.album_name}-${prevsong.name}`);
+        console.log("prevcondition", prev_exists_queue, prev_track_downloaded, prev_preloaded_song);
+        if (prev_exists_queue.length === 0 && !prev_track_downloaded && !prev_preloaded_song) {
+        const [streaming_link, title] = await getstreaminglink(prevsong);
+        await AsyncStorage.setItem(`preloaded-track:${prevsong.artist}-${prevsong.album_name}-${prevsong.name}`, streaming_link);
+        return { streaming_link, title };
+        }
+        return null;
+    }
+export const loadcurrent = async (nextsong,queue,player_ind) => {
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
         const preloaded_song =  await AsyncStorage.getItem(`preloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
-
-        //console.log(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.ExternalStorageDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`)
-        let [streaming_link,title] = !track_downloaded  ? preloaded_song ? [preloaded_song,nextsong.name] :await getstreaminglink(nextsong) :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
+        let [streaming_link,title] = !track_downloaded  ? preloaded_song ? [preloaded_song,nextsong.name] :await getstreaminglink(nextsong)  :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
         let thumbnail = !track_downloaded  ? nextsong.ytcustom ? nextsong.thumbnail :await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.jpg`
+                
         const streaming_type = streaming_link.includes(".m3u8") ? "hls" : "default"
         if ("playlist_thumbnail" in nextsong && !("playlist_local" in nextsong)){
             await TrackPlayer.add([{playlist_thumbnail:nextsong.playlist_thumbnail,playlist_id:nextsong.playlist_id,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:nextsong.duration_ms / 1000,mediastatus:"online",type:streaming_type}]);
@@ -98,6 +119,42 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
         await AsyncStorage.setItem("current-tracks",queue_current_track);
     }
+
+    }
+export const getstreaminglinktracks = async (currentsong,track_index_in_album,album_tracks,queue,player_ind) => {
+    let album_length = album_tracks.length
+    let previous_track_index = track_index_in_album - 1
+    let next_track_index = track_index_in_album + 1
+
+    let prevsong = previous_track_index < 0 ? album_tracks[0] : album_tracks[previous_track_index]
+    let nextsong = next_track_index >= album_length ? album_tracks[0] : album_tracks[next_track_index]
+
+
+    
+    const [currentResult,nextResult, prevResult] = await Promise.all([
+    // Next song processing
+    loadcurrent(currentsong,queue,player_ind),
+    preloadnext(nextsong,queue),
+    // Previous song processing
+    preloadprev(prevsong,queue)
+    ]);
+     
+    
+}
+export const skipToTrack = async (album_tracks,nextsong,player_ind)=>{
+    
+    
+    let queue = await TrackPlayer.getQueue();
+    let next_exists_queue = queue.filter((track) =>{return (track.id === nextsong.id)})
+    if (next_exists_queue.length === 0){
+        const track_index_in_album = album_tracks.findIndex(track =>track.artist === nextsong.artist &&track.album_name === nextsong.album_name && track.name === nextsong.name)
+        console.log("track_index",track_index_in_album)
+        await getstreaminglinktracks(nextsong,track_index_in_album,album_tracks,queue,player_ind)
+     
+        
+        //console.log(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.ExternalStorageDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`)
+
+
 
 
     }
@@ -178,7 +235,7 @@ export const autoplaynextsong = async () =>{
         //console.log("ho")
         //console.log(queue_json)
 
-        await skipToTrack(nextsongqueue,player_ind)
+        await skipToTrack(album_tracks,nextsongqueue,player_ind)
 
        
         queue_json.shift()
@@ -203,10 +260,10 @@ export const autoplaynextsong = async () =>{
         if (nextsong === undefined){
             await AsyncStorage.removeItem("track_after_queue")
             
-            await skipToTrack(album_tracks[next_ind_in_album],player_ind)
+            await skipToTrack(album_tracks,album_tracks[next_ind_in_album],player_ind)
         }
         else{
-            await skipToTrack(nextsong,player_ind)
+            await skipToTrack(album_tracks,nextsong,player_ind)
 
             if (track_after_queue){
                 await AsyncStorage.removeItem("track_after_queue")
@@ -240,7 +297,7 @@ export const autoplayprevioussong = async () =>{
     let next_ind_in_album = (currentTrackIndexInaAlbum -1) <= 0 ? 0 : currentTrackIndexInaAlbum -1 
     let nextsong = album_tracks[next_ind_in_album]
     //console.log("next",currentTrackIndexInaAlbum)
-    await skipToTrack(nextsong,player_ind)
+    await skipToTrack(album_tracks,nextsong,player_ind)
    
 
 

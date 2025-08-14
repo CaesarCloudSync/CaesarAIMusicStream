@@ -28,7 +28,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         let player_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1 
 
 
-        await skipToTrack(nextsong,player_ind)
+        await skipToTrack(album_tracks,nextsong,player_ind)
 
 
        // let final_queue_json = player_queue.filter(obj => nextsong.name !== obj.title);

@@ -20,6 +20,7 @@ import axios from "axios";
 import { convertToValidFilename } from "../tool/tools";
 import { MUSICSDCARDPATH } from "../constants/constants";
 import { set } from "lodash";
+import { preloadnext } from "../controls/controls";
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone,multiplaylistselect,setMultiplePlaylistSelect}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
@@ -148,8 +149,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         setAddedToQueue(true)
         await timeout(1200);
         setAddingQueue(false)
+        let track_queue = await TrackPlayer.getQueue();
         await AsyncStorage.setItem(`queue-current-track-${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,JSON.stringify(album_tracks_state));
-
+        await preloadnext(album_tracks_state[index],track_queue)
         //addtolibrary()
         /*setTimeout(() =>{
             //console.log("jo")
@@ -180,6 +182,10 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         }
 
     }
+    const preloaded_cleanup = async () => {
+        let keys = await AsyncStorage.getAllKeys();
+        await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes(`preloaded-track:`))})) 
+    }
     const playnowsong = async () =>{
         await TrackPlayer.setRepeatMode(RepeatMode.Off);
         const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
@@ -202,6 +208,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             if (album_tracks_stored[0].album_name !== album_tracks_state[0].album_name){
                 
                 await TrackPlayer.reset();
+                await preloaded_cleanup();
+       
+
             }
 
         }
@@ -230,7 +239,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         
             let nextsong = album_track_state
     
-            await skipToTrack(nextsong,next_track_ind)
+            await skipToTrack(album_tracks_state,nextsong,next_track_ind)
         
 
     }
@@ -239,7 +248,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         
             let nextsong = album_track_state
 
-            await skipToTrack(nextsong,next_track_ind)
+            await skipToTrack(album_tracks_state,nextsong,next_track_ind)
         }
 
         
