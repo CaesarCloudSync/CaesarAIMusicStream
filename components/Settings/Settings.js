@@ -57,7 +57,26 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
   useEffect(() =>{
     checkProxyStatus();
   },[proxyEnabled])
-
+  const deletedownloadedmetadata = async () => {
+    let keys = await AsyncStorage.getAllKeys();
+    console.log("Delete Started")
+    await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("downloaded-track:"))}))
+    await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("downloaded-track-order:"))}))
+    await AsyncStorage.multiRemove(keys.filter((key) =>{return(key.includes("library-downloaded:"))}))
+    
+    console.log("Delete Finished.")
+  }
+  const handledownloadedmetadataconfirm = () => {
+    Alert.alert(
+      "Confirm Delete Downloaded Music Metadata",          // Title
+      "Are you sure you want to proceed?", // Message
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "OK", onPress: () => deletedownloadedmetadata() }
+      ],
+      { cancelable: true } // Allows closing by tapping outside on Android
+    );
+  };
   return (
     <View style={styles.container}>
     <View style={{flexDirection:"row"}}>
@@ -95,6 +114,7 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
         </View>
         <Text style={styles.sectionTitle}>Network</Text>
         <View>
+
     
         <Text style={styles.label}>Proxy Server URL</Text>
           <Text style={{marginBottom:20}} >https://www.freeproxy.world/</Text>
@@ -116,6 +136,10 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
         </TouchableOpacity>
                
         </View>
+        <Text style={styles.sectionTitle}>Scripts</Text>
+          <TouchableOpacity style={[styles.button,{"backgroundColor": "red"}]} onPress={() =>{handledownloadedmetadataconfirm()}}>
+            <Text style={styles.buttonText}>Delete Downloaded Metadata</Text>
+        </TouchableOpacity>
 
 
 
