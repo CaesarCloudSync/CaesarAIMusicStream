@@ -37,6 +37,7 @@ export const getaudiolink = async (album_track,init_index=0) =>{
     //const proxy_string = proxy_status ? `&proxy=${proxy}` : "";
     const searchquery = `${album_track.name.replace("&","and").replace("#","")} by ${album_track.artist.replace("¥$","Kanye West")}`//hoodie szn a boogie wit da hoodie album 20 tracks
     console.log("video_link",`https://music.caesaraihub.org/api/v2/getaudio?query=${searchquery}`)
+    console.log(`https://music.caesaraihub.org/api/v2/getaudio?query=${encodeURIComponent(searchquery)}`)
     const response = await axios.get(`https://music.caesaraihub.org/api/v2/getaudio?query=${encodeURIComponent(searchquery)}`)
     let songurl = response.data.streaming_url
     let title = response.data.title
