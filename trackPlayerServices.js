@@ -138,7 +138,9 @@ export async function playbackService() {
                     if (!track_downloaded){
                       if (!current_autonext){
                         await AsyncStorage.setItem("current_autonext","true")
-                        await play_next_queued_song(newqueue,player_ind)
+                        const nextsong_new_queue = JSON.parse(newqueue)
+                        console.log("queued,",nextsong_new_queue[0])
+                        await prefetchsong(nextsong_new_queue[0])
                       }
                     }
 
