@@ -19,6 +19,7 @@ import axios from 'axios';
 import RNFS from 'react-native-fs';
 import { VolumeManager } from 'react-native-volume-manager';
 import { sendmusicconnect } from './components/mqttclient/mqttclient';
+import { get_next_ind_in_album,get_next_song,get_track_after_queue,get_new_queue,play_next_queued_song,prefetchsong } from './components/controls/controls';
 export async function setupPlayer() {
   let isSetup = false;
   try {
@@ -122,16 +123,55 @@ export async function playbackService() {
       console.log(progress)
       if (progress.duration !== 0){
         console.log(progress,"hi")
+        //await AsyncStorage.removeItem("current_autonext")
         const current_autonext = await AsyncStorage.getItem("current_autonext")
-        if ((progress.duration - progress.position) < 2){
+        let duration_remaining = progress.duration - progress.position
+        if (duration_remaining < 20 && duration_remaining > 5){
           //andleautoplaynextsong()
-          await AsyncStorage.setItem("current_autonext","true")
+          
           if (!current_autonext){
-            await autoplaynextsong()
+                const newqueue = await get_new_queue()
+                  if (newqueue){
+                    console.log("ajobca")
+                    const [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks] = await get_next_ind_in_album()
+                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${newqueue.artist}-${newqueue.album_name}-${newqueue.name}`)
+                    if (!track_downloaded){
+                      if (!current_autonext){
+                        await AsyncStorage.setItem("current_autonext","true")
+                        await play_next_queued_song(newqueue,player_ind)
+                      }
+                    }
+
+                  }
+                  else{
+                    console.log("hello")
+                    const [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks] = await get_next_ind_in_album()
+                    console.log("hamamsn")
+                    const track_after_queue = await get_track_after_queue()
+                    console.log("shasu")
+                    const nextsong = await get_next_song(track_after_queue,album_tracks,next_ind_in_album)
+                    console.log("jdacinau")
+                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
+                    console.log("hdabi")
+                    if (!track_downloaded){
+                      await AsyncStorage.setItem("current_autonext","true")
+                      await prefetchsong(nextsong)
+                    }
+                  }
+
+
           }
           //await TrackPlayer.setRepeatMode(RepeatMode.Off);
 
       
+        }
+        else if (duration_remaining < 2){ 
+          await AsyncStorage.setItem("current_autonext","true")
+          if (!current_autonext){
+            await autoplaynextsong()
+          }
+
+
         }
         else{
           await AsyncStorage.removeItem("current_autonext")

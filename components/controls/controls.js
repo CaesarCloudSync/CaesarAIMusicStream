@@ -16,13 +16,43 @@ const get_thumbnail = async (album_id) =>{
     return album_thumbnail_after
 
 }
+const get_prefetched_song = async (nextsong) =>{
+    const current_prefetched = await AsyncStorage.getItem("current-prefetched-nextsong")
+    if (current_prefetched){
+        const current_prefetched_nextsong = JSON.parse(current_prefetched)
+        let nextsong_key = `${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`
+        let prefetchedsong_key = `${current_prefetched_nextsong.artist}-${current_prefetched_nextsong.album_name}-${current_prefetched_nextsong.name}`
+        console.log("prefetched-keys",prefetchedsong_key)
+        console.log("nextsong_key",nextsong_key)
+        if (nextsong_key === prefetchedsong_key){
+            console.log("current_prefectehd",current_prefetched_nextsong)
+            await AsyncStorage.removeItem("current-prefetched-nextsong")
+            return [current_prefetched_nextsong.streaming_link,current_prefetched_nextsong.name]
+        }
+        else{
+            console.error("Prefetch not cleaned correctly")
+        }
+        
+    }
+    else{
+        return await getstreaminglink(nextsong)
+    }
+
+}
+export const prefetchsong = async (nextsong) =>{
+    const [streaming_link,title] = await getstreaminglink(nextsong)
+    nextsong["streaming_link"] = streaming_link
+    await AsyncStorage.setItem("current-prefetched-nextsong",JSON.stringify(nextsong))
+
+}
 export const skipToTrack = async (nextsong,player_ind)=>{
     let queue = await TrackPlayer.getQueue();
     let next_exists_queue = queue.filter((track) =>{return (track.id === nextsong.id)})
     if (next_exists_queue.length === 0){
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
         //console.log(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,`file://${RNFS.ExternalStorageDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`)
-        let [streaming_link,title] = !track_downloaded  ? await getstreaminglink(nextsong) :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
+        let [streaming_link,title] = !track_downloaded  ? await get_prefetched_song(nextsong) :  [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
+        console.log("skippedtrrack",streaming_link)
         let thumbnail = !track_downloaded  ? nextsong.ytcustom ? nextsong.thumbnail :await get_thumbnail(nextsong.album_id) :  `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.jpg`
         const streaming_type = streaming_link.includes(".m3u8") ? "hls" : "default"
         if ("playlist_thumbnail" in nextsong && !("playlist_local" in nextsong)){
@@ -142,12 +172,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
     }
 }
 
-export const autoplaynextsong = async () =>{
-    // TODO Clean up functions - Chase Shakurs new song caused youtubesearch to go zero which caused album_tracks[index].link = undefined
-    //await AsyncStorage.removeItem("current-tracks")
-    // await AsyncStorage.removeItem("current-track")
-    //await AsyncStorage.removeItem("track_after_queue")
-    //await AsyncStorage.removeItem("queue")
+export const get_next_ind_in_album =  async () =>{
 
     const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
     const album_tracks = JSON.parse(stored_album_tracks)
@@ -162,45 +187,76 @@ export const autoplaynextsong = async () =>{
     //console.log("next",player_ind,num_of_tracks,album_tracks)
     const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
     let next_ind_in_album = (currentTrackIndexInaAlbum +1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +1 
-   
+    return [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks]
+}
+export const get_next_song = async (track_after_queue,album_tracks,next_ind_in_album) =>{
+    const nextsong = track_after_queue  ? album_tracks[parseInt(track_after_queue)]:album_tracks[next_ind_in_album]
+    return nextsong
+}
+export const play_next_queued_song = async (newqueue,player_ind) =>{
+    let queue_json = JSON.parse(newqueue)
+    let nextsongqueue = queue_json[0]
+
+    await skipToTrack(nextsongqueue,player_ind)
+
+    
+    queue_json.shift()
+    if (queue_json.length !== 0){
+    await AsyncStorage.setItem("queue",JSON.stringify(queue_json))
+    }
+    else{
+        await AsyncStorage.removeItem("queue")
+    }
+
+}
+export const play_next_song_after_queue = async (album_tracks,next_ind_in_album,player_ind) =>{
+    await AsyncStorage.removeItem("track_after_queue")
+    
+    await skipToTrack(album_tracks[next_ind_in_album],player_ind)
+}
+export const play_next_song = async (nextsong,player_ind,track_after_queue) =>{
+    await skipToTrack(nextsong,player_ind)
+
+    if (track_after_queue){
+        await AsyncStorage.removeItem("track_after_queue")
+    }
+}
+export const get_new_queue = async () =>{
+    const stored_queue = await AsyncStorage.getItem("queue")
+    return stored_queue
+}
+export const get_track_after_queue = async () =>{
+    const stored_track_after_queue = await AsyncStorage.getItem("track_after_queue")
+    return stored_track_after_queue
+}
+export const autoplaynextsong = async () =>{
+    // TODO Clean up functions - Chase Shakurs new song caused youtubesearch to go zero which caused album_tracks[index].link = undefined
+    //await AsyncStorage.removeItem("current-tracks")
+    // await AsyncStorage.removeItem("current-track")
+    //await AsyncStorage.removeItem("track_after_queue")
+    //await AsyncStorage.removeItem("queue")
+
+    const [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks] = await get_next_ind_in_album()
+    
     // next_ind null 23 22
-    const newqueue = await AsyncStorage.getItem("queue")
+    const newqueue = await get_new_queue()
     if (newqueue){
-        let queue_json = JSON.parse(newqueue)
-        let nextsongqueue = queue_json[0]
-        //console.log("ho")
-        //console.log(queue_json)
-
-        await skipToTrack(nextsongqueue,player_ind)
-
-       
-        queue_json.shift()
-        if (queue_json.length !== 0){
-        await AsyncStorage.setItem("queue",JSON.stringify(queue_json))
-        }
-        else{
-            await AsyncStorage.removeItem("queue")
-        }
+        await play_next_queued_song(newqueue,player_ind)
 
     }
     else{
        
         //await AsyncStorage.removeItem("track_after_queue")
-        const track_after_queue = await AsyncStorage.getItem("track_after_queue");
-
+        
+        const track_after_queue = await get_track_after_queue()
         console.log("next_ind",track_after_queue,next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum)
-        let nextsong = track_after_queue  ? album_tracks[parseInt(track_after_queue)]:album_tracks[next_ind_in_album]
+        const nextsong = await get_next_song(track_after_queue,album_tracks,next_ind_in_album)
         if (nextsong === undefined){
-            await AsyncStorage.removeItem("track_after_queue")
-            
-            await skipToTrack(album_tracks[next_ind_in_album],player_ind)
+            await play_next_song_after_queue(album_tracks,next_ind_in_album,player_ind)
         }
         else{
-            await skipToTrack(nextsong,player_ind)
+            await play_next_song(nextsong,player_ind,track_after_queue)
 
-            if (track_after_queue){
-                await AsyncStorage.removeItem("track_after_queue")
-            }
         }
 
 

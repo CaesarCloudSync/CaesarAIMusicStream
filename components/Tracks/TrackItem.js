@@ -199,8 +199,8 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             }
 
             //console.log(album_tracks_stored[0].album_name,album_tracks_state[0].name)
+            // Clean up
             if (album_tracks_stored[0].album_name !== album_tracks_state[0].album_name){
-                
                 await TrackPlayer.reset();
             }
 
