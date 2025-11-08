@@ -21,7 +21,7 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
   const [theme, setTheme] = useState("Dark");
   const [proxyEnabled, setProxyEnabled] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [internalPath, setInternalPath] = useState("");
+  const [externalPath, setExternalPath] = useState("");
   const [batches, setBatches] = useState(0);
   const [group, setGroup] = useState(0);
 
@@ -151,15 +151,25 @@ const exportAsyncStorageChunkedToExternal = async (
 
   const json = JSON.stringify(data, null, 2);
 
+
   // 3. Write JSON to internal storage
   const internalPath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
   await RNFS.writeFile(internalPath, json, 'utf8');
 
-  console.log('Exported to:', internalPath);
+  // 4. Request Android permissions for external storage
+  const granted = await requestExternalPermissions();
+  if (!granted) throw new Error('Storage permissions denied');
+
+  // 5. Copy the file to external Downloads folder
+  const externalPath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
+  await RNFS.copyFile(internalPath, externalPath);
+  
   setExporting(false);
+  setExternalPath(externalPath);
   // 6. Return paths for convenience
   return {
-    internalPath
+    internalPath,
+    externalPath
   };
 };
 
@@ -228,7 +238,7 @@ const exportAsyncStorageChunkedToExternal = async (
         </TouchableOpacity>
         {exporting ? <Text style={{color:"white",marginTop:10}}>Exporting...</Text> : null}
         {batches > 0 ? <Text style={{color:"white",marginTop:10}}>Batches: {group}/{batches}</Text> : null}
-        {internalPath !== "" ? <Text style={{color:"white",marginTop:10}}>Exported to now adb pull {internalPath}</Text> : null}
+        {externalPath !== "" ? <Text style={{color:"white",marginTop:10}}>Exported to now adb pull {externalPath}</Text> : null}
           <TouchableOpacity style={[styles.button,{"backgroundColor": "blue"},{"marginTop":20}]} onPress={() =>{exportAsyncStorageChunkedToExternal()}}>
             <Text style={styles.buttonText}>Export AsyncStorage Metadata</Text>
         </TouchableOpacity>
