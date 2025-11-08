@@ -8,6 +8,11 @@ import TrackProgress from "../TrackProgress/TrackProgress";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { set } from "lodash";
+
+import RNFS from 'react-native-fs';
+
+import { PermissionsAndroid, Platform } from 'react-native';
+
 export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack }) {
     const navigate = useNavigate();
   const [proxyUrl, setProxyUrl] = useState("");
@@ -15,6 +20,10 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
   const [lowDataMode, setLowDataMode] = useState(false);
   const [theme, setTheme] = useState("Dark");
   const [proxyEnabled, setProxyEnabled] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [internalPath, setInternalPath] = useState("");
+  const [batches, setBatches] = useState(0);
+  const [group, setGroup] = useState(0);
 
   const toggleTheme = () => {
     setTheme(theme === "Dark" ? "Light" : "Dark");
@@ -77,6 +86,83 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
       { cancelable: true } // Allows closing by tapping outside on Android
     );
   };
+
+
+
+// --------- chunk helper ----------
+const chunk = (arr, size) =>
+  arr.length ? [arr.slice(0, size), ...chunk(arr.slice(size), size)] : [];
+
+// --------- request permissions ----------
+async function requestExternalPermissions() {
+  if (Platform.OS !== 'android') return true;
+
+  const result = await PermissionsAndroid.requestMultiple([
+    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+  ]);
+
+  return (
+    result['android.permission.WRITE_EXTERNAL_STORAGE'] === 'granted' &&
+    result['android.permission.READ_EXTERNAL_STORAGE'] === 'granted'
+  );
+}
+
+// --------- MAIN EXPORT FUNCTION ----------
+const exportAsyncStorageChunkedToExternal = async (
+  fileName = 'asyncstorage-backup.json',
+  batchSize = 20
+) => {
+  // 1. Read keys
+  setExporting(true);
+  const exists = await RNFS.exists(`${RNFS.DocumentDirectoryPath}/${fileName}`)
+  if (exists){
+    await RNFS.unlink(`${RNFS.DocumentDirectoryPath}/${fileName}`)
+  }
+
+  const keys = await AsyncStorage.getAllKeys();
+  const batches = chunk(keys, batchSize);
+  setBatches(batches.length);
+
+  const data = {};
+
+  // 2. Resolve items in chunks
+  for (const group of batches) {
+    const reads = group.map(k => AsyncStorage.getItem(k));
+     console.log('Exporting chunk:', group);
+    const values = await Promise.all(reads);
+    setGroup(group.length);
+
+   
+
+    group.forEach((key, i) => {
+      
+      
+      if (!key.includes("userDataDirectory")){
+        data[key] = values[i];
+        console.log('Key:', key,);
+
+      }
+    });
+
+  }
+  setGroup(batches.length);
+  console.log('Final data');
+
+  const json = JSON.stringify(data, null, 2);
+
+  // 3. Write JSON to internal storage
+  const internalPath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+  await RNFS.writeFile(internalPath, json, 'utf8');
+
+  console.log('Exported to:', internalPath);
+  setExporting(false);
+  // 6. Return paths for convenience
+  return {
+    internalPath
+  };
+};
+
   return (
     <View style={styles.container}>
     <View style={{flexDirection:"row"}}>
@@ -139,6 +225,12 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
         <Text style={styles.sectionTitle}>Scripts</Text>
           <TouchableOpacity style={[styles.button,{"backgroundColor": "red"}]} onPress={() =>{handledownloadedmetadataconfirm()}}>
             <Text style={styles.buttonText}>Delete Downloaded Metadata</Text>
+        </TouchableOpacity>
+        {exporting ? <Text style={{color:"white",marginTop:10}}>Exporting...</Text> : null}
+        {batches > 0 ? <Text style={{color:"white",marginTop:10}}>Batches: {group}/{batches}</Text> : null}
+        {internalPath !== "" ? <Text style={{color:"white",marginTop:10}}>Exported to now adb pull {internalPath}</Text> : null}
+          <TouchableOpacity style={[styles.button,{"backgroundColor": "blue"},{"marginTop":20}]} onPress={() =>{exportAsyncStorageChunkedToExternal()}}>
+            <Text style={styles.buttonText}>Export AsyncStorage Metadata</Text>
         </TouchableOpacity>
 
 
