@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
 import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gesture-handler";
 
-import { skipToTrack } from "../controls/controls";
+import { prefetchsong, skipToTrack } from "../controls/controls";
 import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
 import axios from "axios";
@@ -202,6 +202,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             // Clean up
             if (album_tracks_stored[0].album_name !== album_tracks_state[0].album_name){
                 await AsyncStorage.removeItem("current-prefetched-nextsong")
+                await prefetchsong(album_track_state)
                 await TrackPlayer.reset();
             }
 
