@@ -12,6 +12,7 @@ import { set } from "lodash";
 import RNFS from 'react-native-fs';
 
 import { PermissionsAndroid, Platform } from 'react-native';
+import axios from "axios";
 
 export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack }) {
     const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack 
   const [externalPath, setExternalPath] = useState("");
   const [batches, setBatches] = useState(0);
   const [group, setGroup] = useState(0);
+  const [healthcheckactive,setHealthCheckActive] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === "Dark" ? "Light" : "Dark");
@@ -172,7 +174,29 @@ const exportAsyncStorageChunkedToExternal = async (
     externalPath
   };
 };
+const healthcheck = async () => {
+  try{
+      const response = await axios.get("https://music.caesaraihub.org/")
+  let result = response.data
+  if (result === "Welcome to CaesarAIMusicStreamYT."){
+    setHealthCheckActive(true)
+  }
+  console.log(result)
+  }
+  catch{
+    setHealthCheckActive(false)
+  }
 
+}
+  useEffect(() => {
+    const id = setInterval(() => {
+      healthcheck()
+      console.log("Running every 5 seconds");
+      // call your function here
+    }, 1000);
+
+    return () => clearInterval(id); // cleanup
+  }, []);
   return (
     <View style={styles.container}>
     <View style={{flexDirection:"row"}}>
@@ -185,6 +209,14 @@ const exportAsyncStorageChunkedToExternal = async (
         <Text style={styles.headerText}>Settings</Text>
       </View>
       <View style={styles.content}>
+        <Text style={styles.sectionTitle}>Health Check</Text>
+        <View style={styles.settingRow}>
+          <Text style={[{height:20},styles.label]}>{healthcheckactive === true ? "Active" : "Not Active"}</Text>
+          <View style={[{width:30,height:30,borderRadius:100,backgroundColor:healthcheckactive === true ? "green" : "red",bottom:8},styles.label]}>
+  
+     
+          </View>
+      </View>
         <Text style={styles.sectionTitle}>Preferences</Text>
         <View style={styles.settingRow}>
           <Text style={styles.label}>Notifications</Text>
