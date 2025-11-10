@@ -202,7 +202,10 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             // Clean up
             if (album_tracks_stored[0].album_name !== album_tracks_state[0].album_name){
                 await AsyncStorage.removeItem("current-prefetched-nextsong")
+                const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)
+                if (!track_downloaded){
                 await prefetchsong(album_track_state)
+                }
                 await TrackPlayer.reset();
             }
 
