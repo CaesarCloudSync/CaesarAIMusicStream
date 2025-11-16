@@ -5,7 +5,7 @@ import PlaylistCarouselItem from "./PlaylistCarouselItem";
 export function FavouriteAlbums({favouritecards,playlists,access_token,recentalbums,setRecentAlbums}){
     return(
         <View key={playlists[0].name} style={{justifyContent: 'center',marginTop:10}}>
-        <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:20}}>
+        <View style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap',gap:10}}>
             
                 {playlists.map((album,index) =>{
                     //console.log(album)
