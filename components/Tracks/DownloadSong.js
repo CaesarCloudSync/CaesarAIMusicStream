@@ -138,6 +138,14 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
 
   const filename = `${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${name}`)}.mp3`;
   const filePath = `${MUSICSDCARDPATH}/${filename}`;
+  
+  const exists = await RNFS.exists(MUSICSDCARDPATH)
+  console.log(exists)
+  if (!exists){
+    await RNFS.mkdir(MUSICSDCARDPATH);
+  }
+  console.log(exists)
+  console.log(filePath)
   const thumbnail_filePath = `${RNFS.DocumentDirectoryPath}/${filename.replace('mp3', 'jpg')}`;
   const thumbnail = !album_track.ytcustom ? await get_thumbnail(album_track.album_id) : album_track.thumbnail;
 
