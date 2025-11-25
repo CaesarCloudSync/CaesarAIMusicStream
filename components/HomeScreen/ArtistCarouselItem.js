@@ -40,7 +40,7 @@ export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favo
       
             return(
         
-                <View  style={{backgroundColor:"#141212",width:favouritecards === true ? 205 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
+                <View  style={{backgroundColor:"#141212",width:favouritecards === true ? 195 : (favouritecards === false ? 200 : 300),height:favouritecards === true ? 50 : (favouritecards === false ? 300 : 300),borderRadius: 5,borderWidth: 3,margin:5,borderColor:"#141212"}}>
                 <GestureDetector gesture={Gesture.Exclusive(longPress,singleTap)}>
                     <View  key={artist_name} style={{backgroundColor:"#141212",flexDirection:favouritecards === true ? "row":"column",justifyContent:favouritecards === true ? "flex-start":"flex-start",alignItems:favouritecards === true ? "stretch": "stretch",flex:1}}>
                         <View style={{flex:favouritecards === true ? 0. : (favouritecards === false ? 1 : 1)}}>
