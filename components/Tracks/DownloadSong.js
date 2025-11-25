@@ -240,6 +240,7 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
             JSON.stringify({ name, order: 0 })
           );
         }
+        await new Promise(res => setTimeout(res, 5000));
         await notifee.cancelNotification(notif_id);
         await AsyncStorage.removeItem(`current_downloading:${notif_id}`);
       })
