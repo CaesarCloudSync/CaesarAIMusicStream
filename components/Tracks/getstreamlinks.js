@@ -46,13 +46,15 @@ export const getyoutubelink  = async (album_track,download=false,init_index=0) =
 export const getaudiolink = async (album_track,init_index=0) =>{
     let response;
     try{
-    const [video_link,title] = await getyoutubelink(album_track,download=false,init_index);
-    const proxy = await AsyncStorage.getItem("PROXY");
-    const proxy_status = await AsyncStorage.getItem("PROXY_STATUS");
-    const proxy_string = proxy_status ? `&proxy=${proxy}` : "";
-    console.log("video_link",`https://music.caesaraihub.org/getaudio?url=${video_link}${proxy_string}`)
-    response = await axios.get(`https://music.caesaraihub.org/getaudio?url=${video_link}${proxy_string}`)
+    //const [video_link,title] = await getyoutubelink(album_track,download=false,init_index);
+    //const proxy = await AsyncStorage.getItem("PROXY");
+    //const proxy_status = await AsyncStorage.getItem("PROXY_STATUS");
+    //const proxy_string = proxy_status ? `&proxy=${proxy}` : "";
+    let searchquery = `${album_track.name.replace("&","and").replace("#","")} by ${album_track.artist.replace("¥$","Kanye West")}`//hoodie szn a boogie wit da hoodie album 20 tracks
+    console.log("video_link",`https://music.caesaraihub.org/api/v2/getaudio?query=${searchquery}`) // ${proxy_string}
+    response = await axios.get(`https://music.caesaraihub.org/api/v2/getaudio?query=${searchquery}`) // ${proxy_string}
     let songurl = response.data.streaming_url
+    let title = response.data.title
     return [songurl,title]
     }
     catch(error){

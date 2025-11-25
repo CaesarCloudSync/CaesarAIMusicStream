@@ -155,6 +155,13 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
     toFile: thumbnail_filePath,
     background: true,
     discretionary: true,
+          headers:{
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Accept-Encoding": "identity",
+    "Range": "bytes=0-"  // forces partial-content; prevents reset
+  },
   }).promise;
 
   // Create notification channel
@@ -171,16 +178,27 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
     Alert.alert("Streaming Link is manifest https://manifest.googlevideo.com/index.m3u8.Have not implemented M3u8 downloading yet.")
     //await downloadM3U8(songurl, filePath, notif_title, notif_id, channelId, album_track, name);
   } else {
+    let lastUpdate = 0;
     // Run original download logic
     await RNFS.downloadFile({
       fromUrl: songurl,
       toFile: filePath,
       background: true,
       discretionary: true,
+      headers:{
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Accept-Encoding": "identity",
+    "Range": "bytes=0-"  // forces partial-content; prevents reset
+  },
       progress: async (res) => {
         await AsyncStorage.setItem(`current_downloading:${notif_id}`, JSON.stringify({ jobId: res.jobId }));
         const progress = (res.bytesWritten / res.contentLength) * 100;
         console.log(`Progress: ${progress.toFixed(2)}%`);
+        const now = Date.now();
+        if (now - lastUpdate < 500) return; // update every 500ms
+        lastUpdate = now;
         await notifee.displayNotification({
           id: notif_id,
           title: notif_title,
