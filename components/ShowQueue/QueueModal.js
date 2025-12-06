@@ -19,7 +19,7 @@ import { SectionList } from "react-native";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { prefetchsong } from "../controls/controls";
 import { searchsongsrecommend } from "../Tracks/getrecommendations";
-import { repopulaterecommendations } from "../../trackPlayerServices";
+import { getsongrecommendation, getspecificsongrecommendation, repopulaterecommendations } from "../../trackPlayerServices";
 export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVisible,setQueue}) {//console.log("queue in QueueModal",queue)
 
   const [queuepositionsrc,setQueuePositionSrc] = useState("");
@@ -62,13 +62,13 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
     const playnextrecommend = async (nextsongyt) =>{
       const song_name = nextsongyt.title
       const artist_name = nextsongyt.artists[0].name
-      const [nextsong_recommend,album_tracks_recommend] = await searchsongsrecommend(song_name,artist_name);
-      console.log("nextsong from recommend",nextsong_recommend)
-      await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_recommend))
-      await AsyncStorage.removeItem("current-prefetched-nextsong")
-      const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong_recommend.artist}-${nextsong_recommend.album_name}-${nextsong_recommend.name}`)
-      // TODO: Make the Youtube text to spotiy search accurate to get song then play. The auto play.
       
+
+      
+      // TODO: Make the Youtube text to spotiy search accurate to get song then play. The auto play.
+      const nextsong_recommend = await getspecificsongrecommendation(song_name,artist_name)
+      console.log("nextsong_recommend",nextsong_recommend)
+      const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong_recommend.artist}-${nextsong_recommend.album_name}-${nextsong_recommend.name}`)
       if (!track_downloaded){
       await prefetchsong(nextsong_recommend)
       } 
