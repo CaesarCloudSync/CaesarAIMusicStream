@@ -19,6 +19,7 @@ import { SectionList } from "react-native";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { prefetchsong } from "../controls/controls";
 import { searchsongsrecommend } from "../Tracks/getrecommendations";
+import { repopulaterecommendations } from "../../trackPlayerServices";
 export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVisible,setQueue}) {//console.log("queue in QueueModal",queue)
 
   const [queuepositionsrc,setQueuePositionSrc] = useState("");
@@ -79,6 +80,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
       await skipToTrack(nextsong,next_track_ind)
 
       await removefromrecommend(nextsongyt)
+      await repopulaterecommendations()
         
     }
     const removefromqueue = async (song) =>{
@@ -161,6 +163,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
               const stored_recommendations = await AsyncStorage.getItem("current-recommendations")
       if (stored_recommendations){
         const recommendations = JSON.parse(stored_recommendations)
+
         setCurrentRecommendations(recommendations)
         setSections(prev =>
         prev.map(section =>
@@ -169,6 +172,8 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
             : section
         )
       );
+
+       
     }
     }
 

@@ -1,19 +1,34 @@
 import axios from "axios";
 import { get_access_token } from "../access_token/getaccesstoken";
-export async function getrecommendations(current_track){
+export async function getrecommendations(current_track,max_songs=10){
     
     if (current_track){
         const artist = current_track.artist;
         const track_name = current_track.title;
         // Simple recommendation logic based on artist and track name
         const song_query = `${track_name} by ${artist}`;
-        const reponse = await axios.get(`https://caesaraimusicrecommend-662756251108.us-central1.run.app/api/v1/get_recommendations?song_query=${encodeURIComponent(song_query)}`);
+        const reponse = await axios.get(`https://caesaraimusicrecommend-662756251108.us-central1.run.app/api/v1/get_recommendations?song_query=${encodeURIComponent(song_query)}&max_songs=${max_songs}`);
         let results = reponse.data.music;
         return results;
     }
     else{
         return null
     }
+}
+export const getrecommendation = async (current_track) =>{
+    if (current_track){
+        const artist = current_track.artist;
+        const track_name = current_track.title;
+        // Simple recommendation logic based on artist and track name
+        const song_query = `${track_name} by ${artist}`;
+        const reponse = await axios.get(`https://caesaraimusicrecommend-662756251108.us-central1.run.app/api/v1/get_recommendation?song_query=${encodeURIComponent(song_query)}`);
+        let results = reponse.data.music[0];
+        return results;
+    }
+    else{
+        return null
+    }
+
 }
 export const searchsongsrecommend = async (song_name, artist_name) =>{
       const query = `track:"${song_name}" artist:"${artist_name}"`;

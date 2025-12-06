@@ -20,6 +20,7 @@ import RNFS from 'react-native-fs';
 import { VolumeManager } from 'react-native-volume-manager';
 import { sendmusicconnect } from './components/mqttclient/mqttclient';
 import { get_next_ind_in_album,get_next_song,get_track_after_queue,get_new_queue,play_next_queued_song,prefetchsong } from './components/controls/controls';
+import { getrecommendations } from './components/Tracks/getrecommendations';
 export async function setupPlayer() {
   let isSetup = false;
   try {
@@ -110,6 +111,26 @@ export async function addTracks() {
 };
 
 
+export const repopulaterecommendations = async () =>{
+    const stored_recommendations = await AsyncStorage.getItem("current-recommendations")
+    console.log("stored_recommendations_hi",stored_recommendations)
+    if (stored_recommendations){
+
+      let recommendations = JSON.parse(stored_recommendations)
+      console.log("recommendations_hi",recommendations.length)
+      if (recommendations.length < 10){
+          console.log("getting more recommendations")
+         // get songs
+          const current_track = await TrackPlayer.getActiveTrack();
+          let needed_recommendations = 10 - recommendations.length
+          console.log("needed_recommendations",needed_recommendations)
+          const single_recommendation = await getrecommendations(current_track,max_songs=needed_recommendations)
+          console.log("single_recommendation",single_recommendation[0])
+          const new_recommendations = recommendations.concat(single_recommendation) 
+          await AsyncStorage.setItem("current-recommendations",JSON.stringify(new_recommendations))
+        }
+      }
+  }
 export async function playbackService() {
   TrackPlayer.addEventListener(Event.PlaybackProgressUpdated, async (progress) => {
     console.log('Event.PlaybackProgressUpdated');
@@ -159,7 +180,9 @@ export async function playbackService() {
                       await AsyncStorage.setItem("current_autonext","true")
                       await prefetchsong(nextsong)
                     }
+                    await repopulaterecommendations();
                   }
+                  
 
 
           }
@@ -317,19 +340,19 @@ export async function playbackService() {
    
   });
 
-  TrackPlayer.addEventListener(Event.RemoteNext, () => {
+  TrackPlayer.addEventListener(Event.RemoteNext, async () => {
     console.log('Event.RemoteNext');
       
-    TrackPlayer.getActiveTrackIndex().then((currentTrackInd) =>{
-      TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
-        if (currentTrack.mediastatus !== "online"){
-          TrackPlayer.skipToNext();
+   const currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
+    const currentTrack = await TrackPlayer.getTrack(currentTrackInd)
+    if (currentTrack.mediastatus !== "online"){
+         await  TrackPlayer.skipToNext();
         }
         else{
-          autoplaynextsong()
+          await autoplaynextsong()
+          await repopulaterecommendations();
         }
-      })
-    })
+  
   });
 
     TrackPlayer.addEventListener('remote-seek', ({position}) => {
