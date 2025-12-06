@@ -31,7 +31,10 @@ const get_prefetched_song = async (nextsong) =>{
             return [current_prefetched_nextsong.streaming_link,current_prefetched_nextsong.name]
         }
         else{
-            console.error("Prefetch not cleaned correctly")
+            //console.warn("Prefetch not cleaned correctly")
+            await AsyncStorage.removeItem("current-prefetched-nextsong")
+            
+            return await getstreaminglink(nextsong)
         }
         
     }

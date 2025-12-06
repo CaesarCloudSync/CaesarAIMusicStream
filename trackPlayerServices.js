@@ -124,10 +124,12 @@ export const repopulaterecommendations = async () =>{
           const current_track = await TrackPlayer.getActiveTrack();
           let needed_recommendations = 10 - recommendations.length
           console.log("needed_recommendations",needed_recommendations)
+          await AsyncStorage.setItem("current-autorecommend","true")
           const single_recommendation = await getrecommendations(current_track,max_songs=needed_recommendations)
           console.log("single_recommendation",single_recommendation[0])
           const new_recommendations = recommendations.concat(single_recommendation) 
           await AsyncStorage.setItem("current-recommendations",JSON.stringify(new_recommendations))
+          await AsyncStorage.removeItem("current-autorecommend")
         }
       }
   }
@@ -180,7 +182,13 @@ export async function playbackService() {
                       await AsyncStorage.setItem("current_autonext","true")
                       await prefetchsong(nextsong)
                     }
-                    await repopulaterecommendations();
+            
+                    
+                    const current_autorecommend = await AsyncStorage.getItem("current-autorecommend")
+                    if (!current_autorecommend){
+                      await repopulaterecommendations();
+                      
+                    }
                   }
                   
 
