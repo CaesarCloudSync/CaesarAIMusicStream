@@ -6,7 +6,7 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 //import { Dirs, FileSystem } from 'react-native-file-access';
 import { getstreaminglink } from './components/Tracks/getstreamlinks';
-import { autoplaynextsong,autoplayprevioussong } from './components/controls/controls';
+import { autoplaynextsong,autoplayprevioussong, changerecommendyt, get_next_song_in_recommend_queue, get_recommend_mode, get_recommended_songs, store_current_recommended_yt_to_spotify } from './components/controls/controls';
 // ...
 import notifee, { EventType } from '@notifee/react-native';
 
@@ -20,7 +20,7 @@ import RNFS from 'react-native-fs';
 import { VolumeManager } from 'react-native-volume-manager';
 import { sendmusicconnect } from './components/mqttclient/mqttclient';
 import { get_next_ind_in_album,get_next_song,get_track_after_queue,get_new_queue,play_next_queued_song,prefetchsong } from './components/controls/controls';
-import { getrecommendations } from './components/Tracks/getrecommendations';
+import { getrecommendations, searchsongsrecommend } from './components/Tracks/getrecommendations';
 export async function setupPlayer() {
   let isSetup = false;
   try {
@@ -154,6 +154,8 @@ export async function playbackService() {
           
           if (!current_autonext){
                 const newqueue = await get_new_queue()
+                const recommend_mode = await get_recommend_mode()
+                
                   if (newqueue){
                     console.log("ajobca")
                     const [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks] = await get_next_ind_in_album()
@@ -167,6 +169,29 @@ export async function playbackService() {
                       }
                     }
 
+                  }
+                  else if (recommend_mode){
+               
+                      
+                      const recommended_songs = await get_recommended_songs()
+                      const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
+                      
+                      console.log("nextsongrecommendyt",nextsongrecommendyt)
+                      const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
+                      const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsongsrecommend.artist}-${nextsongsrecommend.album_name}-${nextsongsrecommend.name}`)
+                      await store_current_recommended_yt_to_spotify(album_tracks_recommend)
+                      //await AsyncStorage.setItem("current-recommend",JSON.stringify(nextsongsrecommend))
+                      if (!track_downloaded){
+                        if (!current_autonext){
+                        await AsyncStorage.setItem("current_autonext","true")
+                        console.log("prefetching",nextsongsrecommend)
+                        await prefetchsong(nextsongsrecommend)
+                      }
+                      }
+                      // await repopulaterecommendations()
+        
+                    
+ 
                   }
                   else{
                     console.log("hello")
@@ -184,11 +209,7 @@ export async function playbackService() {
                     }
             
                     
-                    const current_autorecommend = await AsyncStorage.getItem("current-autorecommend")
-                    if (!current_autorecommend){
-                      await repopulaterecommendations();
-                      
-                    }
+
                   }
                   
 
@@ -202,6 +223,7 @@ export async function playbackService() {
           await AsyncStorage.setItem("current_autonext","true")
           if (!current_autonext){
             await autoplaynextsong()
+            await repopulaterecommendations();
           }
 
 

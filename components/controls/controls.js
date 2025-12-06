@@ -31,10 +31,10 @@ const get_prefetched_song = async (nextsong) =>{
             return [current_prefetched_nextsong.streaming_link,current_prefetched_nextsong.name]
         }
         else{
-            //console.warn("Prefetch not cleaned correctly")
-            await AsyncStorage.removeItem("current-prefetched-nextsong")
+            console.warn("Prefetch not cleaned correctly")
+            //await AsyncStorage.removeItem("current-prefetched-nextsong")
             
-            return await getstreaminglink(nextsong)
+            //return await getstreaminglink(nextsong)
         }
         
     }
@@ -256,8 +256,9 @@ export const get_next_song_in_recommend_queue = async (recommended_songs ) =>{
 export const store_current_recommended_yt_to_spotify = async (album_tracks_recommend) =>{
     await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_recommend))
 }
-export const changerecommendyt = async (recommended_songs) =>{
-    const recommend_json = JSON.parse(recommended_songs)
+export const changerecommendyt = async () =>{
+    const current_recommendations= await  AsyncStorage.getItem("current-recommendations")
+    const recommend_json = JSON.parse(current_recommendations)
     recommend_json.shift()
     if (recommend_json.length !== 0){
     await AsyncStorage.setItem("current-recommendations",JSON.stringify(recommend_json))
@@ -267,6 +268,7 @@ export const changerecommendyt = async (recommended_songs) =>{
     }
 
 }
+
 export const autoplaynextsong = async () =>{
     // TODO Clean up functions - Chase Shakurs new song caused youtubesearch to go zero which caused album_tracks[index].link = undefined
     //await AsyncStorage.removeItem("current-tracks")
@@ -284,27 +286,7 @@ export const autoplaynextsong = async () =>{
     }
     else{
        
-        //await AsyncStorage.removeItem("track_after_queue")
-        const recommend_mode = await get_recommend_mode()
-        if (recommend_mode){
-            console.log("recommend_mode",recommend_mode)
-            const recommended_songs = await get_recommended_songs()
-            console.log("recommended_songs",recommended_songs)
-            const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
-            console.log("nextsongrecommendyt",nextsongrecommendyt)
-            const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
-            await store_current_recommended_yt_to_spotify(album_tracks_recommend)
-            
 
-            console.log("hemmoeiaics",nextsongsrecommend)
-            if (recommended_songs){
-                await play_recommended_next_song(nextsongsrecommend,player_ind)
-                await changerecommendyt(recommended_songs)
-                
-            }
-        }
-        else{
-        
         const track_after_queue = await get_track_after_queue()
         console.log("next_ind",track_after_queue,next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum)
         const nextsong = await get_next_song(track_after_queue,album_tracks,next_ind_in_album)
@@ -315,7 +297,12 @@ export const autoplaynextsong = async () =>{
             await play_next_song(nextsong,player_ind,track_after_queue)
 
         }
+        const recommend_mode = await get_recommend_mode()
+        if (recommend_mode){
+            console.log("recommend_mode active")
+          await changerecommendyt()
         }
+        
 
 
     }
