@@ -1,0 +1,36 @@
+{
+    "album_id": "26rTTXIEtEeSTan28AiLaV",
+    "album_name": "Larger Than Life",
+    "artist": "Brent Faiyaz",
+    "duration_ms": 124552,
+    "id": "7qzQfE2se3Ai5reZcxs920",
+    "name": "Tim's Intro",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273ceb160561269ab00b1df9678"
+}
+
+{
+    "album_id": "26rTTXIEtEeSTan28AiLaV",$
+    "album_name": "Larger Than Life",$
+    "name": "Tim's Intro", $
+    "id": "7qzQfE2se3Ai5reZcxs920",$
+    "artist": "Brent Faiyaz",$
+    "artist_id": "3tlXnStJ1fFhdScmQeLpuG", $
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273ceb160561269ab00b1df9678",$
+    "track_number": 1, $
+    "duration_ms": 124552,$
+    "streaming_link": "https://rr4---sn-8pgbpohxqp5-aigel.googlevideo.com/videoplayback?expire=1765056750&ei=jkw0aZbSLtqjp-oP1I6z6QU&ip=82.36.137.231&id=o-AN6fjXktw0JT3WuDOkAgczqrHmY1HRLsc5AWNnvAkh11&itag=251&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=32&met=1765035150%2C&mh=2M&mm=31%2C26&mn=sn-8pgbpohxqp5-aigel%2Csn-5hnednss&ms=au%2Conr&mv=m&mvi=4&pl=20&rms=au%2Cau&initcwndbps=4376250&bui=AYUSA3D8TIr_KEUd_zwDgg6xFWzELeC2Ja3Cog3P2W7slDrQBr6FmnbVj2oOsZxvqEqeU-1f_e-BxxO1&spc=wH4Qq70vM30J&vprv=1&svpuc=1&mime=audio%2Fwebm&rqh=1&gir=yes&clen=2253256&dur=125.161&lmt=1732386149304551&mt=1765034716&fvip=5&keepalive=yes&fexp=51552689%2C51565116%2C51565682%2C51580968&c=ANDROID&txp=4532434&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJfQdSswRAIgEynDvQ89DF1UffZfDchHTbmAG4wWoJRR35o2WEjgDc4CIEkE8CSzBamtUPsAciD6sROReZVSsuFT51IVjwMAd27N&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRQIhAJNFhWyuk7-ewatmUIOLbntNSRnmRu6_oeTo8XXbJyUwAiBjHaw32j0oJbv92UqyXYHLaSM4AC9dEpRSaxc0PfFqKA%3D%3D"
+}
+{
+    "id":track.id, $
+    "album_id":track.album.id, $
+    "name":track.name,$
+    thumbnail:track.album.images[
+        0
+    ].url,$
+    "artist":track.album.artists[
+        0$
+    ].name,
+    artist_id: track.artists[
+        0
+    ].id$,duration_ms: track.duration_ms,album_name:$ track.album.name
+}
