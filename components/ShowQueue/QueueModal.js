@@ -18,10 +18,11 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import { SectionList } from "react-native";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { prefetchsong } from "../controls/controls";
-export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVisible,setQueue}) {console.log("queue in QueueModal",queue)
+export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVisible,setQueue}) {//console.log("queue in QueueModal",queue)
 
   const [queuepositionsrc,setQueuePositionSrc] = useState("");
   const [current_recommendations, setCurrentRecommendations] = useState([]);
+  const [recommendationmode,setRecommendationMode] = useState(false);
   const [sections, setSections] = useState([
   { title: "Queue", data: queue },
   {title:"Shuffling From:", data: current_recommendations}
@@ -154,6 +155,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
 
   }
   const recommendshufflemode = async () =>{
+ 
     const current_track = await TrackPlayer.getActiveTrack();
     const recommendations = await getrecommendations(current_track)
     if (recommendations){
@@ -167,7 +169,8 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
           : section
       )
     );
-   
+      setRecommendationMode(true)
+    await AsyncStorage.setItem("recommendation-mode","true")
     }
 
   }
@@ -183,6 +186,47 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         }
         
     }
+    const getcurrentrecommendations = async () =>{
+      const recommendationmode_storage = await AsyncStorage.getItem("recommendation-mode")
+      if (recommendationmode_storage === "true"){
+        setRecommendationMode(true)
+              const stored_recommendations = await AsyncStorage.getItem("current-recommendations")
+      if (stored_recommendations){
+        const recommendations = JSON.parse(stored_recommendations)
+        setCurrentRecommendations(recommendations)
+        setSections(prev =>
+        prev.map(section =>
+          section.title === "Shuffling From:"
+            ? { ...section, data: recommendations} // update only this section
+            : section
+        )
+      );
+    }
+    }
+
+    }
+    const getrecommendationmode = async () =>{
+      const recommendationmode_storage = await AsyncStorage.getItem("recommendation-mode")
+      if (recommendationmode_storage === "true"){
+        setRecommendationMode(true)
+      }
+      else{
+        setRecommendationMode(false)
+      }
+    }
+  const stoprecommendshufflemode = async () =>{
+    setRecommendationMode(false)
+    await AsyncStorage.removeItem("recommendation-mode")
+    await AsyncStorage.removeItem("current-recommendations")
+    setCurrentRecommendations([])
+    setSections(prev =>
+      prev.map(section =>
+        section.title === "Shuffling From:"
+          ? { ...section, data: []} // update only this section
+          : section
+      )
+    );
+  }
   useEffect(() =>{
       setSections(prev =>
       prev.map(section =>
@@ -191,14 +235,10 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
           : section
       )
     );
-    setSections(prev =>
-      prev.map(section =>
-        section.title === "Shuffling From:"
-          ? { ...section, data: current_recommendations} // update only this section
-          : section
-      )
-    );
-  },[queue,current_recommendations])
+    getcurrentrecommendations()
+    getrecommendationmode()
+  },[queue,current_recommendations,recommendationmode])
+
   return (
     <View style={styles.flexView}>
       <StatusBar />
@@ -220,8 +260,8 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         <View style={styles.modalContent}>
           <View style={styles.center}>
             <View style={[styles.barIcon,{alignSelf:"center"}]} />
-            <TouchableOpacity onPress={() =>{recommendshufflemode()}} style={{alignSelf:"flex-end"}}>
-              <MaterialIcons style={{marginTop:10}} name="shuffle-on" size={25} color="white"/>
+            <TouchableOpacity onLongPress={() =>{stoprecommendshufflemode()}} onPress={() =>{recommendshufflemode()}} style={{alignSelf:"flex-end"}}>
+              <MaterialIcons style={{marginTop:10}} name="shuffle-on" size={25} color={recommendationmode === true ? "green" : "white"}/>
             </TouchableOpacity>
                   <SectionList
         sections={sections}
@@ -366,5 +406,4 @@ const styles = StyleSheet.create({
   },
 });
 
-/*
-            */
+
