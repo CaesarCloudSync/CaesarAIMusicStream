@@ -24,15 +24,18 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
   const [current_recommendations, setCurrentRecommendations] = useState([]);
   const [sections, setSections] = useState([
   { title: "Queue", data: queue },
-  {title:"Shuffling From", data: current_recommendations}
+  {title:"Shuffling From:", data: current_recommendations}
 ]);
-    const searchsongs = async (song_query) =>{
+    const searchsongs = async (song_name, artist_name) =>{
+      const query = `track:"${song_name}" artist:"${artist_name}"`;
+      const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
+
       const access_token = await get_access_token();
         const headers = {Authorization: `Bearer ${access_token}`}
         //console.log(text)
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=${song_query}&limit=50&type=track`, {headers: headers})
+        const resp = await fetch(url, {headers: headers})
         const feedresult = await resp.json()
-
+        //console.log("feedresult in searchsongs",feedresult)
         const track = feedresult.tracks.items[0]
         //console.log("track in searchsongs",track)
         const result_track = {"id":track.id,"album_id":track.album.id,"name":track.name,thumbnail:track.album.images[0].url,"artist":track.album.artists[0].name,artist_id: track.artists[0].id,duration_ms: track.duration_ms,album_name: track.album.name,track_numer: track.track_number}
@@ -87,41 +90,26 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         
     }
     const playnextrecommend = async (nextsongyt) =>{
-      console.log("nextspngyt",nextsongyt)
-      const song_query = `${nextsongyt.title} by ${nextsongyt.artists[0].name}`
-      const [nextsong_recommend,album_tracks_recommend] = await searchsongs(song_query);
+      const song_name = nextsongyt.title
+      const artist_name = nextsongyt.artists[0].name
+      const [nextsong_recommend,album_tracks_recommend] = await searchsongs(song_name,artist_name);
       console.log("nextsong from recommend",nextsong_recommend)
       await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_recommend))
       await AsyncStorage.removeItem("current-prefetched-nextsong")
       const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong_recommend.artist}-${nextsong_recommend.album_name}-${nextsong_recommend.name}`)
       // TODO: Make the Youtube text to spotiy search accurate to get song then play. The auto play.
-      /*
-            if (!track_downloaded){
+      
+      if (!track_downloaded){
       await prefetchsong(nextsong_recommend)
       } 
-     await TrackPlayer.reset();
-      const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
-      console.log("current_traCKSSS",stored_album_tracks)
-      const album_tracks = JSON.parse(stored_album_tracks)
-      //console.log(album_tracks[0])
-      let num_of_tracks = album_tracks.length
-      //console.log(num_of_tracks)
-      let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
-      //console.log("current",currentTrackInd)
-      let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
-      //console.log(currentTrack.index,currentTrack)
-      let player_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1 
+      await TrackPlayer.reset();
+      let next_track_ind = 0
+  
+      let nextsong = nextsong_recommend
 
+      await skipToTrack(nextsong,next_track_ind)
 
-      await skipToTrack(nextsong_recommend,player_ind) */
-
-            
-
-
-
-
-       // let final_queue_json = player_queue.filter(obj => nextsong.name !== obj.title);
-       //await removefromrecommend(nextsongyt)
+      await removefromrecommend(nextsongyt)
         
     }
     const removefromqueue = async (song) =>{
@@ -174,7 +162,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
       setCurrentRecommendations(recommendations)
       setSections(prev =>
       prev.map(section =>
-        section.title === "Shuffling From"
+        section.title === "Shuffling From:"
           ? { ...section, data: recommendations} // update only this section
           : section
       )
@@ -205,7 +193,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
     );
     setSections(prev =>
       prev.map(section =>
-        section.title === "Shuffling From"
+        section.title === "Shuffling From:"
           ? { ...section, data: current_recommendations} // update only this section
           : section
       )
@@ -261,8 +249,8 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
 
             </View> 
               )}
-          else if (title === "Shuffling From"){
-            console.log("item in Shuffling From",item)
+          else if (title === "Shuffling From:"){
+            //console.log("item in Shuffling From:",item)
             return(
             <View style={{flex:1,flexDirection:"row",alignItems:"center"}}>
               <TouchableOpacity style={{flexDirection:"row",width:325}} onLongPress={() =>{removefromrecommend(item)}} onPress={() =>{playnextrecommend(item)}} >
@@ -288,9 +276,9 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
               }
         }
         renderSectionHeader={({section: {title}}) => {
-          if (title === "Shuffling From"){
+          if (title === "Shuffling From:"){
             return (
-              <View style={{marginTop:20}}>
+              <View style={{marginTop:20,width:200}}>
                       <View style={{flexDirection:"row"}}>
 
                       <Entypo style={{marginTop:10}} name="shuffle" size={15}>
