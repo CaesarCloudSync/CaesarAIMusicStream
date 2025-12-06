@@ -217,8 +217,9 @@ export const play_next_song_after_queue = async (album_tracks,next_ind_in_album,
     await skipToTrack(album_tracks[next_ind_in_album],player_ind)
 }
 export const play_next_song = async (nextsong,player_ind,track_after_queue) =>{
+    console.log("playsongmiu",nextsong)
     await skipToTrack(nextsong,player_ind)
-
+    console.log("played next song3")
     if (track_after_queue){
         await AsyncStorage.removeItem("track_after_queue")
     }
@@ -283,6 +284,7 @@ export const autoplaynextsong = async () =>{
 
     }
     else{
+        //console.log("no queue")
        
 
         const track_after_queue = await get_track_after_queue()
@@ -292,7 +294,9 @@ export const autoplaynextsong = async () =>{
             await play_next_song_after_queue(album_tracks,next_ind_in_album,player_ind)
         }
         else{
+            console.log("nextsonghiuwu",nextsong)
             await play_next_song(nextsong,player_ind,track_after_queue)
+            console.log("played next song")
 
         }
         const recommend_mode = await get_recommend_mode()

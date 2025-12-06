@@ -110,6 +110,16 @@ export async function addTracks() {
   await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 };
 
+export const getsongrecommendation = async () =>{
+    const recommended_songs = await get_recommended_songs()
+  const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
+  
+  console.log("nextsongrecommendyt",nextsongrecommendyt)
+  const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
+  
+  await store_current_recommended_yt_to_spotify(album_tracks_recommend)
+  return nextsongsrecommend
+}
 
 export const repopulaterecommendations = async () =>{
     const stored_recommendations = await AsyncStorage.getItem("current-recommendations")
@@ -171,15 +181,9 @@ export async function playbackService() {
 
                   }
                   else if (recommend_mode){
-               
-                      
-                      const recommended_songs = await get_recommended_songs()
-                      const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
-                      
-                      console.log("nextsongrecommendyt",nextsongrecommendyt)
-                      const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
-                      const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsongsrecommend.artist}-${nextsongsrecommend.album_name}-${nextsongsrecommend.name}`)
-                      await store_current_recommended_yt_to_spotify(album_tracks_recommend)
+                    
+                    const nextsongsrecommend = await getsongrecommendation()
+                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsongsrecommend.artist}-${nextsongsrecommend.album_name}-${nextsongsrecommend.name}`)  
                       //await AsyncStorage.setItem("current-recommend",JSON.stringify(nextsongsrecommend))
                       if (!track_downloaded){
                         if (!current_autonext){
@@ -379,6 +383,12 @@ export async function playbackService() {
          await  TrackPlayer.skipToNext();
         }
         else{
+          const recommend_mode = await get_recommend_mode()
+          console.log("recommend_mode",recommend_mode)
+          if (recommend_mode){
+            const nextsongsrecommend = await getsongrecommendation()
+            await prefetchsong(nextsongsrecommend)
+          }
           await autoplaynextsong()
           await repopulaterecommendations();
         }
