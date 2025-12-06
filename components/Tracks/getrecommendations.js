@@ -43,7 +43,7 @@ export const searchsongsrecommend = async (song_name, artist_name) =>{
         //console.log("feedresult in searchsongs",feedresult)
         const track = feedresult.tracks.items[0]
         //console.log("track in searchsongs",track)
-        const result_track = {"id":track.id,"album_id":track.album.id,"name":track.name,thumbnail:track.album.images[0].url,"artist":track.album.artists[0].name,artist_id: track.artists[0].id,duration_ms: track.duration_ms,album_name: track.album.name,track_numer: track.track_number}
+        const result_track = {"id":track.id,"album_id":track.album.id,"name":track.name,thumbnail:track.album.images[0].url,"artist":track.album.artists[0].name,artist_id: track.artists[0].id,duration_ms: track.duration_ms,album_name: track.album.name,track_number: track.track_number}
         const resp2 = await fetch(`https://api.spotify.com/v1/albums/${result_track.album_id}/tracks`, {headers: headers})
         const tracksresult = await resp2.json()
         const  tracks = tracksresult.items.map((item) => ({

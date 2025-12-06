@@ -6,7 +6,7 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 //import { Dirs, FileSystem } from 'react-native-file-access';
 import { getstreaminglink } from './components/Tracks/getstreamlinks';
-import { autoplaynextsong,autoplayprevioussong, changerecommendyt, get_next_song_in_recommend_queue, get_recommend_mode, get_recommended_songs, store_current_recommended_yt_to_spotify } from './components/controls/controls';
+import { autoplaynextsong,autoplayprevioussong, changerecommendyt, find_recommended_song, get_next_song_in_recommend_queue, get_recommend_mode, get_recommended_songs, store_current_recommended_yt_to_spotify } from './components/controls/controls';
 // ...
 import notifee, { EventType } from '@notifee/react-native';
 
@@ -113,6 +113,16 @@ export async function addTracks() {
 export const getsongrecommendation = async () =>{
     const recommended_songs = await get_recommended_songs()
   const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
+  
+  console.log("nextsongrecommendyt",nextsongrecommendyt)
+  const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
+  
+  await store_current_recommended_yt_to_spotify(album_tracks_recommend)
+  return nextsongsrecommend
+}
+export const getspecificsongrecommendation = async (song_name,artist) =>{
+  const recommended_songs = await get_recommended_songs()
+  const nextsongrecommendyt = await find_recommended_song(song_name,artist,recommended_songs)
   
   console.log("nextsongrecommendyt",nextsongrecommendyt)
   const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)

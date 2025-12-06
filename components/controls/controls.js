@@ -32,6 +32,7 @@ const get_prefetched_song = async (nextsong) =>{
         }
         else{
             console.warn("Prefetch not cleaned correctly")
+            return await getstreaminglink(nextsong)
     
         }
         
@@ -188,10 +189,13 @@ export const get_next_ind_in_album =  async () =>{
     let player_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1 // This adds songs to player regardless of order in album. It just makes sure not to exceed the num of songs in album. The index of song would then be found in player then added to end or skipped to.
     //console.log("next",player_ind,num_of_tracks,album_tracks)
     const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
+    
     let next_ind_in_album = (currentTrackIndexInaAlbum +1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +1 
     return [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks]
 }
 export const get_next_song = async (track_after_queue,album_tracks,next_ind_in_album) =>{
+    console.log("track_after_queue",track_after_queue)
+    console.log("next_ind_in_album",next_ind_in_album)
     const nextsong = track_after_queue  ? album_tracks[parseInt(track_after_queue)]:album_tracks[next_ind_in_album]
     return nextsong
 }
@@ -267,7 +271,15 @@ export const changerecommendyt = async () =>{
     }
 
 }
+export const find_recommended_song = async (title,artist,recommended_songs) =>{
+    const recommended_songs_json = JSON.parse(recommended_songs)
+    
+    
+    const recommend_song = recommended_songs_json.find((song) => song.title === title && song.artists[0].name === artist)
+    console.log("recommend_song",recommend_song)
+    return recommend_song
 
+}
 export const autoplaynextsong = async () =>{
     // TODO Clean up functions - Chase Shakurs new song caused youtubesearch to go zero which caused album_tracks[index].link = undefined
     //await AsyncStorage.removeItem("current-tracks")
@@ -290,6 +302,7 @@ export const autoplaynextsong = async () =>{
         const track_after_queue = await get_track_after_queue()
         console.log("next_ind",track_after_queue,next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum)
         const nextsong = await get_next_song(track_after_queue,album_tracks,next_ind_in_album)
+        console.log("nextsong_main",nextsong)
         if (nextsong === undefined){
             await play_next_song_after_queue(album_tracks,next_ind_in_album,player_ind)
         }
