@@ -257,6 +257,7 @@ export const get_recommended_songs = async () =>{
 export const play_recommended_next_song = async (player_ind) =>{
     const nextsongsrecommend = await getsongrecommendation()
     await skipToTrack(nextsongsrecommend,player_ind)
+    
 
     
 

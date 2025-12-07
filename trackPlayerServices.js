@@ -109,15 +109,25 @@ export async function addTracks() {
   await TrackPlayer.add(alltracks);
   await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 };
-
+export const remove_recommend_next_played = async (recommended_songs) =>{
+    const recommended_songs_json = JSON.parse(recommended_songs)
+    recommended_songs_json.shift()
+    if (recommended_songs_json.length !== 0){
+    await AsyncStorage.setItem("current-recommendations",JSON.stringify(recommended_songs_json))
+    }
+    else{
+        await AsyncStorage.removeItem("current-recommendations")
+    }
+}
 export const getsongrecommendation = async () =>{
-    const recommended_songs = await get_recommended_songs()
+  const recommended_songs = await get_recommended_songs()
   const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
   
   console.log("nextsongrecommendyt",nextsongrecommendyt)
   const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
 
   await store_current_recommended_yt_to_spotify(album_tracks_recommend)
+  await remove_recommend_next_played(recommended_songs)
   return nextsongsrecommend
 }
 export const getspecificsongrecommendation = async (song_name,artist) =>{
@@ -128,6 +138,7 @@ export const getspecificsongrecommendation = async (song_name,artist) =>{
   const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
   
   await store_current_recommended_yt_to_spotify(album_tracks_recommend)
+   await remove_recommend_next_played(recommended_songs)
   return nextsongsrecommend
 }
 
@@ -393,12 +404,6 @@ export async function playbackService() {
          await  TrackPlayer.skipToNext();
         }
         else{
-          const recommend_mode = await get_recommend_mode()
-          console.log("recommend_mode",recommend_mode)
-          if (recommend_mode){
-            const nextsongsrecommend = await getsongrecommendation()
-            await prefetchsong(nextsongsrecommend)
-          }
           await autoplaynextsong()
           await repopulaterecommendations();
         }
