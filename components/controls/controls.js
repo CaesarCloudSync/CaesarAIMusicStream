@@ -8,6 +8,7 @@ import { sendmusicconnect } from "../mqttclient/mqttclient";
 import { VolumeManager } from 'react-native-volume-manager';
 import { MUSICSDCARDPATH } from "../constants/constants";
 import { searchsongsrecommend } from "../Tracks/getrecommendations";
+import { getsongrecommendation } from "../../trackPlayerServices";
 const get_thumbnail = async (album_id) =>{
     const access_token = await get_access_token();
     const headers = {Authorization: `Bearer ${access_token}`}
@@ -129,6 +130,12 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
         await AsyncStorage.setItem("current-tracks",queue_current_track);
     }
+    const recommend_current_track = await AsyncStorage.getItem(`current-recommend-sp`);
+    console.log("recommend_current_track",recommend_current_track)
+    if (recommend_current_track){
+        await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
+        await AsyncStorage.setItem("current-tracks",recommend_current_track);
+    }
 
     }
     else{
@@ -169,6 +176,13 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         if (queue_current_track){
             await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
             await AsyncStorage.setItem("current-tracks",queue_current_track);
+        }
+     
+        const recommend_current_track = await AsyncStorage.getItem(`current-recommend-sp`);
+        console.log("recommend_current_track",recommend_current_track)
+        if (recommend_current_track){
+            await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
+            await AsyncStorage.setItem("current-tracks",recommend_current_track);
         }
      
 
@@ -240,8 +254,9 @@ export const get_recommended_songs = async () =>{
     const stored_recommended_songs = await AsyncStorage.getItem("current-recommendations")
     return stored_recommended_songs
 }
-export const play_recommended_next_song = async (nextsong,player_ind) =>{
-    await skipToTrack(nextsong,player_ind)
+export const play_recommended_next_song = async (player_ind) =>{
+    const nextsongsrecommend = await getsongrecommendation()
+    await skipToTrack(nextsongsrecommend,player_ind)
 
     
 
@@ -257,7 +272,7 @@ export const get_next_song_in_recommend_queue = async (recommended_songs ) =>{
 
 }
 export const store_current_recommended_yt_to_spotify = async (album_tracks_recommend) =>{
-    await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_recommend))
+    await AsyncStorage.setItem("current-recommend-sp",JSON.stringify(album_tracks_recommend))
 }
 export const changerecommendyt = async () =>{
     const current_recommendations= await  AsyncStorage.getItem("current-recommendations")
@@ -291,8 +306,14 @@ export const autoplaynextsong = async () =>{
     
     // next_ind null 23 22
     const newqueue = await get_new_queue()
+    const recommend_mode = await get_recommend_mode();
     if (newqueue){
         await play_next_queued_song(newqueue,player_ind)
+
+    }
+    if (recommend_mode){
+        await play_recommended_next_song(player_ind)
+        // get yt from storage then
 
     }
     else{
@@ -312,11 +333,7 @@ export const autoplaynextsong = async () =>{
             console.log("played next song")
 
         }
-        const recommend_mode = await get_recommend_mode()
-        if (recommend_mode){
-            console.log("recommend_mode active")
-          await changerecommendyt()
-        }
+
         
 
 
