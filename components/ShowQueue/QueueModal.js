@@ -26,6 +26,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
   const [recommendpositionsrc,setRecommendPositionSrc] = useState("");
   const [current_recommendations, setCurrentRecommendations] = useState([]);
   const [recommendationmode,setRecommendationMode] = useState(false);
+  const [shufflefetching,setShuffleFetching] = useState(false);
   const [sections, setSections] = useState([
   { title: "Queue", data: queue },
   {title:"Shuffling From:", data: current_recommendations}
@@ -148,7 +149,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
 
   }
   const recommendshufflemode = async () =>{
- 
+    setShuffleFetching(true)
     const current_track = await TrackPlayer.getActiveTrack();
     const recommendations = await getrecommendations(current_track)
     if (recommendations){
@@ -164,6 +165,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
     );
       setRecommendationMode(true)
     await AsyncStorage.setItem("recommendation-mode","true")
+    setShuffleFetching(false)
     }
 
   }
@@ -212,6 +214,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
     }
   const stoprecommendshufflemode = async () =>{
     setRecommendationMode(false)
+    setShuffleFetching(false)
     await AsyncStorage.removeItem("recommendation-mode")
     await AsyncStorage.removeItem("current-recommendations")
     setCurrentRecommendations([])
@@ -257,9 +260,12 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
         <View style={styles.modalContent}>
           <View style={styles.center}>
             <View style={[styles.barIcon,{alignSelf:"center"}]} />
-            <TouchableOpacity onLongPress={() =>{stoprecommendshufflemode()}} onPress={() =>{recommendshufflemode()}} style={{alignSelf:"flex-end"}}>
-              <MaterialIcons style={{marginTop:10}} name="shuffle-on" size={25} color={recommendationmode === true ? "green" : "white"}/>
+            <View  style={{marginTop:10,alignSelf:"flex-end"}}>
+            <TouchableOpacity onLongPress={() =>{stoprecommendshufflemode()}} onPress={() =>{if (shufflefetching === false){recommendshufflemode()}}} >
+              <MaterialIcons name="shuffle-on" size={25} color={recommendationmode === true ? shufflefetching ? "blue" : "green" : shufflefetching ? "blue":"white"}/>
             </TouchableOpacity>
+            </View>
+
                   <SectionList
         sections={sections}
         keyExtractor={(item, index) => item + index}
