@@ -8,7 +8,7 @@ import TrackPlayer, {
     State
   } from 'react-native-track-player';
 import { TouchableOpacity,Image} from "react-native";
-import { autoplaynextsong } from "../controls/controls";
+import { autoplaynextsong, get_recommended_songs } from "../controls/controls";
 import { getstreaminglink } from "../Tracks/getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { skipToTrack } from "../controls/controls";
@@ -23,6 +23,7 @@ import { getsongrecommendation, getspecificsongrecommendation, repopulaterecomme
 export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVisible,setQueue}) {//console.log("queue in QueueModal",queue)
 
   const [queuepositionsrc,setQueuePositionSrc] = useState("");
+  const [recommendpositionsrc,setRecommendPositionSrc] = useState("");
   const [current_recommendations, setCurrentRecommendations] = useState([]);
   const [recommendationmode,setRecommendationMode] = useState(false);
   const [sections, setSections] = useState([
@@ -124,6 +125,28 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
 
 
   }
+    const handlerecommendchange = async (index) =>{
+    const recommend_songs = await get_recommended_songs();
+    if (recommend_songs){
+    if (recommendpositionsrc === "" ){
+      setRecommendPositionSrc(index);
+    } 
+    else{
+      if (recommendpositionsrc !== index){
+        console.log("src",recommendpositionsrc,"dest:",index)
+        const reordered_recommend = swapElements(JSON.parse(recommend_songs),recommendpositionsrc,index);
+        await AsyncStorage.setItem("current-recommendations",JSON.stringify(reordered_recommend))
+        setRecommendPositionSrc("");
+      }
+      else{
+        setRecommendPositionSrc("");
+      }
+
+    }
+  }
+
+
+  }
   const recommendshufflemode = async () =>{
  
     const current_track = await TrackPlayer.getActiveTrack();
@@ -201,6 +224,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
     );
   }
   useEffect(() =>{
+
       setSections(prev =>
       prev.map(section =>
         section.title === "Queue"
@@ -279,7 +303,7 @@ export default function QueueModal({ queue,toggleModal,isModalVisible,setModalVi
               </TouchableOpacity>
 
             <TouchableOpacity onPress={() =>{handlerecommendchange(index)}} style={{marginLeft:30}}>
-              <Entypo size={19} name="dots-three-vertical" color={queuepositionsrc === index ? "green" :"white"}></Entypo>
+              <Entypo size={19} name="dots-three-vertical" color={recommendpositionsrc === index ? "green" :"white"}></Entypo>
             </TouchableOpacity>
         
 
