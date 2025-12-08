@@ -1,5 +1,7 @@
 import axios from "axios";
 import { get_access_token } from "../access_token/getaccesstoken";
+import { remove_recommend_next_played } from "../../trackPlayerServices";
+import { get_recommended_songs } from "../controls/controls";
 export async function getrecommendations(current_track,max_songs=10){
     
     if (current_track){
@@ -69,5 +71,8 @@ export const searchsongsrecommend = async (song_name, artist_name) =>{
         }
         catch{
             console.warn("The songs query string is probably not read correcly by searchsongsrecommend /search. Likely Odd characteers. ")
+            // For now just removing the song until I fully fix it.
+            const recommend_songs = await get_recommended_songs();
+            await remove_recommend_next_played(recommend_songs);
         }
     }
