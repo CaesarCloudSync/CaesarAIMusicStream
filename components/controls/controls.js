@@ -8,7 +8,7 @@ import { sendmusicconnect } from "../mqttclient/mqttclient";
 import { VolumeManager } from 'react-native-volume-manager';
 import { MUSICSDCARDPATH } from "../constants/constants";
 import { searchsongsrecommend } from "../Tracks/getrecommendations";
-import { getsongrecommendation } from "../../trackPlayerServices";
+import { getsongrecommendation, remove_recommend_next_played } from "../../trackPlayerServices";
 const get_thumbnail = async (album_id) =>{
     const access_token = await get_access_token();
     const headers = {Authorization: `Bearer ${access_token}`}
@@ -255,8 +255,21 @@ export const get_recommended_songs = async () =>{
     return stored_recommended_songs
 }
 export const play_recommended_next_song = async (player_ind) =>{
-    const nextsongsrecommend = await getsongrecommendation()
+    let nextsongsrecommend
+    const current_prefetched = await AsyncStorage.getItem("current-prefetched-nextsong")
+    if (current_prefetched){
+        console.log("prefecthed_recommend")
+        nextsongsrecommend = JSON.parse(current_prefetched)
+    }
+    else{
+        console.log("fetching_recomemnd")
+        nextsongsrecommend = await getsongrecommendation()
+    }
+    
     await skipToTrack(nextsongsrecommend,player_ind)
+    const recommended_songs = await get_recommended_songs();
+    await remove_recommend_next_played(recommended_songs)
+    
     
 
     
@@ -312,7 +325,7 @@ export const autoplaynextsong = async () =>{
         await play_next_queued_song(newqueue,player_ind)
 
     }
-    if (recommend_mode){
+    else if (recommend_mode && !newqueue){
         await play_recommended_next_song(player_ind)
         // get yt from storage then
 

@@ -119,7 +119,7 @@ export const remove_recommend_next_played = async (recommended_songs) =>{
         await AsyncStorage.removeItem("current-recommendations")
     }
 }
-export const getsongrecommendation = async () =>{
+export const getsongrecommendation = async (prefetching=false) =>{
   const recommended_songs = await get_recommended_songs()
   const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
   
@@ -127,7 +127,7 @@ export const getsongrecommendation = async () =>{
   const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
 
   await store_current_recommended_yt_to_spotify(album_tracks_recommend)
-  await remove_recommend_next_played(recommended_songs)
+  
   return nextsongsrecommend
 }
 export const getspecificsongrecommendation = async (song_name,artist) =>{
@@ -138,7 +138,7 @@ export const getspecificsongrecommendation = async (song_name,artist) =>{
   const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
   
   await store_current_recommended_yt_to_spotify(album_tracks_recommend)
-   await remove_recommend_next_played(recommended_songs)
+   
   return nextsongsrecommend
 }
 

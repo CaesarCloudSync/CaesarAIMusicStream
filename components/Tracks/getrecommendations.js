@@ -31,6 +31,7 @@ export const getrecommendation = async (current_track) =>{
 
 }
 export const searchsongsrecommend = async (song_name, artist_name) =>{
+         try{
       const query = `track:"${song_name}" artist:"${artist_name}"`;
       console.log("query in searchsongs",query)
       const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
@@ -46,6 +47,7 @@ export const searchsongsrecommend = async (song_name, artist_name) =>{
         const result_track = {"id":track.id,"album_id":track.album.id,"name":track.name,thumbnail:track.album.images[0].url,"artist":track.album.artists[0].name,artist_id: track.artists[0].id,duration_ms: track.duration_ms,album_name: track.album.name,track_number: track.track_number}
         const resp2 = await fetch(`https://api.spotify.com/v1/albums/${result_track.album_id}/tracks`, {headers: headers})
         const tracksresult = await resp2.json()
+   
         const  tracks = tracksresult.items.map((item) => ({
           id: item.id,
           name: item.name,
@@ -64,4 +66,8 @@ export const searchsongsrecommend = async (song_name, artist_name) =>{
         //setTracks(tracks)
   
         //toggleModal()
+        }
+        catch{
+            console.warn("The songs query string is probably not read correcly by searchsongsrecommend /search. Likely Odd characteers. ")
+        }
     }
