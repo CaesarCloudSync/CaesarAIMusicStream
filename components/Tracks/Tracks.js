@@ -120,7 +120,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             const [youtube_link,title] = await getstreaminglink(album_track)
             await downloadFile(youtube_link,album_track.name,title,album_track)
             number_of_downloaded +=1
-            setDownloadedSongInd(number_of_downloaded)
+            //setDownloadedSongInd(number_of_downloaded)
            
         })
         await Promise.all(promises)
