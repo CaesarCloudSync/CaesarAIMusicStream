@@ -341,12 +341,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
     useEffect(() =>{
         check_downloaded()
     },[downloadwasremoved,removealldownloadsdone])
-    useEffect(() =>{
-        console.log("current-download",index,downloadedsongind)
-        if (index === downloadedsongind +1){
-            setIsDownloaded(true)
-        }
-    },[downloadedsongind])
+
     
     const check_is_downloaded = async () =>{
         const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)

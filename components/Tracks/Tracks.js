@@ -42,7 +42,6 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const [preload,setPreload] = useState(false);
     const [totalpromises,setTotalPromises] = useState(0);
     const [completedpromises,setCompletedPromises] = useState(0);
-    const [downloadedsongind,setDownloadedSongInd] = useState(0)
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [downloadalbumisfull,setDownloadedAlbumIsFull] = useState(false);
     const [removealldownloadsdone,setRemoveAllDownloadsDone] = useState(false);
@@ -120,7 +119,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             const [youtube_link,title] = await getstreaminglink(album_track)
             await downloadFile(youtube_link,album_track.name,title,album_track)
             number_of_downloaded +=1
-            //setDownloadedSongInd(number_of_downloaded)
+    
            
         })
         await Promise.all(promises)
@@ -213,7 +212,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             ref={refContainer}
             data={album_tracks}
             style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal} downloadedsongind={downloadedsongind} setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull} removealldownloadsdone={removealldownloadsdone} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect}/>}
+            renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}  setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull} removealldownloadsdone={removealldownloadsdone} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect}/>}
             onScrollToIndexFailed={info => {
                 const wait = new Promise(resolve => setTimeout(resolve, 500));
                 wait.then(() => {
