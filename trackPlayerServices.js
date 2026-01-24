@@ -14,6 +14,7 @@ import notifee, { EventType } from '@notifee/react-native';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader'
 
 //import { Buffer } from "buffer";
 import RNFS from 'react-native-fs';
@@ -311,15 +312,30 @@ export async function playbackService() {
     // On Android, additional volume types are available:
     // music, system, ring, alarm, notification
   });
-  
+  const stopBackgroundDownload = async (jobId) => {
+  const lostTasks = await RNBackgroundDownloader.checkForExistingDownloads();
+    const tasksToStop = lostTasks.filter(t => t.id === jobId);
+
+    for (const task of tasksToStop) {
+      console.log(`Stopping: ${task.id}`);
+      task.stop();
+    }
+
+    if (tasksToStop.length === 0) {
+      console.log(`No tasks matched jobId: ${jobId}`);
+}
+  }
   notifee.onForegroundEvent(async ({ type, detail }) => {
     if (type === EventType.ACTION_PRESS && detail.pressAction.id) {
       console.log('User pressed an action with the id: ',detail.pressAction.id);
       const jobIdjson = JSON.parse(await AsyncStorage.getItem(`current_downloading:${detail.notification.id}`));
       console.log("notif_id",detail.notification.id)
       console.log(jobIdjson)
-      await RNFS.stopDownload(jobIdjson["jobId"])
+      stopBackgroundDownload( jobIdjson["jobId"])
       await notifee.cancelNotification(detail.notification.id);
+      await AsyncStorage.removeItem(`current_downloading:${detail.notification.id}`);
+      //const keys = await AsyncStorage.getAllKeys();
+      //AsyncStorage.multiRemove(keys.filter(key => key.includes('current_downloading:notif_r')))
       
     }
   });
@@ -329,8 +345,9 @@ export async function playbackService() {
       const jobIdjson = JSON.parse(await AsyncStorage.getItem(`current_downloading:${detail.notification.id}`));
       console.log("notif_id",detail.notification.id)
       console.log(jobIdjson)
-      await RNFS.stopDownload(jobIdjson["jobId"])
+      stopBackgroundDownload( jobIdjson["jobId"])
       await notifee.cancelNotification(detail.notification.id);
+      await AsyncStorage.removeItem(`current_downloading:${detail.notification.id}`);
       
     }
   });

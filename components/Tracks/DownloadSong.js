@@ -10,6 +10,8 @@ import { get_access_token } from "../access_token/getaccesstoken";
 import { convertToValidFilename } from "../tool/tools";
 import { MUSICSDCARDPATH } from "../constants/constants";
 import { Buffer } from 'buffer';
+import RNBackgroundDownloader, { download, completeHandler } from '@kesha-antonov/react-native-background-downloader'
+
 import axios from "axios";
 const get_thumbnail = async (album_id) =>{
   const access_token = await get_access_token();
@@ -138,200 +140,170 @@ export const check_if_failed_download = async (youtube_link,title) =>{
     return [youtube_link,title]
   }
 }
-// Modified downloadFile function for true background downloading
 export const downloadFile = async (songurl, name, notif_title, album_track) => {
-  // Ensure Music directory exists
   await ensureMusicDirectory();
 
   const filename = `${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${name}`)}.mp3`;
   const filePath = `${MUSICSDCARDPATH}/${filename}`;
-  
-  const exists = await RNFS.exists(MUSICSDCARDPATH);
-  if (!exists) {
+
+  // Ensure directory exists
+  const dirExists = await RNFS.exists(MUSICSDCARDPATH);
+  if (!dirExists) {
     await RNFS.mkdir(MUSICSDCARDPATH);
   }
 
-  const thumbnail_filePath = `${RNFS.DocumentDirectoryPath}/${filename.replace('mp3', 'jpg')}`;
+  // Thumbnail (quick → kept with RNFS for simplicity)
+  const thumbnail_filePath = `${RNFS.DocumentDirectoryPath}/${filename.replace('.mp3', '.jpg')}`;
   const thumbnail = !album_track.ytcustom ? await get_thumbnail(album_track.album_id) : album_track.thumbnail;
 
-  // Download thumbnail (this can still be awaited as it's quick)
-  await RNFS.downloadFile({
+  RNFS.downloadFile({
     fromUrl: thumbnail,
     toFile: thumbnail_filePath,
     background: true,
     discretionary: true,
+  }).promise.catch(() => {}); // silent fail is fine for thumbnail
+
+  // ────────────────────────────────────────────────
+  //  Notification channel & ID setup
+  // ────────────────────────────────────────────────
+  const channelId = await notifee.createChannel({
+    id: 'downloads',
+    name: 'Downloads',
+  });
+
+  const notif_id = `dl_${filename.replace(/[^a-z0-9]/gi, '_')}`;
+  const jobId = notif_id; // stable & unique
+
+  if (songurl.toLowerCase().endsWith('.m3u8')) {
+    Alert.alert("M3U8 manifests are not supported yet.");
+    return;
+  }
+
+  let lastUpdate = 0;
+  AsyncStorage.setItem(`current_downloading:${notif_id}`, JSON.stringify({ 
+    jobId: jobId,
+    filename,
+    album_track: JSON.stringify(album_track),
+    name 
+  }));
+
+
+  // ────────────────────────────────────────────────
+  //  Start the real background download
+  // ────────────────────────────────────────────────
+  const task = download({
+    id: jobId,
+    url: songurl,
+    destination: filePath,
     headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       "Accept": "*/*",
       "Connection": "keep-alive",
-      "Accept-Encoding": "identity",
-      "Range": "bytes=0-"
     },
-  }).promise;
+  })
+    .begin(({ expectedBytes, headers }) => {
+      console.log(`Download starting — expected: ${expectedBytes ?? 'unknown'} bytes`);
+    })
+    .progress((percent)=> {
+      const percentInt = Math.floor(percent * 100);
+      console.log(`Download progress: ${percentInt}%`);
+              // Store job ID for later reference
 
-  // Create notification channel
-  const channelId = await notifee.createChannel({
-    id: 'default',
-    name: 'Default Channel',
-  });
-  
-  const notif_id = `notif_${filename}`;
-  console.log('song', songurl);
-
-  // Check if songurl is an M3U8 file
-  if (songurl.toLowerCase().endsWith('.m3u8')) {
-    Alert.alert("Streaming Link is manifest https://manifest.googlevideo.com/index.m3u8.Have not implemented M3u8 downloading yet.");
-  } else {
-    let lastUpdate = 0;
-    
-    // DON'T await the promise - let it run in background
-    const downloadTask = RNFS.downloadFile({
-      fromUrl: songurl,
-      toFile: filePath,
-      background: true,
-      discretionary: true,
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-        "Accept": "*/*",
-        "Connection": "keep-alive",
-        "Accept-Encoding": "identity",
-        "Range": "bytes=0-"
-      },
-      progress: async (res) => {
-        // Store job ID for later reference
-        await AsyncStorage.setItem(`current_downloading:${notif_id}`, JSON.stringify({ 
-          jobId: res.jobId,
-          filename,
-          album_track: JSON.stringify(album_track),
-          name 
-        }));
-        
-        const progress = res.contentLength ? (res.bytesWritten / res.contentLength) * 100 : 0;
-        console.log(`Progress: ${progress.toFixed(2)}%`);
-        
-        const now = Date.now();
-        if (now - lastUpdate < 1000) return; // Update every 1 second to reduce battery usage
-        lastUpdate = now;
-        
-        // Show/update progress notification
-        await notifee.displayNotification({
+        // Show starting notification immediately (indeterminate until we get real progress)
+        notifee.displayNotification({
           id: notif_id,
           title: notif_title,
-          body: `Downloading: ${Math.round(progress)}%`,
+          body: `Downloading: ${percentInt}%`,
           android: {
             channelId,
-            progress: {
-              max: 100,
-              current: Math.round(progress),
-              indeterminate: res.contentLength === undefined, // Show indeterminate if content length unknown
-            },
+            progress: { max: 100, current: percentInt, indeterminate: false }, // Show indeterminate if content length unknown
             smallIcon: 'ic_launcher',
-            pressAction: { id: 'default' },
+            ongoing: true,
             actions: [
-              {
-                title: 'Cancel',
-                pressAction: { id: `cancel-download-${notif_id}` },
-              },
+              { title: 'Cancel', pressAction: { id: `cancel-${notif_id}` } },
             ],
           },
         });
-      },
-    });
 
-    // Handle completion without blocking
-    downloadTask.promise.then(async (response) => {
-      console.log('File downloaded!', response);
-      
+
+    })
+    .done(async () => {
+      console.log('Download finished successfully');
+
       try {
-        // Mark as downloaded
-        await AsyncStorage.setItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`, 
-          JSON.stringify(album_track));
-        
-        // Update download count
-        const keys = await AsyncStorage.getAllKeys();
-        const number_of_downloaded = (await AsyncStorage.multiGet(
-          keys.filter(key => key.includes('downloaded-track:'))
-        )).length;
-        
-        await AsyncStorage.setItem('downloaded_num', JSON.stringify(number_of_downloaded));
+        // Mark track as downloaded
+        await AsyncStorage.setItem(
+          `downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`,
+          JSON.stringify(album_track)
+        );
+
+        // Update download stats (your original logic)
+        const allKeys = await AsyncStorage.getAllKeys();
+        const downloadedKeys = allKeys.filter(k => k.startsWith('downloaded-track:'));
+        const downloadedCount = downloadedKeys.length;
+
+        await AsyncStorage.setItem('downloaded_num', JSON.stringify(downloadedCount));
         await AsyncStorage.setItem(
           `downloaded-track-order:${album_track.artist}-${album_track.album_name}-${name}`,
-          JSON.stringify({ name, order: number_of_downloaded })
+          JSON.stringify({ name, order: downloadedCount })
         );
-        
-        // Show completion notification and auto-dismiss after 5 seconds
-        await notifee.displayNotification({
-          id: `complete`, // ${notif_id}_
-          title: 'Download Complete!',
-          body: `${notif_title} has been downloaded successfully`,
-          android: {
-            channelId,
-            smallIcon: 'ic_launcher',
-            pressAction: { id: 'default' },
-            autoCancel: true, // Auto-dismiss when tapped
-          },
-        });
-        await notifee.cancelNotification(notif_id);
-                  await AsyncStorage.removeItem(`current_downloading:${notif_id}`);
-         // await notifee.cancelNotification(notif_id+'_complete');
-        // Keep original notification for 5 seconds then cancel
 
-        
-      } catch (error) {
-        console.log('Error handling download completion:', error);
+        // Success notification
         await notifee.displayNotification({
-          id: `${notif_id}_error`,
-          title: 'Download Failed',
-          body: `Failed to process ${notif_title}`,
+          id: `done`,
+          title: 'Download Complete',
+          body: `${notif_title} has been downloaded.`,
           android: {
             channelId,
             smallIcon: 'ic_launcher',
-            pressAction: { id: 'default' },
             autoCancel: true,
           },
         });
+   
+     
+
+        // Clean up
         await notifee.cancelNotification(notif_id);
         await AsyncStorage.removeItem(`current_downloading:${notif_id}`);
+        
+
+        if (Platform.OS === 'ios') {
+          completeHandler(jobId);
+        }
+      } catch (err) {
+        console.error('Completion handling failed', err);
+        
+        await notifee.displayNotification({
+          id: `err_${notif_id}`,
+          title: 'Processing Error',
+          body: 'Download finished but post-processing failed',
+          android: { channelId, autoCancel: true },
+        });
+        await AsyncStorage.removeItem(`current_downloading:${notif_id}`);
+        if (Platform.OS === 'ios') completeHandler(jobId);
       }
-    }).catch(async (err) => {
-      console.log('Download error:', err);
+    })
+    .error(async (error) => {
+      console.log('Download error/canceled:', error);
+
       await notifee.displayNotification({
-        id: `${notif_id}_error`,
+        id: `err_${notif_id}`,
         title: 'Download Failed',
-        body: `Failed to download ${notif_title}: ${err.message}`,
-        android: {
-          channelId,
-          smallIcon: 'ic_launcher',
-          pressAction: { id: 'default' },
-          autoCancel: true,
-        },
+        body: error?.message || 'Download was stopped',
+        android: { channelId, autoCancel: true },
       });
+
       await notifee.cancelNotification(notif_id);
       await AsyncStorage.removeItem(`current_downloading:${notif_id}`);
+
+      if (Platform.OS === 'ios') {
+        completeHandler(jobId); // required even on failure
+      }
     });
 
-    // Immediately show initial notification
-    await notifee.displayNotification({
-      id: notif_id,
-      title: notif_title,
-      body: 'Starting download...',
-      android: {
-        channelId,
-        progress: {
-          max: 100,
-          current: 0,
-        },
-        smallIcon: 'ic_launcher',
-        pressAction: { id: 'default' },
-        actions: [
-          {
-            title: 'Cancel',
-            pressAction: { id: `cancel-download-${notif_id}` },
-          },
-        ],
-      },
-    });
-  }
+
+  // Optional: return the task if you want to control it right away (pause/resume/stop)
+  return task;
 };
 export const downloadSong = async (songurl,name) => {
     //const getInfo = util.promisify(ytdl.getInfo);

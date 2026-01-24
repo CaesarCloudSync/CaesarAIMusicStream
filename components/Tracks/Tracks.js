@@ -121,10 +121,12 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             //const [download_link,final_title] = check_if_failed_download(youtube_link,title)
             await downloadFile(youtube_link,album_track.name,title,album_track)
             number_of_downloaded +=1
+            await notifee.cancelNotification("done");
     
            
         })
         await Promise.all(promises)
+        await notifee.cancelNotification("done");
         if (number_of_downloaded === album_tracks.length){
             let library = await AsyncStorage.getItem(JSON.stringify(`library:${album_tracks[0].album_name}|${album_tracks[0].artist}`)) 
             if (!library){

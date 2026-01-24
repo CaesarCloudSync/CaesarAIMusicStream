@@ -173,6 +173,7 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             }
         })
         await Promise.all(promises)
+        await notifee.cancelNotification("done");
         if (number_of_downloaded === album_tracks_state.length){
             if (downloadalbumisfull === true){
                 setDownloadedAlbumIsFull(false)
