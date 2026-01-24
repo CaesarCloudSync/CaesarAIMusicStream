@@ -130,7 +130,14 @@ const downloadM3U8 = async (songurl, filePath, notif_title, notif_id, channelId,
     throw error;
   }
 };
-
+export const check_if_failed_download = async (youtube_link,title) =>{
+  if (!youtube_link){
+    return ["https://storage.cloud.google.com/caesaraimusic/fail-234710.mp3","Failed Sound"]
+  }
+  else{
+    return [youtube_link,title]
+  }
+}
 // Modified downloadFile function for true background downloading
 export const downloadFile = async (songurl, name, notif_title, album_track) => {
   // Ensure Music directory exists
@@ -254,7 +261,7 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
         
         // Show completion notification and auto-dismiss after 5 seconds
         await notifee.displayNotification({
-          id: `${notif_id}_complete`,
+          id: `complete`, // ${notif_id}_
           title: 'Download Complete!',
           body: `${notif_title} has been downloaded successfully`,
           android: {
@@ -265,12 +272,10 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
           },
         });
         await notifee.cancelNotification(notif_id);
+                  await AsyncStorage.removeItem(`current_downloading:${notif_id}`);
+         // await notifee.cancelNotification(notif_id+'_complete');
         // Keep original notification for 5 seconds then cancel
-        setTimeout(async () => {
-          
-          await AsyncStorage.removeItem(`current_downloading:${notif_id}`);
-          await notifee.cancelNotification(notif_id+'_complete');
-        }, 5000);
+
         
       } catch (error) {
         console.log('Error handling download completion:', error);

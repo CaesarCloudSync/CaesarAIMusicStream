@@ -7,7 +7,7 @@ import { getTableNames } from "../SQLDB/SQLDB";
 import Entypo from "react-native-vector-icons/Entypo"
 import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
-import {downloadFile}from "./DownloadSong";
+import {check_if_failed_download, downloadFile}from "./DownloadSong";
 import TrackPlayer,{RepeatMode} from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
@@ -20,6 +20,7 @@ import axios from "axios";
 import { convertToValidFilename } from "../tool/tools";
 import { MUSICSDCARDPATH } from "../constants/constants";
 import { set } from "lodash";
+import notifee from '@notifee/react-native';
 export default function TrackItem({album_track,setCurrentTrack,index,num_of_tracks,album_tracks,trackforplaylist,setTrackForPlaylist,handleModal,playlist_details,playlisttrackremoved,setPlaylistTrackRemoved,downloadedsongind,setDownloadedAlbumIsFull,downloadalbumisfull,removealldownloadsdone,multiplaylistselect,setMultiplePlaylistSelect}){
     const navigate = useNavigate()
     const [isDownloading,setIsDownloading] = useState(false);
@@ -159,7 +160,9 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
         setIsDownloading(true)
         const [youtube_link,title] = await getstreaminglink(album_track_state)
         console.log("downloadhello",youtube_link)
+        //const [download_link,final_title] = check_if_failed_download(youtube_link,title)
         await downloadFile(youtube_link,album_track_state.name,title,album_track)
+        await notifee.cancelNotification('complete');
         setIsDownloaded(true)
         let number_of_downloaded = 0
         const promises =  album_tracks_state.map(async(album_track) =>{

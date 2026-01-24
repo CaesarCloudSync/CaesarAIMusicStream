@@ -15,11 +15,12 @@ import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
 import PlaylistModal from "../PlaylistModal/playlistmodal";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
-import { downloadFile } from "./DownloadSong";
+import { check_if_failed_download, downloadFile } from "./DownloadSong";
 import RNFS from "react-native-fs"
 import { get_access_token } from "../access_token/getaccesstoken";
 import { convertToValidFilename } from "../tool/tools";
 import { MUSICSDCARDPATH } from "../constants/constants";
+import notifee from '@notifee/react-native';
 export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const progress = useProgress();
     const [isDownloading,setIsDownloading] = useState(false);
@@ -117,6 +118,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
         let number_of_downloaded = 0
         const promises = album_tracks.map(async (album_track) =>{
             const [youtube_link,title] = await getstreaminglink(album_track)
+            //const [download_link,final_title] = check_if_failed_download(youtube_link,title)
             await downloadFile(youtube_link,album_track.name,title,album_track)
             number_of_downloaded +=1
     
@@ -132,6 +134,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             setIsDownloaded(true)
         }
         setIsDownloaded(true)
+        await notifee.cancelNotification('complete');
 
     }
     useEffect(()=>{   
