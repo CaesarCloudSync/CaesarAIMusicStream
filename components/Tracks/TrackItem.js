@@ -294,7 +294,13 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             let new_album_track_state = Object.assign(album_track_state, {
                 thumbnail: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg` 
              })
-            setAlbumTracksState(prevalbumtracks => { return [...prevalbumtracks, new_album_track_state]; });
+            setAlbumTracksState(prev =>
+            prev.map(track =>
+                track.id === new_album_track_state.id
+                ? new_album_track_state
+                : track
+            )
+            );
             setAlbumTrackState(prevalbumtrack => ({...prevalbumtrack, thumbnail: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg` }))
 
         }
