@@ -20,7 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { autoplaynextsong,autoplayprevioussong } from '../controls/controls';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MusicConnectMQTT from '../musicconnectmqtt/MusicConnectMQTT';
-export default function ShowCurrentTrack({searchscreen,tracks}) {
+export default function ShowCurrentTrack({searchscreen,tracks,setAlbumTracks}) {
 
     //console.log("hi")
     const progress = useProgress();
