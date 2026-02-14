@@ -86,6 +86,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     useEffect(() =>{
         //
     },[isModalVisible])
+    useEffect(() => {
+  setAlbumTracks(location.state?.album_tracks || []);
+}, [location.state?.album_tracks]);
     const check_all_downloaded = async () =>{
         let number_of_downloaded = 0
         const promises = album_tracks.map(async(album_track) =>{
@@ -216,6 +219,9 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             initialScrollIndex={0}
             ref={refContainer}
             data={album_tracks}
+              keyExtractor={(item, index) =>
+    `${item.id}-${item.album_id}${index}`
+  }
             style={{flex:1,backgroundColor:"#141212"}}
             renderItem={({item,index}) =><TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} setTrackForPlaylist={setTrackForPlaylist} trackforplaylist={trackforplaylist} handleModal={handleModal}  setDownloadedAlbumIsFull={setDownloadedAlbumIsFull} downloadalbumisfull={downloadalbumisfull} removealldownloadsdone={removealldownloadsdone} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect}/>}
             onScrollToIndexFailed={info => {
@@ -225,7 +231,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
                 });
               }}
             />
-            <ShowCurrentTrack tracks={true}/>
+            <ShowCurrentTrack setAlbumTracks={setAlbumTracks} tracks={true}/>
             <ShowQueue/>
 
             <TrackProgress  seek={seek} setSeek={setSeek}/>

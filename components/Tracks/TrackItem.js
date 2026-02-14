@@ -286,29 +286,38 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
 
     }
-    const check_downloaded = async () =>{
-        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)
-        if (track_downloaded){
-            setIsDownloaded(true);
-        
-            let new_album_track_state = Object.assign(album_track_state, {
-                thumbnail: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg` 
-             })
-            setAlbumTracksState(prev =>
-            prev.map(track =>
-                track.id === new_album_track_state.id
-                ? new_album_track_state
-                : track
-            )
-            );
-            setAlbumTrackState(prevalbumtrack => ({...prevalbumtrack, thumbnail: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg` }))
+    const check_downloaded = async () => {
+  const key = `downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`;
 
-        }
-        else{
-            setIsDownloaded(false)
-        }
+  const track_downloaded = await AsyncStorage.getItem(key);
 
-    }
+  if (track_downloaded) {
+    setIsDownloaded(true);
+
+    const newThumbnail =
+      `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(
+        `${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`
+      )}.jpg`;
+
+    // update list safely
+    setAlbumTracksState(prev =>
+      prev.map(track =>
+        track.id === album_track_state.id
+          ? { ...track, thumbnail: newThumbnail }
+          : track
+      )
+    );
+
+    // update current track safely
+    setAlbumTrackState(prev => ({
+      ...prev,
+      thumbnail: newThumbnail
+    }));
+
+  } else {
+    setIsDownloaded(false);
+  }
+};
     const removedownload = async ()=>{
         try{
             await RNFS.unlink(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.mp3`)
