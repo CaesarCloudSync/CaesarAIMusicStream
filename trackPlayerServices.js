@@ -231,7 +231,7 @@ export async function playbackService() {
                     console.log("hdabi")
                     if (!track_downloaded){
                       await AsyncStorage.setItem("current_autonext","true")
-                      await prefetchsong(nextsong,1)
+                      await prefetchsong(nextsong)
                     }
             
                     
