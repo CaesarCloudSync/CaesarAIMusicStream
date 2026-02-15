@@ -311,7 +311,7 @@ export async function playbackService() {
          }
         }
         else{
-          await AsyncStorage.removeItem("current_autonext_error")
+          await AsyncStorage.removeItem("current_autonext")
         }
       })
 

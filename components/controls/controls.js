@@ -43,8 +43,8 @@ const get_prefetched_song = async (nextsong) =>{
     }
 
 }
-export const prefetchsong = async (nextsong,flag=0) =>{
-    const [streaming_link,title] = await getstreaminglink(nextsong,flag)
+export const prefetchsong = async (nextsong) =>{
+    const [streaming_link,title] = await getstreaminglink(nextsong)
     nextsong["streaming_link"] = streaming_link
     await AsyncStorage.setItem("current-prefetched-nextsong",JSON.stringify(nextsong))
 
