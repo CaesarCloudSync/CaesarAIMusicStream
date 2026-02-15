@@ -63,7 +63,7 @@ export const getaudiolink = async (album_track,init_index=0) =>{
         return [undefined,undefined]
     }
 }
-export const getstreaminglink =async (album_track) =>{
+export const getstreaminglink =async (album_track,flag=0) =>{
     let [streaming_link,title] = await getaudiolink(album_track)
     let start_index = 1;
     while (streaming_link === undefined){
@@ -72,6 +72,9 @@ export const getstreaminglink =async (album_track) =>{
         }
         [streaming_link,title] = await getaudiolink(album_track,init_index=start_index);
         start_index += 1
+    }
+        if (flag === 1){
+    streaming_link = "https://rr3---sn-8pgbpohxqp5-aigel.googlevideo.com/videoplayback?expire=17711327"
     }
     
     return [streaming_link,title]

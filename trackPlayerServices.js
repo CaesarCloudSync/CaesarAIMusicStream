@@ -231,7 +231,7 @@ export async function playbackService() {
                     console.log("hdabi")
                     if (!track_downloaded){
                       await AsyncStorage.setItem("current_autonext","true")
-                      await prefetchsong(nextsong)
+                      await prefetchsong(nextsong,1)
                     }
             
                     
@@ -265,6 +265,55 @@ export async function playbackService() {
 
    
   });
+  async function updateStreamUrl(index, newUrl) {
+  const oldTrack = await TrackPlayer.getTrack(index);
+
+  await TrackPlayer.remove([index]);
+
+  await TrackPlayer.add(
+    {
+      ...oldTrack,
+      url: newUrl,
+    },
+    index
+  );
+  console.log(    {
+      ...oldTrack,
+      url: newUrl,
+    },"UpdateStreamUrl")
+  await TrackPlayer.skip(index);
+}
+  TrackPlayer.addEventListener(Event.PlaybackError,async (event) => {
+        console.log('Playback error:', event);
+        let message = event.message;
+         if (message === "Source error"){
+          const current_autonext = await AsyncStorage.getItem("current_autonext_error")
+          if (!current_autonext){
+            await AsyncStorage.setItem("current_autonext_error","true")
+           const current_track = await TrackPlayer.getActiveTrack();
+           if (current_track.url.includes("https://")){
+            console.log(current_track,"Errror")
+            const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
+            const album_tracks = JSON.parse(stored_album_tracks)
+            let num_of_tracks = album_tracks.length
+            let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
+            //console.log("current",currentTrackInd)
+            let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
+    
+            const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
+            let nextsong = album_tracks[currentTrackIndexInaAlbum]
+            const [streaming_link,title] = await getstreaminglink(nextsong)
+            await updateStreamUrl(currentTrackInd,streaming_link)
+            //console.log("next",currentTrackIndexInaAlbum)
+
+           }
+          
+         }
+        }
+        else{
+          await AsyncStorage.removeItem("current_autonext_error")
+        }
+      })
 
   const handleautoplaynextsong = throttle( async () =>{
       await autoplaynextsong()
