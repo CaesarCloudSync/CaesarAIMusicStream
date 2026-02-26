@@ -1,5 +1,5 @@
 // Last.fm API key - replace with your own from https://www.last.fm/api/account/create
-export const LASTFM_API_KEY = "c31f3aaac5568953732eedb59b5a3739";
+export const LASTFM_API_KEY = "YOUR_LASTFM_API_KEY_HERE";
 export const LASTFM_BASE_URL = "https://ws.audioscrobbler.com/2.0/";
 
 // Helper to build Last.fm API URLs

@@ -71,7 +71,6 @@ export default function ArtistProfile({ seek, setSeek }) {
     const get_albums = async (resolvedName) => {
         try {
             const albums = await getArtistTopAlbums(resolvedName, 50);
-            console.log("get_albums result", albums[0].images);
             // Last.fm doesn't distinguish album/single/compilation, so put all in albums
             setAllAlbumTracks(albums);
         } catch (err) {

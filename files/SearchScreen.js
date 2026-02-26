@@ -71,11 +71,10 @@ export default function Search({ seek, setSeek }) {
         if (!text.trim()) return;
         try {
             const { tracks: foundTracks, albums, artists: foundArtists } = await combinedSearch(text, 20);
-            console.log("searchsongs foundTracks", foundTracks[0].album);
+
             // Shape tracks for FavouriteSearchAlbums
             const shapedTracks = foundTracks.map(t => normalizeTrack(t));
             const shapedAlbums = albums.map(a => normalizeAlbum(a));
-            
             const shapedArtists = foundArtists.map(a => ({
                 artist_id: a.artist_id,
                 name: a.name || a.artist_name,
