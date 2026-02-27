@@ -24,38 +24,68 @@ export default function ArtistProfile({seek, setSeek}){
     const [artistname,setArtistName] = useState("");
 
     const get_artist_thumbnail = async (headers) =>{
-        const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}`, {headers: headers})
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=artist&limit=20`, {headers: headers})
         const feedresult = await resp.json();
-        //console.log(feedresult)
-        await AsyncStorage.setItem(`artist:${feedresult.name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id,"artist_name":feedresult.name,"thumbnail":feedresult.images[0].url}))
-        setArtistName(feedresult.name)
-        setArtistThumbnail(feedresult.images[0].url)
+        console.log(feedresult)
+        const artist = feedresult.artists.items.find((artist) => artist.name.toLowerCase() === album_tracks[0].artist.toLowerCase())
+        await AsyncStorage.setItem(`artist:${artist.name}`,JSON.stringify({"artist_id":artist.id,"artist_name":artist.name,"thumbnail":artist.images[0].url}))
+        setArtistName(artist.name)
+        setArtistThumbnail(artist.images[0].url)
     }
+function processAlbums(items, artistName, sortOrder = "desc", albumType = "album") {
+  // normalize for safe comparisons
+  const target = artistName.toLowerCase().trim();
+
+  // keep only albums of selected type AND matching artist
+  const filtered = items.filter(item =>
+    item.album_type === albumType &&
+    item.artists.some(a => a.name.toLowerCase().trim() === target)
+  );
+
+  // remove duplicates by album name
+  const uniqueAlbums = Array.from(
+    new Map(filtered.map(album => [album.name.toLowerCase(), album])).values()
+  );
+
+  // sort by release date
+  uniqueAlbums.sort((a, b) => {
+    const dateA = new Date(a.release_date);
+    const dateB = new Date(b.release_date);
+    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+  });
+
+  return uniqueAlbums;
+}
+
     const get_albums_compilations = async (headers) =>{
-        const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}/albums?include_groups=album,compilation,single&limit=50`, {headers: headers})
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=album&limit=50`, {headers: headers})
         const feedresult = await resp.json();
-        let artist_items = feedresult.items
-        const all_album_tracks = artist_items.filter((item) =>{return(item.album_type === "album")})
-        setAllAlbumTracks(all_album_tracks)
-        const compilations = artist_items.filter((item) =>{return(item.album_type === "compilation")})
-        const singles = artist_items.filter((item) =>{return(item.album_type === "single")})
+        let artist_items = feedresult.albums.items
+        const cleanedAlbums = processAlbums(feedresult.albums.items, album_tracks[0].artist, "desc","album");
+        const cleanedSingles = processAlbums(feedresult.albums.items, album_tracks[0].artist, "desc","single");
+        setAllAlbumTracks(cleanedAlbums)
+        //const compilations = artist_items.filter((item) =>{return(item.album_type === "compilation")})
+        //const singles = artist_items.filter((item) =>{return(item.album_type === "single")})
         //console.log(compilations)
-        setSingles(singles)
-        setCompilations(compilations)
+        setSingles(cleanedSingles)
+        //setCompilations(compilations)
     }
     const get_appears_on = async (headers) =>{
         const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}/albums?include_groups=appears_on&limit=50`, {headers: headers})
         const feedresult = await resp.json();
         let artist_items = feedresult.items
-        setAppearsOn(artist_items)
+        //setAppearsOn(artist_items)
 
     }
     const get_top_tracks = async (headers) =>{
-        const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}/top-tracks`, {headers: headers})
+        console.log(album_tracks[0].artist)
+        
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=track&limit=20`, {headers: headers})
         const feedresult = await resp.json()
+        console.log(feedresult)
  
         
-        setTopTracks(feedresult.tracks)
+        setTopTracks(feedresult.tracks.items)
         //console.log(feedresult)
     
     }
@@ -66,7 +96,7 @@ export default function ArtistProfile({seek, setSeek}){
         await get_artist_thumbnail(headers)
         await get_albums_compilations(headers)
         await get_top_tracks(headers)
-        await get_appears_on(headers)
+        //await get_appears_on(headers)
         
 
         

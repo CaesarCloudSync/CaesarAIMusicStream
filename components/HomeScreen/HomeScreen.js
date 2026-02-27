@@ -10,7 +10,7 @@ import {FavouriteAlbums,FavouriteRecommendations, FavouriteRecommendationsHomeSc
 import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { json } from "react-router-native";
+import { Await, json } from "react-router-native";
 import { genreslist } from "./genres";
 import ShowQueue from "../ShowQueue/showqueue";
 import { Button } from "react-native-elements";
@@ -32,9 +32,10 @@ const getintialfeed = async (access_token) =>{
         // https://api.spotify.com/v1/browse/new-releases
 
         const headers = {Authorization: `Bearer ${access_token}`}
-        const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?limit=14', {headers: headers})
+        const resp = await fetch("https://api.spotify.com/v1/search?q=tag:new&type=album&limit=14", {headers: headers})
         const feedresult = await resp.json()
         //console.log(feedresult.albums.items)
+       
         await AsyncStorage.setItem("initial_feed",JSON.stringify(feedresult.albums.items))
         setInitialFeed(feedresult.albums.items)
 
@@ -52,7 +53,7 @@ const chunkcards = (arr,chunksizeval=6) =>{
 const getinitialrnb = async (access_token) =>{
 
     const headers = {Authorization: `Bearer ${access_token}`}
-    const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?offset=15&limit=48', {headers: headers})
+    const resp = await fetch('https://api.spotify.com/v1/search?q=tag:new&type=album&limit=48&offset=15', {headers: headers})
     const feedresult = await resp.json()
     const chunks = chunkcards(feedresult.albums.items)
     await AsyncStorage.setItem("initial_rnb",JSON.stringify(chunks))
@@ -62,7 +63,7 @@ const getinitialrnb = async (access_token) =>{
 }
 const getinitialhiphop = async (access_token) =>{
     const headers = {Authorization: `Bearer ${access_token}`}
-    const resp = await fetch('https://api.spotify.com/v1/browse/new-releases?offset=60&limit=48', {headers: headers})
+    const resp = await fetch('https://api.spotify.com/v1/search?q=tag:new&type=album&limit=48&offset=60', {headers: headers})
     const feedresult = await resp.json()
     const chunks = chunkcards(feedresult.albums.items)
     await AsyncStorage.setItem("initial_hiphop",JSON.stringify(chunks))
@@ -105,7 +106,10 @@ function parseISOString(s) {
 
 
     const getall = async () =>{
-        
+        await AsyncStorage.removeItem("initial_feed")
+        await AsyncStorage.removeItem("initial_rnb")
+        await AsyncStorage.removeItem("initial_hiphop")
+        await AsyncStorage.removeItem("storageWithExpiry")
 
 
         let savedData = await AsyncStorage.getItem(

@@ -120,7 +120,7 @@ export default function Search({seek, setSeek}){
         
         let cache_initial = await AsyncStorage.getItem("initial_search_rnb")
         if (!cache_initial){
-            await getinitialrnb(access_token)
+            //await getinitialrnb(access_token)
             await createxpiration()
         }
         else{
