@@ -227,20 +227,23 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
 
     const playnowsong = async () => {
-        // Prevent duplicate loading requests
-        if (getLoadingTrackId() !== null) {
+        // Prevent duplicate loading requests for streaming tracks
+        if (!isDownloaded && getLoadingTrackId() !== null) {
             console.log("A song is already loading, ignoring press.");
             return;
         }
         const is_real_dl = isDownloaded && !isSkipped;
-        if (is_real_dl) {
-            console.log("Playing downloaded song; resetting any hanging load locks.");
-            setLoadingTrackId(null);
-            return;
+        // Only show spinner for non-downloaded tracks (local files play instantly)
+        if (!is_real_dl) {
+            setIsSongLoading(true);
         }
-        // Show spinner immediately
-        setIsSongLoading(true);
         try {
+            // Always update current-tracks so autoplaynextsong knows the correct album order
+            // (without this, skipping age-restricted songs jumps to wrong/random tracks)
+            if (album_tracks_state && album_tracks_state.length > 0) {
+                await AsyncStorage.setItem("current-tracks", JSON.stringify(album_tracks_state));
+                await AsyncStorage.setItem("current-track", JSON.stringify(album_track_state));
+            }
             await skipToTrack(album_track_state, 0);
         } finally {
             setIsSongLoading(false);

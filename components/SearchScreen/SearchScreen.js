@@ -125,29 +125,35 @@ export default function Search({seek, setSeek}){
         const q = queryOverride || text;
         if (!q) return;
         const headers = {Authorization: `Bearer ${access_token}`}
-        // Add random offset for albums to rotate results
-        const randomAlbumOffset = Math.floor(Math.random() * 20);
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&limit=50&offset=${randomAlbumOffset}&type=artist,album,track,playlist`, {headers: headers})
+        // No random offset — fetch from 0 so Spotify returns the most relevant results first
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&limit=50&type=artist,album,track,playlist`, {headers: headers})
         const feedresult = await resp.json()
 
         const artists = feedresult.artists.items.map((artist) =>{return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
         const tracks = feedresult.tracks.items
-        // Filter out any album that includes an artist named "Various" (case‑insensitive) and shuffle results
-        const rawAlbums = feedresult.albums.items.filter(album => {
-            if (!album.artists) return true;
-            // Exclude if any artist name contains "various"
+
+        // Filter out "Various Artists" compilations and albums with missing images
+        const rawAlbums = (feedresult.albums?.items || []).filter(album => {
+            if (!album.artists || !album.images || album.images.length === 0) return false;
             const hasVarious = album.artists.some(a => (a.name || '').toLowerCase().includes('various'));
             return !hasVarious;
         });
-        const shuffledAlbums = rawAlbums.sort(() => Math.random() - 0.5);
-        const result = shuffledAlbums.map(album => ({
+
+        // Sort by Spotify popularity score (most popular first)
+        rawAlbums.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+
+        // Shuffle only within the top 20 so every search rotates but always shows quality albums
+        const top = rawAlbums.slice(0, 20).sort(() => Math.random() - 0.5);
+
+        const result = top.map(album => ({
             "id": album.id,
             "name": album.name,
             "images": [{"url": album.images[0].url}],
             "artists": [{"name": album.artists[0].name}],
             "total_tracks": album.total_tracks,
             "release_date": album.release_date,
-            "album_type": album.album_type
+            "album_type": album.album_type,
+            "popularity": album.popularity || 0
         }));
         
         const plItems = (feedresult.playlists?.items || []).filter((playlist) => {

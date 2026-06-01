@@ -250,19 +250,20 @@ export const get_next_ind_in_album =  async () =>{
 
     const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
     const album_tracks = JSON.parse(stored_album_tracks)
-    //console.log(album_tracks[0])
-    let num_of_tracks = album_tracks.length -1
-    //console.log(num_of_tracks)
-    let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
-    //console.log("current",currentTrackInd)
-    let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
-    //console.log(currentTrack.index,currentTrack)
-    let player_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1 // This adds songs to player regardless of order in album. It just makes sure not to exceed the num of songs in album. The index of song would then be found in player then added to end or skipped to.
-    //console.log("next",player_ind,num_of_tracks,album_tracks)
+    let num_of_tracks = album_tracks.length - 1
+
+    let currentTrackInd = await TrackPlayer.getActiveTrackIndex()
+    let currentTrack = currentTrackInd !== undefined ? await TrackPlayer.getTrack(currentTrackInd) : null;
+
+    // Nothing is playing yet — default to starting from the beginning
+    if (!currentTrack) {
+        return [0, num_of_tracks, -1, 0, album_tracks];
+    }
+
+    let player_ind = (currentTrack.index + 1) >= num_of_tracks ? 0 : currentTrack.index + 1
     const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
-    
-    let next_ind_in_album = (currentTrackIndexInaAlbum +1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum +1 
-    return [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks]
+    let next_ind_in_album = (currentTrackIndexInaAlbum + 1) >= num_of_tracks ? 0 : currentTrackIndexInaAlbum + 1
+    return [next_ind_in_album, num_of_tracks, currentTrackIndexInaAlbum, player_ind, album_tracks]
 }
 export const get_next_song = async (track_after_queue,album_tracks,next_ind_in_album) =>{
     console.log("track_after_queue",track_after_queue)
@@ -396,14 +397,14 @@ export const find_recommended_song = async (title,artist,recommended_songs) =>{
     console.log("recommend_song",recommend_song)
     return recommend_song
 }
-export const autoplaynextsong = async () =>{
+export const autoplaynextsong = async () => {
     if (loadingTrackId !== null) {
         console.log("Ignore autoplaynextsong: already loading");
         return;
     }
 
     const [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks] = await get_next_ind_in_album()
-    
+
     const newqueue = await get_new_queue()
     const recommend_mode = await get_recommend_mode();
     if (newqueue){
@@ -422,6 +423,11 @@ export const autoplaynextsong = async () =>{
 
         while (!found_unrestricted && loop_count < album_tracks.length) {
             let candidate_song = album_tracks[target_ind];
+            if (!candidate_song) {
+                target_ind = (target_ind + 1) % album_tracks.length;
+                loop_count++;
+                continue;
+            }
             const is_restricted = await is_track_restricted(candidate_song);
             if (is_restricted) {
                 console.log("Album song is restricted, skipping without accessing:", candidate_song.name);
@@ -434,12 +440,19 @@ export const autoplaynextsong = async () =>{
 
         if (found_unrestricted) {
             const nextsong = album_tracks[target_ind];
-            let currentTrackInd = await TrackPlayer.getActiveTrackIndex()
-            let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
-            let new_player_ind = (currentTrack.index + 1) >= (album_tracks.length - 1) ? 0 : currentTrack.index + 1
+            if (!nextsong) {
+                console.log("Next song resolved to undefined, stopping.");
+                await TrackPlayer.stop();
+                return;
+            }
+            let currentTrackInd = await TrackPlayer.getActiveTrackIndex();
+            let currentTrack = currentTrackInd !== undefined ? await TrackPlayer.getTrack(currentTrackInd) : null;
+            let new_player_ind = currentTrack
+                ? ((currentTrack.index + 1) >= (album_tracks.length - 1) ? 0 : currentTrack.index + 1)
+                : 0;
 
-            console.log("nextsonghiuwu",nextsong)
-            await play_next_song(nextsong,new_player_ind,track_after_queue)
+            console.log("nextsonghiuwu", nextsong)
+            await play_next_song(nextsong, new_player_ind, track_after_queue)
             console.log("played next song")
         } else {
             console.log("All album tracks are restricted, stopping playback.");
