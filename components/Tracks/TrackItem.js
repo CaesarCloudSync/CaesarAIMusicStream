@@ -170,139 +170,83 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
             
         },300) */  })
     const downloadsong = async () =>{
-        setIsDownloading(true)
-        const [youtube_link,title] = await getstreaminglink(album_track_state)
-
-        // Age-restricted / unavailable — can't download but mark as "skipped"
-        // so it doesn't prevent the album being counted as fully downloaded
-        if (!youtube_link) {
-            console.log("Age-restricted or unavailable track, marking as skipped:", album_track_state.name)
-            await AsyncStorage.setItem(
-                `downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,
-                JSON.stringify({...album_track_state, skipped: true})
-            );
-            setIsDownloaded(true)
-            Alert.alert(
-                "Track Unavailable",
-                `"${album_track_state.name}" is age-restricted and can't be downloaded. It has been marked as skipped so it won't block the rest of the album.`
-            );
-            // Still check album completion after marking as skipped
-            let number_of_downloaded = 0
-            const promises = album_tracks_state.map(async(album_track) =>{
-                const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
-                if (track_downloaded){ number_of_downloaded += 1 }
-            })
-            await Promise.all(promises)
-            if (number_of_downloaded === album_tracks_state.length){
-                setDownloadedAlbumIsFull(prev => !prev)
+        setIsDownloading(true);
+        // Start download – show spinner
+        setIsSongLoading(true);
+        try {
+            const [youtube_link,title] = await getstreaminglink(album_track_state);
+            // Age-restricted / unavailable — can't download but mark as "skipped"
+            if (!youtube_link) {
+                console.log("Age-restricted or unavailable track, marking as skipped:", album_track_state.name);
+                await AsyncStorage.setItem(
+                    `downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,
+                    JSON.stringify({ ...album_track_state, skipped: true })
+                );
+                setIsDownloaded(true);
+                Alert.alert(
+                    "Track Unavailable",
+                    `"${album_track_state.name}" is age-restricted and can't be downloaded. It has been marked as skipped so it won't block the rest of the album.`
+                );
+                // Check album completion after marking as skipped
+                let number_of_downloaded = 0;
+                const promises = album_tracks_state.map(async (album_track) => {
+                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`);
+                    if (track_downloaded) { number_of_downloaded += 1; }
+                });
+                await Promise.all(promises);
+                if (number_of_downloaded === album_tracks_state.length) {
+                    setDownloadedAlbumIsFull(prev => !prev);
+                }
+                return;
             }
-            setIsDownloading(false)
+            // Actual download flow
+            console.log("downloadhello", youtube_link);
+            await downloadFile(youtube_link, album_track_state.name, title, album_track);
+            await notifee.cancelNotification('complete');
+            setIsDownloaded(true);
+            // Update album completion status
+            let number_of_downloaded = 0;
+            const promises = album_tracks_state.map(async (album_track) => {
+                const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`);
+                if (track_downloaded) { number_of_downloaded += 1; }
+            });
+            await Promise.all(promises);
+            if (number_of_downloaded === album_tracks_state.length) {
+                if (downloadalbumisfull === true) {
+                    setDownloadedAlbumIsFull(false);
+                } else {
+                    setDownloadedAlbumIsFull(true);
+                }
+            }
+        } finally {
+            // Ensure spinner is hidden and downloading flag cleared
+            setIsSongLoading(false);
+            setIsDownloading(false);
+        }
+    }
+
+
+    const playnowsong = async () => {
+        // Prevent duplicate loading requests
+        if (getLoadingTrackId() !== null) {
+            console.log("A song is already loading, ignoring press.");
             return;
         }
-
-        console.log("downloadhello",youtube_link)
-        await downloadFile(youtube_link,album_track_state.name,title,album_track)
-        await notifee.cancelNotification('complete');
-        setIsDownloaded(true)
-        let number_of_downloaded = 0
-        const promises =  album_tracks_state.map(async(album_track) =>{
-            const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
-            if (track_downloaded){
-                number_of_downloaded +=1
-            }
-        })
-        await Promise.all(promises)
-        await notifee.cancelNotification("done");
-        if (number_of_downloaded === album_tracks_state.length){
-            if (downloadalbumisfull === true){
-                setDownloadedAlbumIsFull(false)
-            }
-            else{
-                setDownloadedAlbumIsFull(true)
-            }
-        }
-        setIsDownloading(false)
-    }
-    const playnowsong = async () => {
         const is_real_dl = isDownloaded && !isSkipped;
         if (is_real_dl) {
             console.log("Playing downloaded song; resetting any hanging load locks.");
             setLoadingTrackId(null);
-        } else if (getLoadingTrackId() !== null) {
-            console.log("A song is already loading, ignoring press.");
             return;
         }
+        // Show spinner immediately
+        setIsSongLoading(true);
         try {
-            await TrackPlayer.setRepeatMode(RepeatMode.Off);
-            const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
-            if (stored_album_tracks){
-                const album_tracks_stored = JSON.parse(stored_album_tracks)
-                if (playlist_details){
-                    let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
-                    if (shuffled_tracks){
-                        await AsyncStorage.setItem("current-tracks",shuffled_tracks)
-                    }
-                    else{
-                        await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
-                    }
-                }
-                else{
-                    await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
-                }
-
-                //console.log(album_tracks_stored[0].album_name,album_tracks_state[0].name)
-                // Clean up
-                if (album_tracks_stored[0].album_name !== album_tracks_state[0].album_name){
-                    await AsyncStorage.removeItem("current-prefetched-nextsong")
-                    await AsyncStorage.removeItem("current-recommend-sp")
-                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)
-                    if (!track_downloaded){
-                   
-                    await prefetchsong(album_track_state)
-                    }
-                    await TrackPlayer.reset();
-                }
-
-            }
-            else{
-                if (playlist_details){
-                    let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
-                    if (shuffled_tracks){
-                        await AsyncStorage.setItem("current-tracks",shuffled_tracks)
-                    }
-                    else{
-                        await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
-                    }
-                }
-                else{
-                    await AsyncStorage.setItem("current-tracks",JSON.stringify(album_tracks_state))
-                }
-            }
-
-            let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
-            console.log("current_eh",currentTrackInd)
-            if (currentTrackInd !== undefined){
-                let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
-           
-                let next_track_ind = (currentTrack.index+ 1) >= num_of_tracks ? 0 : currentTrack.index+ 1
-                console.log("next",next_track_ind,num_of_tracks)
-            
-                let nextsong = album_track_state
-        
-                await skipToTrack(nextsong,next_track_ind)
-            }
-            else{
-                let next_track_ind = 0
-            
-                let nextsong = album_track_state
-
-                await skipToTrack(nextsong,next_track_ind)
-            }
-        } catch (error) {
-            console.error("Error playing song:", error);
-            Alert.alert("Playback Error", "Failed to retrieve stream URL or start playback.");
+            await skipToTrack(album_track_state, 0);
+        } finally {
+            setIsSongLoading(false);
         }
-    }
+    };
+
     const showplaylistoptions = async ()=>{
         console.log("playlist details",album_track_state)
         setTrackForPlaylist([album_track_state])
@@ -465,19 +409,36 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                 <View style={{flex:0.15,width:"100%",height:"100%",justifyContent:"center",alignItems:"center",flexDirection:"row",gap:20}}>
                 <TouchableOpacity
                     onLongPress={() => { removedownload() }}
-                    onPress={() => {
-                        if (isDownloading) return;
-                        if (!isDownloaded) {
-                            // Not downloaded yet — fetch from backend and save
-                            downloadsong();
-                        } else if (isSkipped) {
-                            // Skipped placeholder — try a real download to overwrite it
-                            downloadsong();
-                        } else {
-                            // Properly downloaded — play the local file directly
-                            playnowsong();
+                    onPress={() => {                    // Unified press handler that prevents duplicate requests and shows spinner
+                    const handlePress = async () => {
+                        // If a download or load is already in progress, ignore subsequent taps
+                        if (isDownloading || getLoadingTrackId() !== null) {
+                            console.log('Action ignored: already loading/downloading');
+                            return;
                         }
-                    }}
+                        // Show spinner immediately
+                        setIsSongLoading(true);
+                        try {
+                            if (!isDownloaded) {
+                                // Not downloaded yet – initiate download
+                                await downloadsong();
+                                // After successful download, play the track
+                                await playnowsong();
+                            } else if (isSkipped) {
+                                // Skipped placeholder – attempt download again
+                                await downloadsong();
+                                await playnowsong();
+                            } else {
+                                // Already downloaded – play directly
+                                await playnowsong();
+                            }
+                        } finally {
+                            // Hide spinner after operation completes
+                            setIsSongLoading(false);
+                        }
+                    };
+                    // Invoke the unified handler
+                    handlePress();}}
                 >
                     <MaterialCommunityIcons
                         name="download-circle-outline"
@@ -506,6 +467,5 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
 
         </GestureDetector>
     )
-    
-}
-// 
+
+    }

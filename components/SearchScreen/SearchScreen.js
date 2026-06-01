@@ -360,7 +360,13 @@ export default function Search({seek, setSeek}){
                 artist_name: t.artists?.[0]?.name || 'Unknown Artist',
                 artist_id: t.artists?.[0]?.id || null
             }));
-            const albumSugs = (data.albums?.items || []).filter(Boolean).slice(0, 20).map(al => ({
+            const rawAlbumSugs = (data.albums?.items || []).filter(album => {
+                if (!album.artists) return true;
+                const hasVarious = album.artists.some(a => (a.name || '').toLowerCase().includes('various'));
+                return !hasVarious;
+            });
+            const shuffledAlbumSugs = rawAlbumSugs.sort(() => Math.random() - 0.5);
+            const albumSugs = shuffledAlbumSugs.slice(0, 20).map(al => ({
                 label: `${al.name} – ${al.artists?.[0]?.name || 'Unknown Artist'}`,
                 type: "album",
                 id: al.id,
@@ -644,23 +650,7 @@ export default function Search({seek, setSeek}){
                     <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed}/>
                     </View>}
 
-                    {access_token !== "" && featuredPlaylists.length > 0 && (
-                        <View style={{marginTop: 10, paddingHorizontal: 6}}>
-                            <Text style={{
-                                marginHorizontal: 12,
-                                marginBottom: 12,
-                                fontSize: 22,
-                                color: "white",
-                                fontWeight: "bold"
-                            }}>
-                                Featured Playlists
-                            </Text>
-                            <FavouritePlaylistsHomeScreen 
-                                access_token={access_token} 
-                                playlists={featuredPlaylists}
-                            />
-                        </View>
-                    )}
+
 
                     {access_token !== "" && (
                         <View style={{flex: 1, paddingHorizontal: 12, marginTop: 20, marginBottom: 30}}>
