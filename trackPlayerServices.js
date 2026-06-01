@@ -6,7 +6,7 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 //import { Dirs, FileSystem } from 'react-native-file-access';
 import { getstreaminglink } from './components/Tracks/getstreamlinks';
-import { autoplaynextsong,autoplayprevioussong, changerecommendyt, find_recommended_song, get_next_song_in_recommend_queue, get_recommend_mode, get_recommended_songs, store_current_recommended_yt_to_spotify } from './components/controls/controls';
+import { autoplaynextsong,autoplayprevioussong, changerecommendyt, find_recommended_song, get_next_song_in_recommend_queue, get_recommend_mode, get_recommended_songs, store_current_recommended_yt_to_spotify, is_real_download, is_track_restricted } from './components/controls/controls';
 // ...
 import notifee, { EventType } from '@notifee/react-native';
 
@@ -20,7 +20,7 @@ import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downl
 import RNFS from 'react-native-fs';
 import { VolumeManager } from 'react-native-volume-manager';
 import { sendmusicconnect } from './components/mqttclient/mqttclient';
-import { get_next_ind_in_album,get_next_song,get_track_after_queue,get_new_queue,play_next_queued_song,prefetchsong } from './components/controls/controls';
+import { get_next_ind_in_album,get_next_song,get_track_after_queue,get_new_queue,play_next_queued_song,prefetchsong,getLoadingTrackId } from './components/controls/controls';
 import { getrecommendations, searchsongsrecommend } from './components/Tracks/getrecommendations';
 export async function setupPlayer() {
   let isSetup = false;
@@ -191,33 +191,42 @@ export async function playbackService() {
                   if (newqueue){
                     console.log("ajobca")
                     const [next_ind_in_album,num_of_tracks,currentTrackIndexInaAlbum,player_ind,album_tracks] = await get_next_ind_in_album()
-                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${newqueue.artist}-${newqueue.album_name}-${newqueue.name}`)
-                    if (!track_downloaded){
-                      if (!current_autonext){
-                        await AsyncStorage.setItem("current_autonext","true")
-                        const nextsong_new_queue = JSON.parse(newqueue)
-                        console.log("queued,",nextsong_new_queue[0])
-                        await prefetchsong(nextsong_new_queue[0])
-                      }
+                    let queue_json = JSON.parse(newqueue);
+                    let candidate = null;
+                    for (let song of queue_json) {
+                        const is_restricted = await is_track_restricted(song);
+                        if (!is_restricted) {
+                            candidate = song;
+                            break;
+                        }
+                    }
+                    if (candidate) {
+                        const real_dl = await is_real_download(candidate)
+                        if (!real_dl){
+                          if (!current_autonext){
+                            await AsyncStorage.setItem("current_autonext","true")
+                            console.log("queued prefetch,",candidate.name)
+                            await prefetchsong(candidate)
+                          }
+                        }
                     }
 
                   }
                   else if (recommend_mode){
-                    
                     const nextsongsrecommend = await getsongrecommendation()
-                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsongsrecommend.artist}-${nextsongsrecommend.album_name}-${nextsongsrecommend.name}`)  
-                      //await AsyncStorage.setItem("current-recommend",JSON.stringify(nextsongsrecommend))
-                      if (!track_downloaded){
-                        if (!current_autonext){
-                        await AsyncStorage.setItem("current_autonext","true")
-                        console.log("prefetching",nextsongsrecommend)
-                        await prefetchsong(nextsongsrecommend)
-                      }
-                      }
-                      // await repopulaterecommendations()
-        
-                    
- 
+                    if (nextsongsrecommend) {
+                        const is_restricted = await is_track_restricted(nextsongsrecommend);
+                        if (!is_restricted) {
+                            const real_dl_rec = await is_real_download(nextsongsrecommend)
+                            if (!real_dl_rec){
+                              if (!current_autonext){
+                                await AsyncStorage.setItem("current_autonext","true")
+                                console.log("prefetching recommended",nextsongsrecommend.name)
+                                await prefetchsong(nextsongsrecommend)
+                              }
+                            }
+                        }
+                    }
                   }
                   else{
                     console.log("hello")
@@ -225,17 +234,33 @@ export async function playbackService() {
                     console.log("hamamsn")
                     const track_after_queue = await get_track_after_queue()
                     console.log("shasu")
-                    const nextsong = await get_next_song(track_after_queue,album_tracks,next_ind_in_album)
-                    console.log("jdacinau")
-                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
-                    console.log("hdabi")
-                    if (!track_downloaded){
-                      await AsyncStorage.setItem("current_autonext","true")
-                      await prefetchsong(nextsong)
-                    }
-            
-                    
 
+                    let initial_next_ind = track_after_queue ? parseInt(track_after_queue) : next_ind_in_album;
+                    let target_ind = initial_next_ind;
+                    let found_unrestricted = false;
+                    let loop_count = 0;
+
+                    while (!found_unrestricted && loop_count < album_tracks.length) {
+                        let candidate_song = album_tracks[target_ind];
+                        const is_restricted = await is_track_restricted(candidate_song);
+                        if (is_restricted) {
+                            target_ind = (target_ind + 1) % album_tracks.length;
+                            loop_count++;
+                        } else {
+                            found_unrestricted = true;
+                        }
+                    }
+
+                    if (found_unrestricted) {
+                        const nextsong = album_tracks[target_ind];
+                        console.log("jdacinau")
+                        const real_dl_next = await is_real_download(nextsong)
+                        console.log("hdabi")
+                        if (!real_dl_next){
+                          await AsyncStorage.setItem("current_autonext","true")
+                          await prefetchsong(nextsong)
+                        }
+                    }
                   }
                   
 
@@ -285,27 +310,45 @@ export async function playbackService() {
 }
   TrackPlayer.addEventListener(Event.PlaybackError,async (event) => {
         console.log('Playback error:', event);
-        let message = event.message;
-         if (message === "Source error"){
+        const { message, code } = event;
+
+        // File-not-found = local file missing (e.g. skipped/age-restricted placeholder).
+        // Auto-skip immediately — no point retrying a file that doesn't exist.
+        if (code === "android-io-file-not-found") {
+          console.log("Local file missing, auto-skipping to next track.");
+          await AsyncStorage.removeItem("current_autonext_error");
+          await autoplaynextsong();
+          return;
+        }
+
+        if (message === "Source error"){
           const current_autonext = await AsyncStorage.getItem("current_autonext_error")
           if (!current_autonext){
             await AsyncStorage.setItem("current_autonext_error","true")
            const current_track = await TrackPlayer.getActiveTrack();
-           if (current_track.url.includes("https://")){
+           if (current_track.url.includes("https://") || current_track.url === "undefined" || !current_track.url){
             console.log(current_track,"Errror")
             const stored_album_tracks = await AsyncStorage.getItem("current-tracks")
             const album_tracks = JSON.parse(stored_album_tracks)
-            let num_of_tracks = album_tracks.length
             let currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
-            //console.log("current",currentTrackInd)
             let currentTrack = await TrackPlayer.getTrack(currentTrackInd)
     
             const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
             let nextsong = album_tracks[currentTrackIndexInaAlbum]
             const [streaming_link,title] = await getstreaminglink(nextsong)
-            await updateStreamUrl(currentTrackInd,streaming_link)
-            //console.log("next",currentTrackIndexInaAlbum)
 
+            // If stream URL comes back undefined (age-restricted / unavailable),
+            // skip to the next song instead of stopping playback entirely
+            if (!streaming_link) {
+              console.log("Age-restricted track during playback, marking as restricted and auto-skipping:", nextsong?.name)
+              if (nextsong) {
+                await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
+              }
+              await AsyncStorage.removeItem("current_autonext_error")
+              await autoplaynextsong()
+            } else {
+              await updateStreamUrl(currentTrackInd, streaming_link)
+            }
            }
           
          }
@@ -463,8 +506,11 @@ export async function playbackService() {
 
   TrackPlayer.addEventListener(Event.RemoteNext, async () => {
     console.log('Event.RemoteNext');
-      
-   const currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
+    if (getLoadingTrackId() !== null) {
+      console.log('Ignore RemoteNext: a song is currently loading.');
+      return;
+    }
+    const currentTrackInd = await  TrackPlayer.getActiveTrackIndex()
     const currentTrack = await TrackPlayer.getTrack(currentTrackInd)
     if (currentTrack.mediastatus !== "online"){
          await  TrackPlayer.skipToNext();
@@ -485,7 +531,10 @@ export async function playbackService() {
 
   TrackPlayer.addEventListener(Event.RemotePrevious, () => {
     console.log('Event.RemotePrevious');
-  
+    if (getLoadingTrackId() !== null) {
+      console.log('Ignore RemotePrevious: a song is currently loading.');
+      return;
+    }
     TrackPlayer.getActiveTrackIndex().then((currentTrackInd) =>{
       TrackPlayer.getTrack(currentTrackInd).then((currentTrack) =>{
         if (currentTrack.mediastatus !== "online"){

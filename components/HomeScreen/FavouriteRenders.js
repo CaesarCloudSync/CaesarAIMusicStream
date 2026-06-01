@@ -212,3 +212,34 @@ export function FavouriteRecommendationsHomeScreen({favouritecards,playlists,acc
     </SafeAreaView>
     )
 }
+
+export function FavouritePlaylistsHomeScreen({favouritecards,playlists,access_token}){
+    return(
+        <SafeAreaView style={{flex: 1, marginTop: 5, marginBottom: 5}}>
+            <FlatList
+                data={playlists}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{paddingLeft: 10, paddingRight: 10}}
+                renderItem={({item,index}) => {
+                    if (!item) return null;
+                    const thumbnail = item.images && item.images.length > 0 
+                        ? item.images[0].url 
+                        : "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500";
+                    return (
+                        <PlaylistCarouselItem 
+                            key={index} 
+                            access_token={access_token} 
+                            favouritecards={favouritecards} 
+                            playlistid={item.id}
+                            thumbnail={thumbnail} 
+                            playlist_name={item.name} 
+                            total_tracks={item.tracks?.total || item.total_tracks || 0} 
+                            album_type={item.type || "playlist"}
+                        />
+                    );
+                }}
+            />
+        </SafeAreaView>
+    )
+}

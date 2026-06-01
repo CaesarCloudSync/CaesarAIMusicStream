@@ -27,18 +27,17 @@ export default function ShowCurrentTrack({searchscreen,tracks,setAlbumTracks}) {
     const navigate = useNavigate()
     const [currentTrack,setCurrentTrack] = useState(null)
     const getActiveTrackIndex = async () =>{
-      let queue = await TrackPlayer.getQueue();
-
-      //let isSetup = await setupPlayer();
-      const currentTrackIndex = await TrackPlayer.getActiveTrackIndex()
-      if (currentTrackIndex !==  undefined){
-      const currentTrack = await TrackPlayer.getTrack(currentTrackIndex)
-      //console.log(currentTrack,"crrentTrack")
-
-      setCurrentTrack(currentTrack)
-
+      try {
+        let queue = await TrackPlayer.getQueue();
+        const currentTrackIndex = await TrackPlayer.getActiveTrackIndex()
+        if (currentTrackIndex !==  undefined){
+          const currentTrack = await TrackPlayer.getTrack(currentTrackIndex)
+          setCurrentTrack(currentTrack)
+        }
+      } catch (e) {
+        console.log("TrackPlayer not setup yet in getActiveTrackIndex:", e.message);
+      }
     }
-  }
 
   const autonextsong = async () =>{
       if (progress.duration !== 0){

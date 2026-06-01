@@ -286,6 +286,12 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
     .error(async (error) => {
       console.log('Download error/canceled:', error);
 
+      // Mark as skipped/restricted so it doesn't keep attempting downloads
+      await AsyncStorage.setItem(
+        `downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`,
+        JSON.stringify({...album_track, skipped: true})
+      );
+
       await notifee.displayNotification({
         id: `err_${notif_id}`,
         title: 'Download Failed',

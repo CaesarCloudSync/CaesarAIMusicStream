@@ -119,14 +119,20 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     const downloadallsong = async () =>{
         setIsDownloading(true)
         let number_of_downloaded = 0
-        const promises = album_tracks.map(async (album_track) =>{
+        const promises = album_tracks.map(async (album_track) => {
             const [youtube_link,title] = await getstreaminglink(album_track)
-            //const [download_link,final_title] = check_if_failed_download(youtube_link,title)
+            if (!youtube_link) {
+                console.log("Age-restricted track in downloadallsong, marking as skipped:", album_track.name)
+                await AsyncStorage.setItem(
+                    `downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`,
+                    JSON.stringify({...album_track, skipped: true})
+                );
+                number_of_downloaded += 1
+                return;
+            }
             await downloadFile(youtube_link,album_track.name,title,album_track)
             number_of_downloaded +=1
             await notifee.cancelNotification("done");
-    
-           
         })
         await Promise.all(promises)
         await notifee.cancelNotification("done");

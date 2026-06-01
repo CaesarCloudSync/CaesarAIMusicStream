@@ -31,10 +31,8 @@ export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favo
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-    const navartistprofile = async () =>{
-        
-        
-        navigate("/artistprofile",{state:{"album_tracks":[{"artist_id":artist_id}]}})
+    const navartistprofile = async () => {
+        navigate("/artistprofile", {state: {"album_tracks": [{"artist_id": artist_id, "artist": artist_name}]}})
     }
     //console.log(artist_id)
       
