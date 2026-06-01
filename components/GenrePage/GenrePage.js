@@ -61,21 +61,30 @@ export default function GenrePage({seek,setSeek}){
                     "name": artist.name
                 }));
            
-            let playlists = (feedresult.playlists?.items || [])
-                .filter((playlist) => playlist !== null && playlist.images && playlist.images.length > 0)
-                .map((playlist) => {
-                    let image = playlist.images[0].url;
-                    return {
-                        "id": playlist.id,
-                        "name": playlist.name,
-                        "images": [{"url": image}],
-                        "total_tracks": playlist.tracks?.total || 0,
-                        "album_type": playlist.type
-                    };
-                });
+            let plItems = (feedresult.playlists?.items || []).filter((playlist) => {
+                if (!playlist) return false;
+                if (!playlist.images || playlist.images.length === 0) return false;
+                const ownerName = playlist.owner?.display_name?.toLowerCase() || "";
+                if (ownerName.includes("various artist")) return false;
+                if ((playlist.tracks?.total || 0) < 5) return false;
+                return true;
+            });
 
-            // Rotate / Shuffle the playlists & artists for maximum variation
-            playlists = playlists.sort(() => Math.random() - 0.5);
+            const spotifyPls = plItems.filter(p => p.owner?.display_name?.toLowerCase() === 'spotify').sort(() => Math.random() - 0.5);
+            const otherPls = plItems.filter(p => p.owner?.display_name?.toLowerCase() !== 'spotify').sort(() => Math.random() - 0.5);
+            const sortedPls = [...spotifyPls, ...otherPls];
+
+            let playlists = sortedPls.map((playlist) => {
+                let image = playlist.images[0].url;
+                return {
+                    "id": playlist.id,
+                    "name": playlist.name,
+                    "images": [{"url": image}],
+                    "total_tracks": playlist.tracks?.total || 0,
+                    "album_type": playlist.type
+                };
+            });
+
             artists = artists.sort(() => Math.random() - 0.5);
 
             setPlaylists(playlists)

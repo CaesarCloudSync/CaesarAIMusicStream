@@ -131,7 +131,41 @@ export default function Search({seek, setSeek}){
         const artists = feedresult.artists.items.map((artist) =>{return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
         const tracks = feedresult.tracks.items
         const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
-        const playlists = feedresult.playlists.items.filter((playlist) =>{return(playlist !== null)}).map((playlist) =>{return({"id":playlist.id,"name":playlist.name,"images":[{"url":playlist.images[0].url}],"total_tracks":playlist.tracks.total,"album_type":playlist.type})})
+        
+        let plItems = (feedresult.playlists?.items || []).filter((playlist) => {
+            if (!playlist) return false;
+            if (!playlist.images || playlist.images.length === 0) return false;
+            const ownerName = playlist.owner?.display_name?.toLowerCase() || "";
+            if (ownerName.includes("various artist")) return false;
+            if ((playlist.tracks?.total || 0) < 5) return false;
+            return true;
+        });
+
+        const queryLower = q.toLowerCase();
+        plItems.sort((a, b) => {
+            const aIsSpotify = a.owner?.display_name?.toLowerCase() === 'spotify';
+            const bIsSpotify = b.owner?.display_name?.toLowerCase() === 'spotify';
+            if (aIsSpotify && !bIsSpotify) return -1;
+            if (!aIsSpotify && bIsSpotify) return 1;
+
+            const aMatch = a.name?.toLowerCase().includes(queryLower);
+            const bMatch = b.name?.toLowerCase().includes(queryLower);
+            if (aMatch && !bMatch) return -1;
+            if (!aMatch && bMatch) return 1;
+
+            return (b.tracks?.total || 0) - (a.tracks?.total || 0);
+        });
+
+        const playlists = plItems.map((playlist) => {
+            return {
+                "id": playlist.id,
+                "name": playlist.name,
+                "images": [{"url": playlist.images[0].url}],
+                "total_tracks": playlist.tracks?.total || 0,
+                "album_type": playlist.type
+            };
+        });
+
         setPlaylists(playlists)
         setSongs(result)
         setTracks(tracks)
@@ -312,7 +346,28 @@ export default function Search({seek, setSeek}){
                 id: al.id,
                 image: al.images?.[0]?.url || null
             }));
-            const playlistSugs = (data.playlists?.items || []).filter(Boolean).slice(0, 15).map(pl => ({
+            let plItems = (data.playlists?.items || []).filter(p => {
+                if (!p) return false;
+                const ownerName = p.owner?.display_name?.toLowerCase() || "";
+                if (ownerName.includes("various artist")) return false;
+                if ((p.tracks?.total || 0) < 5) return false;
+                return true;
+            });
+            const queryLower = query.toLowerCase();
+            plItems.sort((a, b) => {
+                const aIsSpotify = a.owner?.display_name?.toLowerCase() === 'spotify';
+                const bIsSpotify = b.owner?.display_name?.toLowerCase() === 'spotify';
+                if (aIsSpotify && !bIsSpotify) return -1;
+                if (!aIsSpotify && bIsSpotify) return 1;
+
+                const aMatch = a.name?.toLowerCase().includes(queryLower);
+                const bMatch = b.name?.toLowerCase().includes(queryLower);
+                if (aMatch && !bMatch) return -1;
+                if (!aMatch && bMatch) return 1;
+
+                return (b.tracks?.total || 0) - (a.tracks?.total || 0);
+            });
+            const playlistSugs = plItems.slice(0, 15).map(pl => ({
                 label: pl.name,
                 type: "playlist",
                 id: pl.id,
