@@ -125,14 +125,32 @@ export default function Search({seek, setSeek}){
         const q = queryOverride || text;
         if (!q) return;
         const headers = {Authorization: `Bearer ${access_token}`}
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&limit=50&type=artist,album,track,playlist`, {headers: headers})
+        // Add random offset for albums to rotate results
+        const randomAlbumOffset = Math.floor(Math.random() * 20);
+        const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&limit=50&offset=${randomAlbumOffset}&type=artist,album,track,playlist`, {headers: headers})
         const feedresult = await resp.json()
 
         const artists = feedresult.artists.items.map((artist) =>{return({"artist_id":artist.id,"images":artist.images,"name":artist.name})})
         const tracks = feedresult.tracks.items
-        const result = feedresult.albums.items.map((album) =>{return({"id":album.id,"name":album.name,"images":[{"url":album.images[0].url}],"artists":[{"name":album.artists[0].name}],"total_tracks":album.total_tracks,"release_date":album.release_date,"album_type":album.album_type})})
+        // Filter out any album that includes an artist named "Various" (case‑insensitive) and shuffle results
+        const rawAlbums = feedresult.albums.items.filter(album => {
+            if (!album.artists) return true;
+            // Exclude if any artist name contains "various"
+            const hasVarious = album.artists.some(a => (a.name || '').toLowerCase().includes('various'));
+            return !hasVarious;
+        });
+        const shuffledAlbums = rawAlbums.sort(() => Math.random() - 0.5);
+        const result = shuffledAlbums.map(album => ({
+            "id": album.id,
+            "name": album.name,
+            "images": [{"url": album.images[0].url}],
+            "artists": [{"name": album.artists[0].name}],
+            "total_tracks": album.total_tracks,
+            "release_date": album.release_date,
+            "album_type": album.album_type
+        }));
         
-        let plItems = (feedresult.playlists?.items || []).filter((playlist) => {
+        const plItems = (feedresult.playlists?.items || []).filter((playlist) => {
             if (!playlist) return false;
             if (!playlist.images || playlist.images.length === 0) return false;
             const ownerName = playlist.owner?.display_name?.toLowerCase() || "";
@@ -277,6 +295,7 @@ export default function Search({seek, setSeek}){
                 const headers = {Authorization: `Bearer ${access_token}`};
                 const resp = await fetch(`https://api.spotify.com/v1/albums/${s.album_id}`, {headers});
                 const feedresult = await resp.json();
+                const track_duration = (track) => (typeof track.duration_ms === 'number' && !isNaN(track.duration_ms)) ? track.duration_ms / 1000 : 0;
                 let album_tracks = feedresult.tracks.items.map((track) => ({
                     "album_id": feedresult.id,
                     "album_name": feedresult.name,
@@ -286,7 +305,8 @@ export default function Search({seek, setSeek}){
                     "artist_id": track.artists[0].id,
                     "thumbnail": feedresult.images?.[0]?.url || s.image,
                     "track_number": track.track_number,
-                    "duration_ms": track.duration_ms
+                    "duration_ms": track.duration_ms,
+                    "duration": track_duration(track)
                 }));
                 navigate("/tracks", { state: { "current_single": s.track_name, "album_tracks": album_tracks } });
             } catch(e) { console.log(e); }

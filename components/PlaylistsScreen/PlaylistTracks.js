@@ -25,7 +25,6 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const progress = useProgress();
     const location = useLocation();
     const netInfo = useNetInfo();
-
     const navigate = useNavigate();
     const [trackforplaylist,setTrackForPlaylist] = useState([]);
     const [multiplaylistselect,setMultiplePlaylistSelect] = useState(false);
@@ -33,8 +32,8 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
-    const [playlist_details,setPlaylistDetails] = useState(location.state.playlist_details)
-    const [album_tracks,setAlbumTracks] = useState(); // location.state.playlist_tracks
+    const [playlist_details,setPlaylistDetails] = useState(location.state?.playlist_details || {})
+    const [album_tracks,setAlbumTracks] = useState(location.state?.playlist_tracks || [])
     const [loadingaudio,setLoadingAudio] = useState(false)
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
@@ -165,11 +164,14 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         setPlaylistDetails(playlist_details);
 
     }
-    useEffect(() =>{
-        
-        getplaylist()
-        
-    },[playlisttrackremoved,netInfo])
+    useEffect(() => {
+        if (album_tracks && album_tracks.length > 0) {
+            // Already have tracks from navigation, no need to fetch from AsyncStorage
+            return;
+        }
+        getplaylist();
+    }, [playlisttrackremoved, netInfo, location.state?.playlist_tracks]);
+    
     const setthumbnailimage = async () =>{
         const response = await requestGalleryWithPermission();
         await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":response["uri"],"playlist_size":playlist_details.playlist_size}))
