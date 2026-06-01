@@ -4,19 +4,17 @@ import { useNavigate } from "react-router-native";
 import TrackProgress from "../TrackProgress/TrackProgress";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { get_access_token } from "../access_token/getaccesstoken";
-import { FavouriteAlbums, FavouriteSearchPlaylists } from "../HomeScreen/FavouriteRenders";
+import { FavouriteAlbums, FavouriteSearchPlaylists, FavouriteSearchAlbums, FavouriteTopTracksAlbums, FavouritePlaylistsHomeScreen } from "../HomeScreen/FavouriteRenders";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import axios from "axios";
 import * as MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNetInfo} from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FavouriteSearchAlbums } from "../HomeScreen/FavouriteRenders";
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Directions } from 'react-native-gesture-handler';
 import ArtistCarouselItem from "../HomeScreen/ArtistCarouselItem";
 import ShowQueue from "../ShowQueue/showqueue";
-import { FavouriteTopTracksAlbums } from "../HomeScreen/FavouriteRenders";
 import GenreItem from "../HomeScreen/GenreItem";
 import { genreslist } from "../HomeScreen/genres";
 
@@ -93,6 +91,7 @@ export default function Search({seek, setSeek}){
     const [recent_removed,setRecentRemoved] = useState(false)
     const [recentalbums,setRecentAlbums] = useState([]);
     const [playlists,setPlaylists] = useState([]);
+    const [featuredPlaylists, setFeaturedPlaylists] = useState([]);
     const [tracks,setTracks] = useState([]);
     const [visibleArtistCount, setVisibleArtistCount] = useState(12);
     const [searchHistory, setSearchHistory] = useState([]);
@@ -146,6 +145,29 @@ export default function Search({seek, setSeek}){
     const getinitialrnbfeed = async () =>{
         const access_token = await get_access_token();
         setAccessToken(access_token)
+        try {
+            const headers = {Authorization: `Bearer ${access_token}`}
+            const randomOffset = Math.floor(Math.random() * 25);
+            const resp = await fetch(`https://api.spotify.com/v1/browse/featured-playlists?limit=15&offset=${randomOffset}`, {headers});
+            const data = await resp.json();
+            let plItems = data.playlists?.items || [];
+            if (plItems.length === 0) {
+                const searchResp = await fetch(`https://api.spotify.com/v1/search?q=hits&type=playlist&limit=15&offset=${randomOffset}`, {headers});
+                const searchData = await searchResp.json();
+                plItems = searchData.playlists?.items || [];
+            }
+            plItems = plItems.filter(p => p !== null && p.images && p.images.length > 0).map(p => ({
+                id: p.id,
+                name: p.name,
+                images: [{"url": p.images[0].url}],
+                total_tracks: p.tracks?.total || 0,
+                type: p.type || "playlist"
+            }));
+            // Shuffle them
+            setFeaturedPlaylists(plItems.sort(() => Math.random() - 0.5));
+        } catch (e) {
+            console.log("Error fetching featured playlists for search screen:", e);
+        }
     }
     const get_recent_artists = async () =>{
         let keys = await AsyncStorage.getAllKeys()
@@ -546,6 +568,24 @@ export default function Search({seek, setSeek}){
                     <Text  style={{marginLeft:10}}>Latest Albums</Text>
                     <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed}/>
                     </View>}
+
+                    {access_token !== "" && featuredPlaylists.length > 0 && (
+                        <View style={{marginTop: 10, paddingHorizontal: 6}}>
+                            <Text style={{
+                                marginHorizontal: 12,
+                                marginBottom: 12,
+                                fontSize: 22,
+                                color: "white",
+                                fontWeight: "bold"
+                            }}>
+                                Featured Playlists
+                            </Text>
+                            <FavouritePlaylistsHomeScreen 
+                                access_token={access_token} 
+                                playlists={featuredPlaylists}
+                            />
+                        </View>
+                    )}
 
                     {access_token !== "" && (
                         <View style={{flex: 1, paddingHorizontal: 12, marginTop: 20, marginBottom: 30}}>
