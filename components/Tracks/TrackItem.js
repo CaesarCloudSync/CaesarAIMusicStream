@@ -364,7 +364,6 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
                                     if (!isDownloaded || isSkipped) {
                                         await downloadsong();
                                     }
-                                    await playnowsong();
                                 } finally {
                                     setIsSongLoading(false);
                                 }
