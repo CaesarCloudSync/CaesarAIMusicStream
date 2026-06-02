@@ -195,6 +195,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
         if (recommend_current_track){
             await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
             await AsyncStorage.setItem("current-tracks",recommend_current_track);
+            await AsyncStorage.removeItem("current-recommend-sp");
         }
 
         }
@@ -235,6 +236,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             if (recommend_current_track){
                 await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
                 await AsyncStorage.setItem("current-tracks",recommend_current_track);
+                await AsyncStorage.removeItem("current-recommend-sp");
             }
          
 

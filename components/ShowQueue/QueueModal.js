@@ -8,7 +8,7 @@ import TrackPlayer, {
   State
 } from 'react-native-track-player';
 import { TouchableOpacity, Image } from "react-native";
-import { autoplaynextsong, get_recommended_songs, getLoadingTrackId, subscribeToLoadingTrack } from "../controls/controls";
+import { autoplaynextsong, get_recommended_songs, getLoadingTrackId, subscribeToLoadingTrack, is_track_restricted } from "../controls/controls";
 import { getstreaminglink } from "../Tracks/getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { skipToTrack } from "../controls/controls";
@@ -90,6 +90,12 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
       // TODO: Make the Youtube text to spotify search accurate to get song then play. The auto play.
       const nextsong_recommend = await getspecificsongrecommendation(song_name, artist_name)
       console.log("nextsong_recommend", nextsong_recommend)
+      const is_restricted = await is_track_restricted(nextsong_recommend);
+      if (is_restricted) {
+        console.log("Recommended song is restricted, skipping without accessing:", nextsong_recommend.name);
+        await removefromrecommend(nextsongyt);
+        return;
+      }
       const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong_recommend.artist}-${nextsong_recommend.album_name}-${nextsong_recommend.name}`)
       if (!track_downloaded) {
         await prefetchsong(nextsong_recommend)
