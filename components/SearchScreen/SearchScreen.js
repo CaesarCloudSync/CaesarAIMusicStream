@@ -321,25 +321,31 @@ export default function Search({seek, setSeek}){
                 const headers = {Authorization: `Bearer ${access_token}`};
                 const resp = await fetch(`https://api.spotify.com/v1/playlists/${targetId}`, {headers});
                 const feedresult = await resp.json();
-                let playlist_tracks = feedresult.tracks.items.map((item) => {
-                    const track = item.track;
-                    return {
-                        "album_id": track.album?.id,
-                        "album_name": track.album?.name,
-                        "name": track.name,
-                        "id": track.id,
-                        "artist": track.artists?.[0]?.name,
-                        "artist_id": track.artists?.[0]?.id,
-                        "thumbnail": track.album?.images?.[0]?.url || s.image,
-                        "duration_ms": track.duration_ms
-                    };
-                });
-                const playlist_details = {
-                    playlist_name: feedresult.name,
-                    playlist_thumbnail: feedresult.images?.[0]?.url || s.image,
-                    playlist_size: playlist_tracks.length
-                };
-                navigate("/playlist-tracks", { state: { playlist_details, playlist_tracks } });
+                const thumbnail = feedresult.images?.[0]?.url || s.image;
+                const playlist_name = feedresult.name;
+                // Mirror PlaylistCarouselItem: embed playlist metadata on each track and
+                // navigate to /tracks (album-style online view). Long-pressing the cover
+                // in Tracks.js will save it as a real local playlist.
+                let album_tracks = feedresult.tracks.items
+                    .filter(item => item.track)
+                    .map((item) => {
+                        const track = item.track;
+                        return {
+                            "playlist_thumbnail": thumbnail,
+                            "playlist_id": feedresult.id,
+                            "playlist_name": playlist_name,
+                            "album_id": track.album?.id,
+                            "album_name": track.album?.name,
+                            "name": track.name,
+                            "id": track.id,
+                            "artist": track.artists?.[0]?.name,
+                            "artist_id": track.artists?.[0]?.id,
+                            "thumbnail": track.album?.images?.[0]?.url || thumbnail,
+                            "track_number": track.track_number,
+                            "duration_ms": track.duration_ms
+                        };
+                    });
+                navigate("/tracks", { state: { album_tracks } });
             } catch(e) { console.log(e); }
         }
     }

@@ -171,7 +171,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         }
         getplaylist();
     }, [playlisttrackremoved, netInfo, location.state?.playlist_tracks]);
-    
+
     const setthumbnailimage = async () =>{
         const response = await requestGalleryWithPermission();
         await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":response["uri"],"playlist_size":playlist_details.playlist_size}))

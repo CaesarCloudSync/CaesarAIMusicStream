@@ -244,6 +244,24 @@ export default function TrackItem({album_track,setCurrentTrack,index,num_of_trac
                 await AsyncStorage.setItem("current-tracks", JSON.stringify(album_tracks_state));
                 await AsyncStorage.setItem("current-track", JSON.stringify(album_track_state));
             }
+            // If this track is from a different album or playlist than the one currently
+            // active, reset the queue so stale/expired yt-dlp URLs are cleared before
+            // a fresh link is fetched. Same album/playlist = keep the cache.
+            try {
+                const activeTrackInd = await TrackPlayer.getActiveTrackIndex();
+                if (activeTrackInd != null) {
+                    const activeTrack = await TrackPlayer.getTrack(activeTrackInd);
+                    const newContext = album_track_state.playlist_name || album_track_state.album_name;
+                    const activeContext = activeTrack?.playlist_name || activeTrack?.album_name;
+                    if (newContext && activeContext && newContext !== activeContext) {
+                        console.log('Different album/playlist on press, resetting queue:', newContext);
+                        await TrackPlayer.reset();
+                    }
+                }
+            } catch (e) {
+                console.log('resetIfDifferentContext error:', e);
+            }
+
             await skipToTrack(album_track_state, 0);
         } finally {
             setIsSongLoading(false);
