@@ -11,23 +11,32 @@ import { TextInput,View } from "react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import { Image } from "react-native";
 import axios from "axios";
+import { triggerBackupSync } from "../access_token/spotifyBackupHelper";
+
 export default function CustomYTModal({playlist_details,setPlaylistDetails,isModalVisible,setIsModalVisible,setPlaylistChanged,playlistchanged}){
     const [playlists,setPlaylists] = useState([]);
     const [userInput,setUserInput] = useState("");
     const navigate = useNavigate();
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
     // {"album_id": "2ygz2yoIAR5S9WWIxnvkAL", "album_name": "STARFACE", "artist": "Lava La Rue", "artist_id": "271bbpX3pdCi56ZJA1jQ43", "duration_ms": 195857, "id": "13pVWYP4Bg03zb7VHiC1Us", "name": "Manifestation Manifesto", "playlist_local": "true", "playlist_name": "BUSSDOWN", "thumbnail": "https://i.scdn.co/image/ab67616d00001e022e975b1e2113c800d86e02fd", "track_number": 3}
-    const addtracktoplaylist = async (trackforplaylist) =>{
-
-     
+    const addtracktoplaylist = async (trackforplaylist) => {
         await AsyncStorage.setItem(`playlist-track:${playlist_details.playlist_name}-${trackforplaylist.name}`,JSON.stringify(trackforplaylist))
         let keys = await AsyncStorage.getAllKeys()
         const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist_details.playlist_name}`))}))
         const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
         const num_of_tracks = playlist_tracks.length
-        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":playlist_details.playlist_thumbnail,"playlist_size":num_of_tracks}))
+        
+        const stored = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`);
+        const existingDetails = stored ? JSON.parse(stored) : {};
+        const newDetails = {
+            ...existingDetails,
+            "playlist_name": playlist_details.playlist_name,
+            "playlist_thumbnail": playlist_details.playlist_thumbnail,
+            "playlist_size": num_of_tracks
+        };
+        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify(newDetails))
         await AsyncStorage.setItem(`playlist-track-order:${playlist_details.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
-        setPlaylistDetails({...playlist_details,"playlist_size":num_of_tracks})
+        setPlaylistDetails(newDetails)
         handleModal()
         if (playlistchanged === false){
             setPlaylistChanged(true)
@@ -35,11 +44,9 @@ export default function CustomYTModal({playlist_details,setPlaylistDetails,isMod
         else{
             setPlaylistChanged(false)
         }
-       
-        //navigate("/playlists")
-
-    
-}
+        
+        await triggerBackupSync(playlist_details.playlist_name);
+    }
 
     const getcustomyt = async () =>{
       

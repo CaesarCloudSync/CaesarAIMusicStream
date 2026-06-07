@@ -21,6 +21,7 @@ import { convertToValidFilename } from "../tool/tools";
 import { MUSICSDCARDPATH } from "../constants/constants";
 import { set } from "lodash";
 import notifee from '@notifee/react-native';
+import { triggerBackupSync } from "../access_token/spotifyBackupHelper";
 
 export default function TrackItem({ album_track, setCurrentTrack, index, num_of_tracks, album_tracks, trackforplaylist, setTrackForPlaylist, handleModal, playlist_details, playlisttrackremoved, setPlaylistTrackRemoved, downloadedsongind, setDownloadedAlbumIsFull, downloadalbumisfull, removealldownloadsdone, multiplaylistselect, setMultiplePlaylistSelect }) {
     const navigate = useNavigate();
@@ -242,7 +243,15 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
     };
 
     const removetrackfromplaylist = async () => {
-        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`, JSON.stringify({ "playlist_name": playlist_details.playlist_name, "playlist_thumbnail": playlist_details.playlist_thumbnail, "playlist_size": playlist_details.playlist_size - 1 }));
+        const stored = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`);
+        const existingDetails = stored ? JSON.parse(stored) : {};
+        const newDetails = {
+            ...existingDetails,
+            "playlist_name": playlist_details.playlist_name,
+            "playlist_thumbnail": playlist_details.playlist_thumbnail,
+            "playlist_size": playlist_details.playlist_size - 1
+        };
+        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`, JSON.stringify(newDetails));
         await AsyncStorage.removeItem(`playlist-track:${playlist_details.playlist_name}-${album_track_state.name}`);
         await AsyncStorage.removeItem(`playlist-track-order:${playlist_details.playlist_name}-${album_track_state.name}`);
 
@@ -254,6 +263,8 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
             await AsyncStorage.setItem(`current-tracks`, JSON.stringify(new_shuffled_tracks_stored));
         }
         setPlaylistTrackRemoved(!playlisttrackremoved);
+        
+        await triggerBackupSync(playlist_details.playlist_name);
     };
 
     const check_downloaded = async () => {
@@ -344,8 +355,8 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
                             </View>
                             <View style={{ padding: 6 }} />
                             <View style={{ flex: 1 }}>
-                                <Text style={{ color: "white" }}>{album_track_state.name}</Text>
-                                <Text style={{ color: "grey" }}>{album_track_state.artist}</Text>
+                                <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "white" }}>{album_track_state.name}</Text>
+                                <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: "grey" }}>{album_track_state.artist}</Text>
                             </View>
                         </View>
                     </GestureDetector>
