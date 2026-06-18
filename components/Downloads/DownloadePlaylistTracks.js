@@ -154,10 +154,11 @@ export default function DownloadedPlaylistTracks({currentTrack,setCurrentTrack,s
 
             
             <TouchableOpacity  style={{justifyContent:"center",alignItems:"center",flex:0.5}}>
-                <GestureDetector gesture={Gesture.Exclusive(doubleTap)}  >
-                    <Image style={{borderRadius:5,width: 175, height: 175}} source={require('../../assets/Download.png')}></Image>
-
-                </GestureDetector>
+                <View style={{borderRadius: 5, overflow: "hidden", width: 175, height: 175}}>
+                    <GestureDetector gesture={Gesture.Exclusive(doubleTap)}  >
+                        <Image style={{borderRadius: 5, width: 175, height: 175}} source={require('../../assets/Download.png')}></Image>
+                    </GestureDetector>
+                </View>
             </TouchableOpacity>
 
             <View style={{flex:editingplaylistname === false ? isfilterTyping ? 0.9 : 0.1:isTyping ?0.5: 0.2,justifyContent:"center",alignItems:"center"}}>

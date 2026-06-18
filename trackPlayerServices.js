@@ -180,11 +180,12 @@ export async function playbackService() {
         console.log(progress,"hi")
         //await AsyncStorage.removeItem("current_autonext")
         const current_autonext = await AsyncStorage.getItem("current_autonext")
+        const current_prefetching = await AsyncStorage.getItem("current_prefetching")
         let duration_remaining = progress.duration - progress.position
         if (duration_remaining < 20 && duration_remaining > 5){
           //andleautoplaynextsong()
           
-          if (!current_autonext){
+          if (!current_prefetching){
                 const newqueue = await get_new_queue()
                 const recommend_mode = await get_recommend_mode()
                 
@@ -203,8 +204,8 @@ export async function playbackService() {
                     if (candidate) {
                         const real_dl = await is_real_download(candidate)
                         if (!real_dl){
-                          if (!current_autonext){
-                            await AsyncStorage.setItem("current_autonext","true")
+                          if (!current_prefetching){
+                            await AsyncStorage.setItem("current_prefetching","true")
                             console.log("queued prefetch,",candidate.name)
                             await prefetchsong(candidate)
                           }
@@ -219,8 +220,8 @@ export async function playbackService() {
                         if (!is_restricted) {
                             const real_dl_rec = await is_real_download(nextsongsrecommend)
                             if (!real_dl_rec){
-                              if (!current_autonext){
-                                await AsyncStorage.setItem("current_autonext","true")
+                              if (!current_prefetching){
+                                await AsyncStorage.setItem("current_prefetching","true")
                                 console.log("prefetching recommended",nextsongsrecommend.name)
                                 await prefetchsong(nextsongsrecommend)
                               }
@@ -257,7 +258,7 @@ export async function playbackService() {
                         const real_dl_next = await is_real_download(nextsong)
                         console.log("hdabi")
                         if (!real_dl_next){
-                          await AsyncStorage.setItem("current_autonext","true")
+                          await AsyncStorage.setItem("current_prefetching","true")
                           await prefetchsong(nextsong)
                         }
                     }
@@ -281,6 +282,7 @@ export async function playbackService() {
         }
         else{
           await AsyncStorage.removeItem("current_autonext")
+          await AsyncStorage.removeItem("current_prefetching")
         }
       
         }
@@ -548,6 +550,17 @@ export async function playbackService() {
 
     //
   });
-  TrackPlayer.addEventListener(Event.PlaybackTrackChanged,() => {
-  })
+  TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, async (event) => {
+    console.log('Event.PlaybackActiveTrackChanged:', event);
+    const { track } = event;
+
+    // Reset flags for the new track
+    await AsyncStorage.removeItem("current_autonext");
+    await AsyncStorage.removeItem("current_prefetching");
+
+    if (track && track.url === "dummy") {
+      console.log("Dummy track detected as active track. Triggering autoplaynextsong.");
+      await autoplaynextsong();
+    }
+  });
 }

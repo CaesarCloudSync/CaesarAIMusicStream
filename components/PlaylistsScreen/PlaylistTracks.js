@@ -420,10 +420,10 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
             </View>
 
             {/* Thumbnail Section */}
-            <TouchableOpacity style={{justifyContent:"center",alignItems:"center",flex:0.45, overflow: "hidden"}}>
-                <View style={{flex: 1, justifyContent: "center", alignItems: "center", width: "100%"}}>
+            <TouchableOpacity style={{justifyContent:"center",alignItems:"center",flex:0.45}}>
+                <View style={{borderRadius: 5, overflow: "hidden", width: 175, height: 175}}>
                     <GestureDetector gesture={Gesture.Exclusive(longPress,doubleTap)}>
-                        <Image style={{borderRadius: 5, width: 175, height: 175, resizeMode: "cover", overflow: "hidden", backgroundColor: "#222"}} source={{uri:playlist_details.playlist_thumbnail}} />
+                        <Image style={{borderRadius: 5, width: 175, height: 175, resizeMode: "cover", backgroundColor: "#222"}} source={{uri:playlist_details.playlist_thumbnail}} />
                     </GestureDetector>
                 </View>
             </TouchableOpacity>
