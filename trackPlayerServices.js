@@ -122,10 +122,18 @@ export const remove_recommend_next_played = async (recommended_songs) =>{
 }
 export const getsongrecommendation = async (prefetching=false) =>{
   const recommended_songs = await get_recommended_songs()
+  if (!recommended_songs) return null;
   const nextsongrecommendyt = await get_next_song_in_recommend_queue(recommended_songs)
+  if (!nextsongrecommendyt || !nextsongrecommendyt.title || !nextsongrecommendyt.artists || !nextsongrecommendyt.artists[0]) {
+    return null;
+  }
   
   console.log("nextsongrecommendyt",nextsongrecommendyt)
-  const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
+  const searchResult = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
+  if (!searchResult || !searchResult[0]) {
+    return null;
+  }
+  const [nextsongsrecommend,album_tracks_recommend] = searchResult;
 
   await store_current_recommended_yt_to_spotify(album_tracks_recommend)
   
@@ -133,10 +141,18 @@ export const getsongrecommendation = async (prefetching=false) =>{
 }
 export const getspecificsongrecommendation = async (song_name,artist) =>{
   const recommended_songs = await get_recommended_songs()
+  if (!recommended_songs) return null;
   const nextsongrecommendyt = await find_recommended_song(song_name,artist,recommended_songs)
+  if (!nextsongrecommendyt || !nextsongrecommendyt.title || !nextsongrecommendyt.artists || !nextsongrecommendyt.artists[0]) {
+    return null;
+  }
   
   console.log("nextsongrecommendyt",nextsongrecommendyt)
-  const  [nextsongsrecommend,album_tracks_recommend] = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
+  const searchResult = await searchsongsrecommend(nextsongrecommendyt.title,nextsongrecommendyt.artists[0].name)
+  if (!searchResult || !searchResult[0]) {
+    return null;
+  }
+  const [nextsongsrecommend,album_tracks_recommend] = searchResult;
   
   await store_current_recommended_yt_to_spotify(album_tracks_recommend)
    
@@ -335,14 +351,18 @@ export async function playbackService() {
     
             const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
             let nextsong = album_tracks[currentTrackIndexInaAlbum]
-            const [streaming_link,title] = await getstreaminglink(nextsong)
+            const [streaming_link,title,isTransient] = await getstreaminglink(nextsong)
 
             // If stream URL comes back undefined (age-restricted / unavailable),
             // skip to the next song instead of stopping playback entirely
             if (!streaming_link) {
-              console.log("Age-restricted track during playback, marking as restricted and auto-skipping:", nextsong?.name)
-              if (nextsong) {
-                await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
+              if (!isTransient) {
+                console.log("Age-restricted track during playback, marking as restricted and auto-skipping:", nextsong?.name)
+                if (nextsong) {
+                  await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
+                }
+              } else {
+                console.log("Transient error during playback, auto-skipping without marking as restricted:", nextsong?.name)
               }
               await AsyncStorage.removeItem("current_autonext_error")
               await autoplaynextsong()

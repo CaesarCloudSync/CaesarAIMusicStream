@@ -137,25 +137,30 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
         setIsDownloading(true);
         setIsSongLoading(true);
         try {
-            const [youtube_link, title] = await getstreaminglink(album_track_state);
+            const [youtube_link, title, isTransient] = await getstreaminglink(album_track_state);
             if (!youtube_link) {
-                await AsyncStorage.setItem(
-                    `downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,
-                    JSON.stringify({ ...album_track_state, skipped: true })
-                );
-                setIsDownloaded(true);
-                Alert.alert(
-                    "Track Unavailable",
-                    `"${album_track_state.name}" is age-restricted and can't be downloaded.`
-                );
-                let number_of_downloaded = 0;
-                const promises = album_tracks_state.map(async (album_track) => {
-                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`);
-                    if (track_downloaded) { number_of_downloaded += 1; }
-                });
-                await Promise.all(promises);
-                if (number_of_downloaded === album_tracks_state.length) {
-                    setDownloadedAlbumIsFull(prev => !prev);
+                if (!isTransient) {
+                    await AsyncStorage.setItem(
+                        `downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,
+                        JSON.stringify({ ...album_track_state, skipped: true })
+                    );
+                    setIsDownloaded(true);
+                    Alert.alert(
+                        "Track Unavailable",
+                        `"${album_track_state.name}" is age-restricted and can't be downloaded.`
+                    );
+                    let number_of_downloaded = 0;
+                    const promises = album_tracks_state.map(async (album_track) => {
+                        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`);
+                        if (track_downloaded) { number_of_downloaded += 1; }
+                    });
+                    await Promise.all(promises);
+                    if (number_of_downloaded === album_tracks_state.length) {
+                        setDownloadedAlbumIsFull(prev => !prev);
+                    }
+                } else {
+                    console.log(`Download failed: transient error for "${album_track_state.name}".`);
+                    Alert.alert("Download Failed", "A network error occurred. Please check your connection and try again.");
                 }
                 return;
             }
@@ -178,19 +183,28 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
     };
 
     const playnowsong = async () => {
-        if (!isDownloaded && getLoadingTrackId() !== null) {
+        let existsInQueue = false;
+        try {
+            const queue = await TrackPlayer.getQueue();
+            existsInQueue = queue.some(track => track.id === album_track_state.id && track.url !== "dummy");
+        } catch (queueError) {
+            console.log("Error checking queue in playnowsong:", queueError);
+        }
+
+        if (!existsInQueue && !isDownloaded && getLoadingTrackId() !== null) {
             console.log("A song is already loading, ignoring press.");
             return;
         }
         
         const is_real_dl = isDownloaded && !isSkipped;
-        if (!is_real_dl) {
+        if (!existsInQueue && !is_real_dl) {
             setIsSongLoading(true);
+            setLoadingTrackId(album_track_state.id);
         }
 
         try {
             // 1. PREFETCH ABSOLUTE FIRST - Fetch stream link before anything else changes or gets reset
-            if (!is_real_dl && typeof prefetchsong === 'function') {
+            if (!existsInQueue && !is_real_dl && typeof prefetchsong === 'function') {
                 console.log("Prefetching stream URL at the beginning of the sequence...");
                 try {
                     await prefetchsong(album_track_state);
@@ -200,6 +214,12 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
                 }
             }
 
+            // Check if we were interrupted/overwritten while we were fetching
+            if (!existsInQueue && !is_real_dl && getLoadingTrackId() !== album_track_state.id) {
+                console.log("Play request cancelled: another track took over during fetch.");
+                return;
+            }
+
             // Update metadata states in storage
             if (album_tracks_state && album_tracks_state.length > 0) {
                 await AsyncStorage.setItem("current-tracks", JSON.stringify(album_tracks_state));
@@ -207,23 +227,25 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
             }
             
             // 2. CONTEXT RESET - Clear track errors and clean state only after network resolving finishes
-            try {
-                const activeTrackInd = await TrackPlayer.getActiveTrackIndex();
-                if (activeTrackInd != null) {
-                    const activeTrack = await TrackPlayer.getTrack(activeTrackInd);
-                    const newContext = album_track_state.playlist_name || album_track_state.album_name;
-                    const activeContext = activeTrack?.playlist_name || activeTrack?.album_name;
-                    
-                    if (newContext && activeContext && newContext !== activeContext) {
-                        console.log('Context switch: Resetting player engine to load new context sequence.');
+            if (!existsInQueue) {
+                try {
+                    const activeTrackInd = await TrackPlayer.getActiveTrackIndex();
+                    if (activeTrackInd != null) {
+                        const activeTrack = await TrackPlayer.getTrack(activeTrackInd);
+                        const newContext = album_track_state.playlist_name || album_track_state.album_name;
+                        const activeContext = activeTrack?.playlist_name || activeTrack?.album_name;
+                        
+                        if (newContext && activeContext && newContext !== activeContext) {
+                            console.log('Context switch: Resetting player engine to load new context sequence.');
+                            await TrackPlayer.reset();
+                        }
+                    } else {
                         await TrackPlayer.reset();
                     }
-                } else {
+                } catch (e) {
+                    console.log('Context evaluation dropped into error state. Executing fallback reset:', e);
                     await TrackPlayer.reset();
                 }
-            } catch (e) {
-                console.log('Context evaluation dropped into error state. Executing fallback reset:', e);
-                await TrackPlayer.reset();
             }
 
             // 3. EXECUTE PLAYBACK - Instantly skips to the target pre-cached song
@@ -231,6 +253,9 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
 
         } catch (globalError) {
             console.error("Playback execution failed:", globalError);
+            if (!existsInQueue && !is_real_dl) {
+                setLoadingTrackId(null);
+            }
         } finally {
             setIsSongLoading(false);
         }

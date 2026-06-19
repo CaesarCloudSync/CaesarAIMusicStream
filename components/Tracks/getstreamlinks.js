@@ -39,7 +39,8 @@ export const getyoutubelink  = async (album_track,download=false,init_index=0) =
 }
     catch(error){
         console.log("error in getyoutubelink",error)
-        Alert.alert(`${searchquery} Error fetching stream link in GetYoutubeLink.`,response.data.error)
+        const errorMessage = response && response.data && response.data.error ? response.data.error : error.message;
+        console.warn(`${searchquery} Error fetching stream link in GetYoutubeLink:`, errorMessage)
         return [undefined,undefined]
     }
 }
@@ -52,29 +53,57 @@ export const getaudiolink = async (album_track,init_index=0) =>{
     //const proxy_string = proxy_status ? `&proxy=${proxy}` : "";
     let searchquery = `${album_track.name.replace("&","and").replaceAll("$","S").replace("#","")} by ${album_track.artist.replace("¥$","Kanye West").replaceAll("$","S")}`//hoodie szn a boogie wit da hoodie album 20 tracks
     console.log("video_link",`https://music.caesaraihub.org/api/v2/getaudio?query=${searchquery}`) // ${proxy_string}
-    response = await axios.get(`https://music.caesaraihub.org/api/v2/getaudio?query=${searchquery}`) // ${proxy_string}
+    response = await axios.get(`https://music.caesaraihub.org/api/v2/getaudio?query=${searchquery}`, { timeout: 10000 }) // ${proxy_string}
     let songurl = response.data.streaming_url
     let title = response.data.title
-    return [songurl,title]
+    if (!songurl) {
+        // Successful API call but no streaming url returned
+        const isRestricted = response.data && response.data.error && (
+            response.data.error.toLowerCase().includes("restricted") ||
+            response.data.error.toLowerCase().includes("copyright") ||
+            response.data.error.toLowerCase().includes("unavailable") ||
+            response.data.error.toLowerCase().includes("block") ||
+            response.data.error.toLowerCase().includes("sign in") ||
+            response.data.error.toLowerCase().includes("age")
+        );
+        return [undefined, undefined, !isRestricted];
+    }
+    return [songurl,title,false]
     }
     catch(error){
         console.log("error in getaudiolink",error)
-        Alert.alert("Error fetching audio link in GetStreamingLink.",response.data.error)
-        return [undefined,undefined]
+        let isTransient = true;
+        if (error.response) {
+            const status = error.response.status;
+            // 4xx errors other than 408 (timeout) and 429 (rate limit) are permanent
+            if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
+                isTransient = false;
+            }
+        } else if (error.request) {
+            // Network error / timeout (request made but no response)
+            isTransient = true;
+        } else {
+            isTransient = true;
+        }
+        const errorMessage = response && response.data && response.data.error ? response.data.error : error.message;
+        console.warn("Error fetching audio link in GetStreamingLink:", errorMessage)
+        return [undefined,undefined,isTransient]
     }
 }
 export const getstreaminglink =async (album_track) =>{
-    let [streaming_link,title] = await getaudiolink(album_track)
+    let [streaming_link,title,isTransient] = await getaudiolink(album_track)
     let start_index = 1;
-    while (streaming_link === undefined){
+    while (streaming_link === undefined && isTransient){
         if (start_index === 3){
             break
         }
-        [streaming_link,title] = await getaudiolink(album_track,init_index=start_index);
+        console.log(`Transient error. Waiting ${start_index}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * start_index));
+        [streaming_link,title,isTransient] = await getaudiolink(album_track,init_index=start_index);
         start_index += 1
     }
     
-    return [streaming_link,title]
+    return [streaming_link,title,isTransient]
 }
 export  const getaudio = async (album_track,setCurrentTrack) =>{
         let [streaming_link,title] = await getstreaminglink(album_track)
