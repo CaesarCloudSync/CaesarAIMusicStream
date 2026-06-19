@@ -14,22 +14,7 @@ import RNBackgroundDownloader, { download, completeHandler } from '@kesha-antono
 
 import axios from "axios";
 
-const downloadListeners = new Set();
-export const subscribeToDownloads = (listener) => {
-    downloadListeners.add(listener);
-    return () => {
-        downloadListeners.delete(listener);
-    };
-};
-export const notifyDownloadChange = (trackKey, status) => {
-    downloadListeners.forEach(listener => {
-        try {
-            listener({ trackKey, status });
-        } catch (e) {
-            console.error("Error in download listener:", e);
-        }
-    });
-};
+
 const get_thumbnail = async (album_id) =>{
   const access_token = await get_access_token();
   const headers = {Authorization: `Bearer ${access_token}`}
@@ -120,7 +105,6 @@ const downloadM3U8 = async (songurl, filePath, notif_title, notif_id, channelId,
 
     // Step 7: Save metadata to AsyncStorage
     await AsyncStorage.setItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`, JSON.stringify(album_track));
-    notifyDownloadChange(`${album_track.artist}-${album_track.album_name}-${name}`, 'done');
     const numofdownloaded = await AsyncStorage.getItem('downloaded_num');
     if (numofdownloaded) {
       const keys = await AsyncStorage.getAllKeys();
@@ -254,7 +238,6 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
           `downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`,
           JSON.stringify(album_track)
         );
-        notifyDownloadChange(`${album_track.artist}-${album_track.album_name}-${name}`, 'done');
 
         // Update download stats (your original logic)
         const allKeys = await AsyncStorage.getAllKeys();
@@ -304,7 +287,6 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
     })
     .error(async (error) => {
       console.log('Download error/canceled:', error);
-      notifyDownloadChange(`${album_track.artist}-${album_track.album_name}-${name}`, 'error');
 
       await notifee.displayNotification({
         id: `err_${notif_id}`,

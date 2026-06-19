@@ -12,23 +12,27 @@ export default function PlaylistCarouselItem({access_token, favouritecards,playl
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-    const singleTap = Gesture.Tap().onEnd((_event,success) =>{
-        if (success){
-            getalbumtracks(`/tracks`)
-        }
-    })
+    const singleTap = Gesture.Tap()
+        .runOnJS(true)
+        .onEnd((_event,success) =>{
+            if (success){
+                getalbumtracks(`/tracks`)
+            }
+        })
     
 
 
-    const longPress = Gesture.LongPress().onStart(async (_event,success) =>{
-        try {
-            let playlist_card = {"name":playlist_name,"id":playlistid,"images":[{"url":thumbnail}],"album_type":album_type}
-            await AsyncStorage.setItem(`playlist-recent-load:${playlist_name}`,JSON.stringify(playlist_card)) 
-            navigate("/search")
-        } catch (e) {
-            console.error("Error in playlist long press:", e);
-        }
-    })
+    const longPress = Gesture.LongPress()
+        .runOnJS(true)
+        .onStart(async (_event,success) =>{
+            try {
+                let playlist_card = {"name":playlist_name,"id":playlistid,"images":[{"url":thumbnail}],"album_type":album_type}
+                await AsyncStorage.setItem(`playlist-recent-load:${playlist_name}`,JSON.stringify(playlist_card)) 
+                navigate("/search")
+            } catch (e) {
+                console.error("Error in playlist long press:", e);
+            }
+        })
     
     const navigate = useNavigate();
 

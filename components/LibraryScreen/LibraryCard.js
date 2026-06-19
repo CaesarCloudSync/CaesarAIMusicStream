@@ -22,19 +22,26 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
     useEffect(() =>{
         check_downloaded()
     },[])
-    const singleTap = Gesture.Tap().onEnd((_event,success) =>{
-        if (success){
-            getalbumtracks(`/tracks`)
-        }
-    })
-    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
-        if (success){
-            getalbumtracks("/artistprofile")
-        }
-    })
-    const longPress = Gesture.LongPress().onStart(async (_event,success) =>{
-        await removefromlibrary()
-    })
+    const singleTap = Gesture.Tap()
+        .runOnJS(true)
+        .onEnd((_event,success) =>{
+            if (success){
+                getalbumtracks(`/tracks`)
+            }
+        })
+    const doubleTap = Gesture.Tap()
+        .numberOfTaps(2)
+        .runOnJS(true)
+        .onEnd((_event,success) =>{
+            if (success){
+                getalbumtracks("/artistprofile")
+            }
+        })
+    const longPress = Gesture.LongPress()
+        .runOnJS(true)
+        .onStart(async (_event,success) =>{
+            await removefromlibrary()
+        })
 
 
     const navigate = useNavigate();

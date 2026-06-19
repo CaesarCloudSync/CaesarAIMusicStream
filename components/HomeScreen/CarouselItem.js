@@ -9,39 +9,42 @@ import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gestu
 
 export default function CarouselItem({spotifyid,access_token,favouritecards,thumbnail,album_name,artist_name,total_tracks,release_date,album_type,toptrack,recentalbums,setRecentAlbums,single}){
     const [addingtolibrary,setAddingToLibrary] = useState(false);
-    const singleTap = Gesture.Tap().onEnd((_event,success) =>{
-        if (success){
-            getalbumtracks(`/tracks`)
-        }
-    })
+    const singleTap = Gesture.Tap()
+        .runOnJS(true)
+        .onEnd((_event,success) =>{
+            if (success){
+                getalbumtracks(`/tracks`)
+            }
+        })
     const flingleft = Gesture.Fling()
-    .direction(Directions.LEFT )
-    .onEnd((event) => {
-        addtolibrary()
-        /*setTimeout(() =>{
-            //console.log("jo")
-            
-        },300) */  })
+        .direction(Directions.LEFT )
+        .runOnJS(true)
+        .onEnd((event) => {
+            addtolibrary()
+        })
 
-    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
-        if (success){
-            getalbumtracks("/artistprofile")
-        }
-    })
-    const longPress = Gesture.LongPress().onStart(async (_event,success) =>{
-        if (recentalbums){
-            await AsyncStorage.removeItem(`album-recent-load:${artist_name}_${album_name}`)
-            let leftoveralbums = recentalbums.filter(obj => {return((obj.name !== album_name))});
-            setRecentAlbums(leftoveralbums)
-        }
-        else{
-
-        //  favouritecards={favouritecards} spotifyid={album.id}thumbnail={album.images[0].url} album_name={album.name} artist_name={album.artists[0].name} total_tracks={album.total_tracks} release_date={album.release_date} album_type={album.album_type}
-        let album_card = {"name":album_name,"id":spotifyid,"images":[{"url":thumbnail}],"artists":[{"name":artist_name}],"album_type":album_type}
-        await AsyncStorage.setItem(`album-recent-load:${artist_name}_${album_name}`,JSON.stringify(album_card)) 
-        navigate("/search")
-        }
-    })
+    const doubleTap = Gesture.Tap()
+        .numberOfTaps(2)
+        .runOnJS(true)
+        .onEnd((_event,success) =>{
+            if (success){
+                getalbumtracks("/artistprofile")
+            }
+        })
+    const longPress = Gesture.LongPress()
+        .runOnJS(true)
+        .onStart(async (_event,success) =>{
+            if (recentalbums){
+                await AsyncStorage.removeItem(`album-recent-load:${artist_name}_${album_name}`)
+                let leftoveralbums = recentalbums.filter(obj => {return((obj.name !== album_name))});
+                setRecentAlbums(leftoveralbums)
+            }
+            else{
+                let album_card = {"name":album_name,"id":spotifyid,"images":[{"url":thumbnail}],"artists":[{"name":artist_name}],"album_type":album_type}
+                await AsyncStorage.setItem(`album-recent-load:${artist_name}_${album_name}`,JSON.stringify(album_card)) 
+                navigate("/search")
+            }
+        })
     
     // addtolibrary()
     const navigate = useNavigate();

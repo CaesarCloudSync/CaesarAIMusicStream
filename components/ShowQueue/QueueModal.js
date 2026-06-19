@@ -7,7 +7,7 @@ import TrackPlayer, {
   Event,
   State
 } from 'react-native-track-player';
-import { TouchableOpacity, Image } from "react-native";
+import { TouchableOpacity as RNTouchableOpacity, Image } from "react-native";
 import { autoplaynextsong, get_recommended_songs, getLoadingTrackId, subscribeToLoadingTrack, is_track_restricted, getNextSessionId, getCurrentSessionId } from "../controls/controls";
 import { getstreaminglink } from "../Tracks/getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,7 +15,7 @@ import { skipToTrack } from "../controls/controls";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { getrecommendations } from "../Tracks/getrecommendations";
 import Entypo from 'react-native-vector-icons/Entypo';
-import { GestureDetector, Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
+import { GestureDetector, Gesture, GestureHandlerRootView, TouchableOpacity } from "react-native-gesture-handler";
 import { SectionList } from "react-native";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { prefetchsong } from "../controls/controls";
@@ -66,17 +66,24 @@ function RecommendTrackItem({
     }
   };
 
-  const togglemultiplaylistselectlongPress = Gesture.LongPress().onStart(async () => {
-    await resolveAndToggleMultiSelect();
-  });
+  const togglemultiplaylistselectlongPress = Gesture.LongPress()
+    .runOnJS(true)
+    .onStart(async () => {
+      await resolveAndToggleMultiSelect();
+    });
 
-  const showplaylistoptionsdoubleTap = Gesture.Tap().numberOfTaps(2).onEnd(() => {
-    setPlaylistModalVisible(true);
-  });
+  const showplaylistoptionsdoubleTap = Gesture.Tap()
+    .numberOfTaps(2)
+    .runOnJS(true)
+    .onEnd(() => {
+      setPlaylistModalVisible(true);
+    });
 
-  const toggleaddplaylistselectsinglePress = Gesture.Tap().onEnd(async () => {
-    await resolveAndSinglePress();
-  });
+  const toggleaddplaylistselectsinglePress = Gesture.Tap()
+    .runOnJS(true)
+    .onEnd(async () => {
+      await resolveAndSinglePress();
+    });
 
   const isLoading = loadingItemId === item.title;
 
@@ -254,6 +261,12 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
       
       if (sessionId !== await getCurrentSessionId()) return;
 
+      if (!nextsong_recommend) {
+        console.log("Recommended song was not resolved, removing from recommendations list.");
+        await removefromrecommend(nextsongyt);
+        return;
+      }
+
       const is_restricted = await is_track_restricted(nextsong_recommend);
       if (is_restricted) {
         console.log("Recommended song is restricted, skipping without accessing:", nextsong_recommend.name);
@@ -282,6 +295,8 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
 
       await removefromrecommend(nextsongyt)
       await repopulaterecommendations()
+    } catch (err) {
+      console.error("Error playing recommended song:", err);
     } finally {
       if (sessionId === await getCurrentSessionId()) {
         setLoadingItemId(null);
@@ -658,7 +673,7 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
                 {customAlert.buttons.map((btn, idx) => {
                   const isCancel = btn.style === "cancel" || btn.text.toLowerCase() === "cancel";
                   return (
-                    <TouchableOpacity
+                    <RNTouchableOpacity
                       key={idx}
                       onPress={() => {
                         setCustomAlert(null);
@@ -680,7 +695,7 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
                         fontSize: 15,
                         fontWeight: "600"
                       }}>{btn.text}</Text>
-                    </TouchableOpacity>
+                    </RNTouchableOpacity>
                   );
                 })}
               </View>

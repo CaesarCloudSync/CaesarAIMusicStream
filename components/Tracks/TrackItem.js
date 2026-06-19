@@ -7,7 +7,7 @@ import { getTableNames } from "../SQLDB/SQLDB";
 import Entypo from "react-native-vector-icons/Entypo";
 import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
-import { check_if_failed_download, downloadFile, subscribeToDownloads, notifyDownloadChange } from "./DownloadSong";
+import { check_if_failed_download, downloadFile } from "./DownloadSong";
 import TrackPlayer, { RepeatMode } from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
@@ -48,53 +48,67 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
         navigate("/artistprofile", { state: { "album_tracks": [album_track_state] } });
     };
 
-    const singleTap = Gesture.Tap().onEnd((_event, success) => {
-        if (success) {
-            playnowsong();
-        }
-    });
+    const singleTap = Gesture.Tap()
+        .runOnJS(true)
+        .onEnd((_event, success) => {
+            if (success) {
+                playnowsong();
+            }
+        });
 
-    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event, success) => {
-        if (success) {
-            if (playlist_details) {
-                if (!album_track_state.ytcustom) {
-                    navartistprofileplaylist();
+    const doubleTap = Gesture.Tap()
+        .numberOfTaps(2)
+        .runOnJS(true)
+        .onEnd((_event, success) => {
+            if (success) {
+                if (playlist_details) {
+                    if (!album_track_state.ytcustom) {
+                        navartistprofileplaylist();
+                    }
                 }
             }
-        }
-    });
+        });
 
-    const longPress = Gesture.LongPress().onStart(async (_event, success) => {
-        if (playlist_details) { removetrackfromplaylist(); }
-    });
+    const longPress = Gesture.LongPress()
+        .runOnJS(true)
+        .onStart(async (_event, success) => {
+            if (playlist_details) { removetrackfromplaylist(); }
+        });
 
     const [addingqueue, setAddingQueue] = useState(false);
 
-    const togglemultiplaylistselectlongPress = Gesture.LongPress().onStart(async (_event, success) => {
-        if (multiplaylistselect === false) {
-            setMultiplePlaylistSelect(true);
-            setTrackForPlaylist([album_track_state]);
-        } else {
-            setMultiplePlaylistSelect(false);
-            setTrackForPlaylist([]);
-        }
-    });
-
-    const showplaylistoptionsdoubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event, success) => {
-        handleModal();
-    });
-
-    const toggleaddplaylistselectsinglePress = Gesture.Tap().onEnd(async (_event, success) => {
-        if (multiplaylistselect === false) {
-            showplaylistoptions();
-        } else {
-            if (trackforplaylist !== undefined && trackforplaylist.some(item => item.name === album_track_state.name)) {
-                setTrackForPlaylist(trackforplaylist.filter(item => item.name !== album_track_state.name));
+    const togglemultiplaylistselectlongPress = Gesture.LongPress()
+        .runOnJS(true)
+        .onStart(async (_event, success) => {
+            if (multiplaylistselect === false) {
+                setMultiplePlaylistSelect(true);
+                setTrackForPlaylist([album_track_state]);
             } else {
-                addplaylisttomultiselect();
+                setMultiplePlaylistSelect(false);
+                setTrackForPlaylist([]);
             }
-        }
-    });
+        });
+
+    const showplaylistoptionsdoubleTap = Gesture.Tap()
+        .numberOfTaps(2)
+        .runOnJS(true)
+        .onEnd((_event, success) => {
+            handleModal();
+        });
+
+    const toggleaddplaylistselectsinglePress = Gesture.Tap()
+        .runOnJS(true)
+        .onEnd(async (_event, success) => {
+            if (multiplaylistselect === false) {
+                showplaylistoptions();
+            } else {
+                if (trackforplaylist !== undefined && trackforplaylist.some(item => item.name === album_track_state.name)) {
+                    setTrackForPlaylist(trackforplaylist.filter(item => item.name !== album_track_state.name));
+                } else {
+                    addplaylisttomultiselect();
+                }
+            }
+        });
 
     function timeout(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -106,6 +120,7 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
 
     const flingleft = Gesture.Fling()
         .direction(Directions.LEFT)
+        .runOnJS(true)
         .onEnd(async (event) => {
             setAddingQueue(true);
             const queue = await AsyncStorage.getItem("queue");
@@ -306,7 +321,6 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
             await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg`);
         } catch { }
         await AsyncStorage.removeItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
-        notifyDownloadChange(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`, 'removed');
         await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
         const numofdownloaded = await AsyncStorage.getItem("downloaded_num");
         if (numofdownloaded) {
@@ -346,14 +360,14 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
     useEffect(() => {
         check_is_downloaded();
         check_downloaded();
-        const unsubscribe = subscribeToDownloads((event) => {
-            const trackKey = `${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`;
-            if (event.trackKey === trackKey || event.trackKey === 'all') {
-                check_is_downloaded();
-                check_downloaded();
-            }
-        });
-        return unsubscribe;
+    }, [album_track_state]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            check_is_downloaded();
+            check_downloaded();
+        }, 2000);
+        return () => clearInterval(interval);
     }, [album_track_state]);
 
     return (

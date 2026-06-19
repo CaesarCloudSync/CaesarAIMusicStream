@@ -7,24 +7,28 @@ import { TouchableHighlight} from "react-native";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function ArtistCarouselItem({artist_id,artist_name,thumbnail,favouritecards,setRecentRemoved,recent_removed}){
-    const singleTap = Gesture.Tap().onEnd((_event,success) =>{
-        if (success){
-            navartistprofile()
-        }
-    })
-    const longPress = Gesture.LongPress().onStart((_event,success) =>{
-        setTimeout(async () =>{
-            if (setRecentRemoved !== undefined){
-            await AsyncStorage.removeItem(`artist:${artist_name}`);
-            if (recent_removed === true){
-                setRecentRemoved(false)
+    const singleTap = Gesture.Tap()
+        .runOnJS(true)
+        .onEnd((_event,success) =>{
+            if (success){
+                navartistprofile()
             }
-            else{
-                setRecentRemoved(true)
-            }
-            }
-        },300)
-    })
+        })
+    const longPress = Gesture.LongPress()
+        .runOnJS(true)
+        .onStart((_event,success) =>{
+            setTimeout(async () =>{
+                if (setRecentRemoved !== undefined){
+                await AsyncStorage.removeItem(`artist:${artist_name}`);
+                if (recent_removed === true){
+                    setRecentRemoved(false)
+                }
+                else{
+                    setRecentRemoved(true)
+                }
+                }
+            },300)
+        })
 
 
     const navigate = useNavigate();
