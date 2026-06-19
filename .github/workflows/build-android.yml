@@ -86,7 +86,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to GitHub Releases (main branch → latest)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/CaesarAIMusicStreamV0-STABLE'
         uses: ncipollo/release-action@v1
         with:
           artifacts: "android/app/build/outputs/apk/release/CaesarAIMusic-latest.apk"
