@@ -69,7 +69,7 @@ export default function LibraryScreen(){
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
             {/*Header */}
-            <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
+            <View  style={{flex:0.08,flexDirection:"row",backgroundColor:"#141212"}}>
                     <View style={{flex:1,margin:10}}>
                     <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
                     

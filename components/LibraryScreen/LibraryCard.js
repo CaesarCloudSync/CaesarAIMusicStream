@@ -5,6 +5,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+import RNFS from "react-native-fs";
+import { convertToValidFilename } from "../tool/tools";
+
 export default function LibraryCard({album,index,setLibraryChanged,librarychanged}){
     //console.log(album)
     const [isDownloaded,setIsDownloaded] = useState(false);
@@ -56,7 +59,14 @@ export default function LibraryCard({album,index,setLibraryChanged,librarychange
         <View   style={{backgroundColor:"#141212",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
             <GestureDetector  gesture={Gesture.Exclusive(longPress,doubleTap,singleTap)}>
             <View style={{flexDirection:"row",flex:1}}>
-            <Image style={{borderRadius:5,width: 50, height: 50}} source={{uri:album[0].thumbnail}}></Image>
+            <Image 
+                style={{borderRadius:5,width: 50, height: 50}} 
+                source={{
+                    uri: !isDownloaded 
+                        ? album[0].thumbnail 
+                        : `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album[0].artist}-${album[0].album_name}-${album[0].name}`)}.jpg`
+                }}
+            />
             <Text style={{color:"white",width:500,position:"relative",top:15,left:10}}>
                     {album[0].album_name} | {album[0].artist}
             </Text>

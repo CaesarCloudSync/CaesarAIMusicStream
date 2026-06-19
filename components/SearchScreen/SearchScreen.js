@@ -590,11 +590,6 @@ export default function Search({seek, setSeek}){
             ) : (
                 /* Default View (Recent Artists, Browse All Genres) */
                 <ScrollView key="search-default-scrollview" removeClippedSubviews={true} style={{flex:1,backgroundColor:"#141212"}}>
-                    {recentalbums.length > 0 && access_token !== ""  && 
-                    <View>
-                    <Text  style={{marginLeft:10}}>Recent Albums</Text>
-                    <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={recentalbums} recentalbums={recentalbums} setRecentAlbums={setRecentAlbums}/>
-                    </View>}
 
                     {recent_artists.length > 0 && access_token !== "" && (
                         <View style={{width: "100%", marginBottom: 6, paddingHorizontal: 14}}>
@@ -705,7 +700,7 @@ export default function Search({seek, setSeek}){
         return(
             <View style={{flex:1,backgroundColor:"#141212"}}>
                 {/*Header */}
-                <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
+                <View  style={{flex:0.08,flexDirection:"row",backgroundColor:"#141212"}}>
                     <View style={{flex:1,margin:10}}>
                     <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
                     

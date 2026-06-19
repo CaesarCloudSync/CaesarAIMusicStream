@@ -9,9 +9,14 @@ export async function getrecommendations(current_track,max_songs=10){
         const track_name = current_track.title;
         // Simple recommendation logic based on artist and track name
         const song_query = `${track_name} by ${artist}`;
-        const reponse = await axios.get(`https://caesaraimusicrecommend-662756251108.us-central1.run.app/api/v1/get_recommendations?song_query=${encodeURIComponent(song_query)}&max_songs=${max_songs}`);
-        let results = reponse.data.music;
-        return results;
+        try {
+            const reponse = await axios.get(`https://caesaraimusicrecommend-662756251108.us-central1.run.app/api/v1/get_recommendations?song_query=${encodeURIComponent(song_query)}&max_songs=${max_songs}`, { timeout: 60000 });
+            let results = reponse.data.music;
+            return results || [];
+        } catch (error) {
+            console.warn("getrecommendations failed or timed out:", error.message);
+            return [];
+        }
     }
     else{
         return null
@@ -23,9 +28,14 @@ export const getrecommendation = async (current_track) =>{
         const track_name = current_track.title;
         // Simple recommendation logic based on artist and track name
         const song_query = `${track_name} by ${artist}`;
-        const reponse = await axios.get(`https://caesaraimusicrecommend-662756251108.us-central1.run.app/api/v1/get_recommendation?song_query=${encodeURIComponent(song_query)}`);
-        let results = reponse.data.music[0];
-        return results;
+        try {
+            const reponse = await axios.get(`https://caesaraimusicrecommend-662756251108.us-central1.run.app/api/v1/get_recommendation?song_query=${encodeURIComponent(song_query)}`, { timeout: 60000 });
+            let results = reponse.data.music[0];
+            return results || null;
+        } catch (error) {
+            console.warn("getrecommendation failed or timed out:", error.message);
+            return null;
+        }
     }
     else{
         return null
@@ -69,10 +79,11 @@ export const searchsongsrecommend = async (song_name, artist_name) =>{
   
         //toggleModal()
         }
-        catch{
-            console.warn("The songs query string is probably not read correcly by searchsongsrecommend /search. Likely Odd characteers. ")
+        catch(error){
+            console.warn("The songs query string is probably not read correcly by searchsongsrecommend /search. Likely Odd characteers. Error: ", error.message)
             // For now just removing the song until I fully fix it.
             const recommend_songs = await get_recommended_songs();
             await remove_recommend_next_played(recommend_songs);
+            return [null, []];
         }
     }
