@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ActivityIndicator, Button, FlatList, StatusBar, StyleSheet, Text, View, Modal as RNModal } from "react-native";
+import { TrackDTO } from "../DTO/TrackDTO";
 import Modal from "react-native-modal";
 import TrackPlayer, {
   useTrackPlayerEvents,
@@ -197,7 +198,12 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
 
   useEffect(() => {
     const unsubscribe = subscribeToLoadingTrack((trackId) => {
-      setGlobalLoadingTrackId(trackId);
+      setGlobalLoadingTrackId(prev => {
+        if (prev !== trackId) {
+          return trackId;
+        }
+        return prev;
+      });
     });
     return unsubscribe;
   }, []); // subscribe once on mount, clean up on unmount

@@ -14,6 +14,7 @@ import { getstreaminglink } from "./getstreamlinks";
 import { Gesture, GestureDetector, Swipeable, Directions } from "react-native-gesture-handler";
 
 import { prefetchsong, skipToTrack, getLoadingTrackId, subscribeToLoadingTrack, setLoadingTrackId } from "../controls/controls";
+import { TrackDTO } from "../DTO/TrackDTO";
 import { useNavigate } from "react-router-native";
 import RNFS from "react-native-fs";
 import axios from "axios";
@@ -34,7 +35,13 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
     useEffect(() => {
         if (!album_track_state) return;
         const unsubscribe = subscribeToLoadingTrack((trackId) => {
-            setIsSongLoading(trackId === album_track_state.id && !isDownloaded);
+            const shouldBeLoading = trackId === album_track_state.id && !isDownloaded;
+            setIsSongLoading(prev => {
+                if (prev !== shouldBeLoading) {
+                    return shouldBeLoading;
+                }
+                return prev;
+            });
         });
         return unsubscribe;
     }, [album_track_state?.id, isDownloaded]);

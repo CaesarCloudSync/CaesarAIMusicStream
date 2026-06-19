@@ -61,6 +61,15 @@
     "react-test-renderer": "18.1.0"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupFiles": [
+      "./jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-native|@react-native|react-native-track-player|@kesha-antonov|react-native-volume-manager|react-native-gesture-handler|@notifee|axios|react-native-ytdl|react-native-storage|react_native_mqtt|react-native-scoped-storage|react-router-native|react-router|react-native-vector-icons|@rneui/base|react-native-ratings|react-native-size-matters|react-native-modal|react-native-animatable|react-native-elements)/)"
+    ]
   }
 }

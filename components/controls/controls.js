@@ -1,4 +1,5 @@
 import { getstreaminglink } from "../Tracks/getstreamlinks"
+import { TrackDTO } from "../DTO/TrackDTO"
 
 let loadingTrackId = null;
 const loadingListeners = new Set();
@@ -179,75 +180,60 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             let thumbnail = !use_local ? nextsong.ytcustom ? nextsong.thumbnail : await get_thumbnail(nextsong.album_id) : `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.jpg`
             const streaming_type = streaming_link.includes(".m3u8") ? "hls" : "default"
             const track_duration = (typeof nextsong.duration_ms === 'number' && !isNaN(nextsong.duration_ms)) ? nextsong.duration_ms / 1000 : 0;
-            if ("playlist_thumbnail" in nextsong && !("playlist_local" in nextsong)){
-                await TrackPlayer.add([{playlist_thumbnail:nextsong.playlist_thumbnail,playlist_id:nextsong.playlist_id,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:track_duration,mediastatus:"online",type:streaming_type}]);
-                await TrackPlayer.add([{playlist_thumbnail:nextsong.playlist_thumbnail,playlist_id:nextsong.playlist_id,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id + "dummy",url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:track_duration,mediastatus:"online",type:streaming_type}]);
-                await TrackPlayer.skip(queue.length)
-                let music_connected =  await AsyncStorage.getItem("music_connected")
-                if (!music_connected){
-                await TrackPlayer.setVolume(1)
-                //TrackPlayer.setRate(1)
-                await TrackPlayer.play()
-                }
-            }
-            else if ("playlist_local" in nextsong){
-                await TrackPlayer.add([{playlist_local:nextsong.playlist_local,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:track_duration,mediastatus:"online",type:streaming_type}]);
-                await TrackPlayer.add([{playlist_local:nextsong.playlist_local,playlist_name:nextsong.playlist_name,index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id + "dummy",url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:track_duration,mediastatus:"online",type:streaming_type}]);
-                await TrackPlayer.skip(queue.length)
-                let music_connected =  await AsyncStorage.getItem("music_connected")
-                if (!music_connected){
-                await TrackPlayer.setVolume(1)
-                //TrackPlayer.setRate(1)mp3
-                await TrackPlayer.play()
-                }
-
-            }
-            else{
-                console.log("nextsong",nextsong)
             
-            await TrackPlayer.add([{index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id,url:streaming_link,title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:track_duration,mediastatus:"online",type:streaming_type}]);
-            await TrackPlayer.add([{index:player_ind,album_id:nextsong.album_id,album:nextsong.album_name,album_name:nextsong.album_name,thumbnail:thumbnail,isActive:true,id:nextsong.id + "dummy",url:"dummy",title:nextsong.name,artist_id:nextsong.artist_id,artist:nextsong.artist,artwork:thumbnail,duration:track_duration,mediastatus:"online",type:streaming_type}]);
-            await TrackPlayer.skip(queue.length)
-            let music_connected =  await AsyncStorage.getItem("music_connected")
-            if (!music_connected){
-            await TrackPlayer.setVolume(1)
-            //TrackPlayer.setRate(1)
-            await TrackPlayer.play()
+            const trackDto = TrackDTO.fromStorage(nextsong) || TrackDTO.fromSpotify(nextsong);
+            trackDto.streamingLink = streaming_link;
+            trackDto.thumbnail = thumbnail;
+            if (track_duration) {
+                trackDto.durationMs = track_duration * 1000;
             }
-        }
-        // music_connected broadcast — only send a remote URL.
-        // If the track is a real local download, keep playing locally and do NOT
-        // re-fetch from the backend; just broadcast the streaming URL for the
-        // remote receiver separately.
-        let music_connected = await AsyncStorage.getItem("music_connected")
-        if (music_connected){
-            // Only hit the backend if the local file is NOT being used
-            const send_url = use_local
-                ? (await getstreaminglink(nextsong))[0]   // remote gets stream; local device keeps file
-                : streaming_link;
-            const send_thumbnail = use_local && !nextsong.ytcustom
-                ? await get_thumbnail(nextsong.album_id)
-                : thumbnail;
-            nextsong.url = send_url;
-            nextsong.thumbnail = send_thumbnail || "";
-            nextsong.volume = (await VolumeManager.getVolume()).volume;
-            await AsyncStorage.setItem("music_connect_next_track", JSON.stringify(nextsong));
-            await sendmusicconnect();
-        }
-        
-        const queue_current_track = await AsyncStorage.getItem(`queue-current-track-${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`);
-        if (queue_current_track){
-            await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
-            await AsyncStorage.setItem("current-tracks",queue_current_track);
-        }
-        const recommend_current_track = await AsyncStorage.getItem(`current-recommend-sp`);
-        console.log("recommend_current_track",recommend_current_track)
-        if (recommend_current_track){
-            await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
-            await AsyncStorage.setItem("current-tracks",recommend_current_track);
-            await AsyncStorage.removeItem("current-recommend-sp");
-        }
-
+            
+            const playerTrack = trackDto.toTrackPlayer();
+            playerTrack.index = player_ind;
+            const dummyTrack = { ...playerTrack, id: playerTrack.id + "dummy", url: "dummy" };
+            
+            await TrackPlayer.add([playerTrack]);
+            await TrackPlayer.add([dummyTrack]);
+            await TrackPlayer.skip(queue.length);
+            
+            let music_connected = await AsyncStorage.getItem("music_connected");
+            if (!music_connected){
+                await TrackPlayer.setVolume(1);
+                await TrackPlayer.play();
+            }
+            
+            // music_connected broadcast — only send a remote URL.
+            // If the track is a real local download, keep playing locally and do NOT
+            // re-fetch from the backend; just broadcast the streaming URL for the
+            // remote receiver separately.
+            let music_connected_val = await AsyncStorage.getItem("music_connected")
+            if (music_connected_val){
+                // Only hit the backend if the local file is NOT being used
+                const send_url = use_local
+                    ? (await getstreaminglink(nextsong))[0]   // remote gets stream; local device keeps file
+                    : streaming_link;
+                const send_thumbnail = use_local && !nextsong.ytcustom
+                    ? await get_thumbnail(nextsong.album_id)
+                    : thumbnail;
+                nextsong.url = send_url;
+                nextsong.thumbnail = send_thumbnail || "";
+                nextsong.volume = (await VolumeManager.getVolume()).volume;
+                await AsyncStorage.setItem("music_connect_next_track", JSON.stringify(nextsong));
+                await sendmusicconnect();
+            }
+            
+            const queue_current_track = await AsyncStorage.getItem(`queue-current-track-${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`);
+            if (queue_current_track){
+                await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
+                await AsyncStorage.setItem("current-tracks",queue_current_track);
+            }
+            const recommend_current_track = await AsyncStorage.getItem(`current-recommend-sp`);
+            console.log("recommend_current_track",recommend_current_track)
+            if (recommend_current_track){
+                await AsyncStorage.setItem("current-track",JSON.stringify(nextsong));
+                await AsyncStorage.setItem("current-tracks",recommend_current_track);
+                await AsyncStorage.removeItem("current-recommend-sp");
+            }
         }
         else{
             var elementPos = queue.findIndex(track => track.id == nextsong.id && track.url !== "dummy")
@@ -288,12 +274,9 @@ export const skipToTrack = async (nextsong,player_ind)=>{
                 await AsyncStorage.setItem("current-tracks",recommend_current_track);
                 await AsyncStorage.removeItem("current-recommend-sp");
             }
-         
-
         }
     } catch (err) {
         console.error("Error in skipToTrack:", err);
-    } finally {
         setLoadingTrackId(null);
     }
 }

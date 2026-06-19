@@ -12,7 +12,6 @@ import { getstreaminglink } from "./getstreamlinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import ShowQueue from "../ShowQueue/showqueue";
-import { ImageManipulator } from 'expo';
 import PlaylistModal from "../PlaylistModal/playlistmodal";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import { check_if_failed_download, downloadFile, notifyDownloadChange } from "./DownloadSong";

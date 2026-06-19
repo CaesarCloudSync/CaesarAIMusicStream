@@ -15,7 +15,7 @@ import Search from './components/SearchScreen/SearchScreen';
 import LibraryScreen from './components/LibraryScreen/LibraryScreen';
 import Tracks from './components/Tracks/Tracks';
 import { useCallback } from 'react';
-import { connectToDatabase,createTables } from "../SQLDB/SQLDB";
+import { connectToDatabase,createTables } from "./components/SQLDB/SQLDB";
 import ArtistProfile from './components/ArtistProfile/ArtistProfile';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import PlaylistScreen from './components/PlaylistsScreen/PlaylistScreen';

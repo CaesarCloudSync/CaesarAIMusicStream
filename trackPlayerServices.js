@@ -3,6 +3,7 @@ import TrackPlayer, {
   Capability,
   RepeatMode,
   Event,
+  State,
 } from 'react-native-track-player';
 //import { Dirs, FileSystem } from 'react-native-file-access';
 import { getstreaminglink } from './components/Tracks/getstreamlinks';
@@ -20,8 +21,9 @@ import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downl
 import RNFS from 'react-native-fs';
 import { VolumeManager } from 'react-native-volume-manager';
 import { sendmusicconnect } from './components/mqttclient/mqttclient';
-import { get_next_ind_in_album,get_next_song,get_track_after_queue,get_new_queue,play_next_queued_song,prefetchsong,getLoadingTrackId } from './components/controls/controls';
+import { get_next_ind_in_album,get_next_song,get_track_after_queue,get_new_queue,play_next_queued_song,prefetchsong,getLoadingTrackId,setLoadingTrackId } from './components/controls/controls';
 import { getrecommendations, searchsongsrecommend } from './components/Tracks/getrecommendations';
+import { TrackDTO } from './components/DTO/TrackDTO';
 export async function setupPlayer() {
   let isSetup = false;
   try {
@@ -552,6 +554,26 @@ export async function playbackService() {
 
     //
   });
+  TrackPlayer.addEventListener(Event.PlaybackState, async (event) => {
+    console.log('Playback state changed:', event.state);
+    const { state } = event;
+    if (
+      state === State.Playing ||
+      state === State.Paused ||
+      state === State.Ready ||
+      state === State.Stopped ||
+      state === 'playing' ||
+      state === 'paused' ||
+      state === 'ready' ||
+      state === 'stopped'
+    ) {
+      if (getLoadingTrackId() !== null) {
+        console.log('Clearing loading spinner since player state is:', state);
+        setLoadingTrackId(null);
+      }
+    }
+  });
+
   TrackPlayer.addEventListener(Event.PlaybackTrackChanged,() => {
   })
 }
