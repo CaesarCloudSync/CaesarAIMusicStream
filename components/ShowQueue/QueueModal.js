@@ -485,7 +485,7 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
           <View style={styles.modalContent}>
           <View style={styles.center}>
             <View style={[styles.barIcon, { alignSelf: "center" }]} />
-            <View style={{ marginTop: 10, alignSelf: "flex-end" }}>
+            <View style={{ alignSelf: "flex-end" }}>
               <TouchableOpacity onLongPress={() => { stoprecommendshufflemode() }} onPress={() => { if (shufflefetching === false) { recommendshufflemode() } }} >
                 <MaterialIcons name="shuffle-on" size={25} color={recommendationmode === true ? shufflefetching ? "blue" : "green" : shufflefetching ? "blue" : "white"} />
               </TouchableOpacity>
