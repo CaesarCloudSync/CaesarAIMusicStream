@@ -202,26 +202,6 @@ export const renameSpotifyPlaylist = async (spotifyPlaylistId, newName) => {
   }
 };
 
-export const deleteSpotifyPlaylist = async (spotifyPlaylistId) => {
-  try {
-    const token = await getUserAccessToken();
-    const response = await fetch(`https://api.spotify.com/v1/playlists/${spotifyPlaylistId}/followers`, {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-    if (!response.ok) {
-      const data = await response.json();
-      console.error("Error deleting playlist on Spotify:", data?.error?.message || response.statusText);
-      throw new Error(data?.error?.message || response.statusText);
-    }
-  } catch (e) {
-    console.error("deleteSpotifyPlaylist failed:", e);
-    throw e;
-  }
-};
-
 export const syncPlaylistToSpotify = async (playlistName, forceCreate = false) => {
   try {
     const token = await getUserAccessToken();

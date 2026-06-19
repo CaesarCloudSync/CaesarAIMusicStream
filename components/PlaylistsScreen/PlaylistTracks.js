@@ -1,9 +1,9 @@
-import { useEffect, useState,useCallback,useRef } from "react"
-import { View,Text, FlatList,Image, TouchableOpacity,AppState,ActivityIndicator,Alert,Modal as RNModal} from "react-native"
-import { useLocation,useNavigate } from "react-router-native"
+import { useEffect, useState, useCallback, useRef } from "react"
+import { View, Text, FlatList, Image, TouchableOpacity, AppState, ActivityIndicator, Alert, Modal as RNModal } from "react-native"
+import { useLocation, useNavigate } from "react-router-native"
 import TrackItem from "../Tracks/TrackItem"
 import AntDesign from "react-native-vector-icons/AntDesign"
-import TrackPlayer,{ useTrackPlayerEvents ,Event,State,useProgress,RepeatMode} from "react-native-track-player";
+import TrackPlayer, { useTrackPlayerEvents, Event, State, useProgress, RepeatMode } from "react-native-track-player";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import TrackProgress from "../TrackProgress/TrackProgress";
 import { usePlaybackState } from 'react-native-track-player';
@@ -16,44 +16,44 @@ import { requestGalleryWithPermission } from "../Picker/pickerhelper"
 import Feather from "react-native-vector-icons/Feather"
 import { TextInput } from "react-native-gesture-handler"
 import PlaylistModal from "../PlaylistModal/playlistmodal"
-import { GestureDetector,Gesture,TouchableOpacity as GestureTouchableOpacity } from "react-native-gesture-handler"
+import { GestureDetector, Gesture, TouchableOpacity as GestureTouchableOpacity } from "react-native-gesture-handler"
 import { useNetInfo } from "@react-native-community/netinfo"
 import CustomYTModal from "../CustomYTModal/customytmodal"
-import { renameSpotifyPlaylist, deleteSpotifyPlaylist, getSpotifyBackupConfig, syncPlaylistToSpotify, triggerBackupSync, findExistingSpotifyPlaylist } from "../access_token/spotifyBackupHelper";
+import { renameSpotifyPlaylist, getSpotifyBackupConfig, syncPlaylistToSpotify, triggerBackupSync, findExistingSpotifyPlaylist } from "../access_token/spotifyBackupHelper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
- 
-export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSeek}){
+
+export default function PlaylistTracks({ currentTrack, setCurrentTrack, seek, setSeek }) {
 
     const progress = useProgress();
     const location = useLocation();
     const netInfo = useNetInfo();
     const navigate = useNavigate();
-    const [trackforplaylist,setTrackForPlaylist] = useState([]);
-    const [multiplaylistselect,setMultiplePlaylistSelect] = useState(false);
-    const [editingplaylistname,setEditingPlaylistName] = useState(false);
+    const [trackforplaylist, setTrackForPlaylist] = useState([]);
+    const [multiplaylistselect, setMultiplePlaylistSelect] = useState(false);
+    const [editingplaylistname, setEditingPlaylistName] = useState(false);
     const { position, duration } = useProgress(200);
     const playerState = usePlaybackState();
     const isPlaying = playerState === State.Playing;
-    const [playlist_details,setPlaylistDetails] = useState(location.state?.playlist_details || {})
-    const [album_tracks,setAlbumTracks] = useState(location.state?.playlist_tracks || [])
-    const [loadingaudio,setLoadingAudio] = useState(false)
+    const [playlist_details, setPlaylistDetails] = useState(location.state?.playlist_details || {})
+    const [album_tracks, setAlbumTracks] = useState(location.state?.playlist_tracks || [])
+    const [loadingaudio, setLoadingAudio] = useState(false)
     const appState = useRef(AppState.currentState);
     const isInitialMount = useRef(true);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
-    const [final_tracks,setFinalTracks] =useState([])
-    const [hasNavigated,setHasNavigated] = useState([]);
-    const [preload,setPreload] = useState(false);
-    const [totalpromises,setTotalPromises] = useState(0);
-    const [completedpromises,setCompletedPromises] = useState(0);
+    const [final_tracks, setFinalTracks] = useState([])
+    const [hasNavigated, setHasNavigated] = useState([]);
+    const [preload, setPreload] = useState(false);
+    const [totalpromises, setTotalPromises] = useState(0);
+    const [completedpromises, setCompletedPromises] = useState(0);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isTyping,setIsTyping] = useState(false);
-    const [userinput,setUserInput] = useState("");
-    const [filteruserinput,setFilterInput] = useState("");
-    const [playlisttrackremoved,setPlaylistTrackRemoved] = useState(false)
-    const[isfilterTyping,setIsFilterTyping] =useState(false);
-    const [showCustomYTInput,setShowCustomYTInput] = useState(false);
-    const [hasbeenshuffled,setHasBeenShuffled] = useState(false);
-    
+    const [isTyping, setIsTyping] = useState(false);
+    const [userinput, setUserInput] = useState("");
+    const [filteruserinput, setFilterInput] = useState("");
+    const [playlisttrackremoved, setPlaylistTrackRemoved] = useState(false)
+    const [isfilterTyping, setIsFilterTyping] = useState(false);
+    const [showCustomYTInput, setShowCustomYTInput] = useState(false);
+    const [hasbeenshuffled, setHasBeenShuffled] = useState(false);
+
     const [isReorderMode, setIsReorderMode] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [selectedTrackIndex, setSelectedTrackIndex] = useState(null);
@@ -64,7 +64,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
             buttons = [
                 {
                     text: "OK",
-                    onPress: () => {}
+                    onPress: () => { }
                 }
             ];
         }
@@ -79,56 +79,56 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
     };
 
     const handleModal = () => setIsModalVisible(() => !isModalVisible);
-    const shuffletracks = async () =>{
+    const shuffletracks = async () => {
         const shuffled_tracks = album_tracks
-        .map(value => ({ value, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .map(({ value }) => value)
+            .map(value => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value)
         //console.log(shuffled)
-  
+
         await TrackPlayer.reset();
         setHasBeenShuffled(true)
-        await AsyncStorage.setItem(`shuffled-tracks:${playlist_details.playlist_name}`,JSON.stringify(shuffled_tracks))
+        await AsyncStorage.setItem(`shuffled-tracks:${playlist_details.playlist_name}`, JSON.stringify(shuffled_tracks))
         await getplaylist();
-        
+
     }
-    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event,success) =>{
-        if (success){
+    const doubleTap = Gesture.Tap().numberOfTaps(2).onEnd((_event, success) => {
+        if (success) {
             //getalbumtracks("/artistprofile")
             shuffletracks()
         }
     })
-    const longPress = Gesture.LongPress().onStart((_event,success) =>{
+    const longPress = Gesture.LongPress().onStart((_event, success) => {
         setthumbnailimage()
     })
 
-    const filterData = (item,index) =>{
-        if (filteruserinput === ""){
-            return(<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} trackforplaylist={trackforplaylist} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect} />)
+    const filterData = (item, index) => {
+        if (filteruserinput === "") {
+            return (<TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} trackforplaylist={trackforplaylist} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect} />)
         }
-       
-        if (item.name.toLowerCase().includes(filteruserinput.toLowerCase())  || item.artist.toLowerCase().includes(filteruserinput.toLowerCase()) ){
-            return(
+
+        if (item.name.toLowerCase().includes(filteruserinput.toLowerCase()) || item.artist.toLowerCase().includes(filteruserinput.toLowerCase())) {
+            return (
                 <TrackItem index={index} setCurrentTrack={setCurrentTrack} album_track={item} num_of_tracks={album_tracks.length} album_tracks={album_tracks} trackforplaylist={trackforplaylist} setTrackForPlaylist={setTrackForPlaylist} playlist_details={playlist_details} handleModal={handleModal} playlisttrackremoved={playlisttrackremoved} setPlaylistTrackRemoved={setPlaylistTrackRemoved} multiplaylistselect={multiplaylistselect} setMultiplePlaylistSelect={setMultiplePlaylistSelect} />
             )
-        } 
+        }
 
     }
 
 
-    const navartistprofile = async () =>{
+    const navartistprofile = async () => {
         //await AsyncStorage.setItem(`artist:${album_tracks[0].artist_name}`,JSON.stringify({"artist_id":album_tracks[0].artist_id}))
-        navigate("/artistprofile",{state:{"album_tracks":album_tracks}})
+        navigate("/artistprofile", { state: { "album_tracks": album_tracks } })
     }
-    const editplaylistname = async () =>{
+    const editplaylistname = async () => {
 
         // Amend Playlist order values
         let keys = await AsyncStorage.getAllKeys()
-        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track-order:${playlist_details.playlist_name}`))}))
-        const playlist_order = items_order.map((item) =>{return(JSON.parse(item[1]))})
-        const new_playlist_order = playlist_order.map((item) =>{return([ `playlist-track-order:${userinput}-${item.name}`,JSON.stringify(item)])})
+        const items_order = await AsyncStorage.multiGet(keys.filter((key) => { return (key.includes(`playlist-track-order:${playlist_details.playlist_name}`)) }))
+        const playlist_order = items_order.map((item) => { return (JSON.parse(item[1])) })
+        const new_playlist_order = playlist_order.map((item) => { return ([`playlist-track-order:${userinput}-${item.name}`, JSON.stringify(item)]) })
         await AsyncStorage.multiSet(new_playlist_order)
-        await AsyncStorage.multiRemove(album_tracks.map((item) =>{return(`playlist-track-order:${playlist_details.playlist_name}-${item.name}`)}))
+        await AsyncStorage.multiRemove(album_tracks.map((item) => { return (`playlist-track-order:${playlist_details.playlist_name}-${item.name}`) }))
         // Amend playlist values
         const newPlaylistObj = {
             ...playlist_details,
@@ -138,12 +138,12 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         };
         await AsyncStorage.setItem(`playlist:${userinput}`, JSON.stringify(newPlaylistObj))
         //await AsyncStorage.setItem(`playlist-track-order:${playliststate.playlist_name}-${trackforplaylist.name}`,JSON.stringify({"name":trackforplaylist.name,"order":num_of_tracks -1}))
-        let new_playlist_tracks = album_tracks.map((item) =>{item["playlist_name"] = userinput;return([ `playlist-track:${userinput}-${item.name}`,JSON.stringify(item)])})
+        let new_playlist_tracks = album_tracks.map((item) => { item["playlist_name"] = userinput; return ([`playlist-track:${userinput}-${item.name}`, JSON.stringify(item)]) })
         await AsyncStorage.multiSet(new_playlist_tracks)
-        await AsyncStorage.multiRemove(album_tracks.map((item) =>{return(`playlist-track:${playlist_details.playlist_name}-${item.name}`)}))
+        await AsyncStorage.multiRemove(album_tracks.map((item) => { return (`playlist-track:${playlist_details.playlist_name}-${item.name}`) }))
 
-        // Rename on Spotify if it is associated with a Spotify playlist
-        if (playlist_details.spotify_playlist_id) {
+        // Rename on Spotify if backup is enabled
+        if (playlist_details.spotify_backup_enabled && playlist_details.spotify_playlist_id) {
             await renameSpotifyPlaylist(playlist_details.spotify_playlist_id, userinput);
         }
 
@@ -156,13 +156,13 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
 
     }
-    const getplaylist = async () =>{
+    const getplaylist = async () => {
         let keys = await AsyncStorage.getAllKeys()
-        const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${playlist_details.playlist_name}`))}))
+        const items = await AsyncStorage.multiGet(keys.filter((key) => { return (key.includes(`playlist-track:${playlist_details.playlist_name}`)) }))
         console.log("playlist_big")
-        const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
-        const items_order = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track-order:${playlist_details.playlist_name}`))}))
-        const playlist_tracks_order = items_order.map((item) =>{return(JSON.parse(item[1]))})
+        const playlist_tracks = items.map((item) => { return (JSON.parse(item[1])) })
+        const items_order = await AsyncStorage.multiGet(keys.filter((key) => { return (key.includes(`playlist-track-order:${playlist_details.playlist_name}`)) }))
+        const playlist_tracks_order = items_order.map((item) => { return (JSON.parse(item[1])) })
 
         function customSort(a, b) {
             const orderObjA = playlist_tracks_order.find(item => item.name === a.name);
@@ -175,25 +175,25 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
         playlist_tracks.sort(customSort);
         //console.log(final_track_fin)
-        const final_promises = playlist_tracks.map(async (track) =>{
+        const final_promises = playlist_tracks.map(async (track) => {
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${track.artist}-${track.album_name}-${track.name}`);
-            if (track_downloaded){
+            if (track_downloaded) {
                 return (track)
             }
-            else{
+            else {
                 return (undefined)
             }
         })
-        const final_playlist_tracks = netInfo.isInternetReachable === false ? (await Promise.all(final_promises)).filter((track) =>{return(track !== undefined)}) : playlist_tracks  
+        const final_playlist_tracks = netInfo.isInternetReachable === false ? (await Promise.all(final_promises)).filter((track) => { return (track !== undefined) }) : playlist_tracks
         let shuffled_tracks = await AsyncStorage.getItem(`shuffled-tracks:${playlist_details.playlist_name}`)
         //console.log("shuffled",shuffled_tracks)
-        if (shuffled_tracks){
+        if (shuffled_tracks) {
             setHasBeenShuffled(true);
             let shuffled_tracks_json = JSON.parse(shuffled_tracks)
             setAlbumTracks(shuffled_tracks_json)
         }
-        else{
-        setAlbumTracks(final_playlist_tracks)
+        else {
+            setAlbumTracks(final_playlist_tracks)
         }
 
         let playlist_detts = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`)
@@ -216,12 +216,12 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         getplaylist();
     }, [playlisttrackremoved, netInfo, location.state?.playlist_tracks]);
 
-    const setthumbnailimage = async () =>{
+    const setthumbnailimage = async () => {
         const response = await requestGalleryWithPermission();
-        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`,JSON.stringify({"playlist_name":playlist_details.playlist_name,"playlist_thumbnail":response["uri"],"playlist_size":playlist_details.playlist_size}))
-        setPlaylistDetails({...playlist_details,playlist_thumbnail: response["uri"]})
+        await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`, JSON.stringify({ "playlist_name": playlist_details.playlist_name, "playlist_thumbnail": response["uri"], "playlist_size": playlist_details.playlist_size }))
+        setPlaylistDetails({ ...playlist_details, playlist_thumbnail: response["uri"] })
     }
-    const unlockshuffle = async () =>{
+    const unlockshuffle = async () => {
         setHasBeenShuffled(false);
         await AsyncStorage.removeItem(`shuffled-tracks:${playlist_details.playlist_name}`)
         await getplaylist();
@@ -257,7 +257,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
                 }
 
                 const existingPlaylist = await findExistingSpotifyPlaylist(playlist_details.playlist_name);
-                
+
                 if (existingPlaylist) {
                     setIsSyncing(false);
                     showAlert(
@@ -333,51 +333,11 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         }
     };
 
-    const handleBackupLongPress = async () => {
-        if (!playlist_details.spotify_playlist_id) {
-            showAlert("No Spotify Backup", "This playlist is not backed up to Spotify yet.");
-            return;
-        }
-
-        showAlert(
-            "Delete Spotify Backup?",
-            "Are you sure you want to delete this playlist from your Spotify account? This will remove the backup on Spotify, but keep your local tracks.",
-            [
-                {
-                    text: "Delete",
-                    onPress: async () => {
-                        try {
-                            setIsSyncing(true);
-                            await deleteSpotifyPlaylist(playlist_details.spotify_playlist_id);
-                            
-                            const stored = await AsyncStorage.getItem(`playlist:${playlist_details.playlist_name}`);
-                            const parsed = stored ? JSON.parse(stored) : {};
-                            parsed.spotify_backup_enabled = false;
-                            parsed.spotify_playlist_id = null;
-                            await AsyncStorage.setItem(`playlist:${playlist_details.playlist_name}`, JSON.stringify(parsed));
-                            setPlaylistDetails(parsed);
-                            
-                            showAlert("Success", "Spotify playlist backup deleted successfully.");
-                        } catch (err) {
-                            showAlert("Error Deleting Backup", err.message);
-                        } finally {
-                            setIsSyncing(false);
-                        }
-                    }
-                },
-                {
-                    text: "Cancel",
-                    style: "cancel"
-                }
-            ]
-        );
-    };
-
     const moveItem = async (fromIndex, toIndex, position) => {
         if (fromIndex === toIndex) return;
         const newTracks = [...album_tracks];
         const [trackToMove] = newTracks.splice(fromIndex, 1);
-        
+
         let destIndex = toIndex;
         if (fromIndex < toIndex) {
             destIndex = toIndex - 1;
@@ -385,11 +345,11 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
         if (position === 'below') {
             destIndex += 1;
         }
-        
+
         newTracks.splice(destIndex, 0, trackToMove);
         setAlbumTracks(newTracks);
         setSelectedTrackIndex(null);
-        
+
         try {
             const promises = newTracks.map(async (track, index) => {
                 await AsyncStorage.setItem(`playlist-track-order:${playlist_details.playlist_name}-${track.name}`, JSON.stringify({ "name": track.name, "order": index }));
@@ -404,141 +364,140 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
 
 
 
-    return(
-        <View style={{flex:1,backgroundColor:"#141212"}}>
-   
+    return (
+        <View style={{ flex: 1, backgroundColor: "#141212" }}>
+
             {/* Header Arrow */}
-            <View style={{flexDirection:"row", alignItems:"center", paddingHorizontal: 15, paddingTop: 4}}>
-                <TouchableOpacity onPress={() =>{navigate(-1)}}>
-                    <AntDesign name="arrowleft" style={{fontSize:26, color: "white"}}/>
+            <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 15, paddingTop: 4 }}>
+                <TouchableOpacity onPress={() => { navigate(-1) }}>
+                    <AntDesign name="arrowleft" style={{ fontSize: 26, color: "white" }} />
                 </TouchableOpacity>
 
                 {loadingaudio === true &&
-                <View style={{marginLeft: 15, flexDirection: "row", alignItems: "center"}}>
-                    <View style={{width:50,height:3,backgroundColor:"white", marginRight: 8}}>
-                        <View style={{width:`${(completedpromises/totalpromises)*100}%`,height:3,backgroundColor:"blue"}}></View>
+                    <View style={{ marginLeft: 15, flexDirection: "row", alignItems: "center" }}>
+                        <View style={{ width: 50, height: 3, backgroundColor: "white", marginRight: 8 }}>
+                            <View style={{ width: `${(completedpromises / totalpromises) * 100}%`, height: 3, backgroundColor: "blue" }}></View>
+                        </View>
+                        <Text style={{ fontSize: 10, color: "white" }}>{completedpromises}/{totalpromises}</Text>
                     </View>
-                    <Text style={{fontSize:10,color: "white"}}>{completedpromises}/{totalpromises}</Text>
-                </View>
                 }
             </View>
 
             {/* Thumbnail Section */}
-            <TouchableOpacity style={{justifyContent:"center",alignItems:"center",flex:0.45}}>
-                <View style={{borderRadius: 5, overflow: "hidden", width: 175, height: 175}}>
-                    <GestureDetector gesture={Gesture.Exclusive(longPress,doubleTap)}>
-                        <Image style={{borderRadius: 5, width: 175, height: 175, resizeMode: "cover", backgroundColor: "#222"}} source={{uri:playlist_details.playlist_thumbnail}} />
+            <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", flex: 0.45 }}>
+                <View style={{ borderRadius: 5, overflow: "hidden", width: 175, height: 175 }}>
+                    <GestureDetector gesture={Gesture.Exclusive(longPress, doubleTap)}>
+                        <Image style={{ borderRadius: 5, width: 175, height: 175, resizeMode: "cover", backgroundColor: "#222" }} source={{ uri: playlist_details.playlist_thumbnail }} />
                     </GestureDetector>
                 </View>
             </TouchableOpacity>
 
             {/* Title Section */}
-            <View style={{justifyContent:"center",alignItems:"center", paddingHorizontal: 20, paddingVertical: 4}}>
-                <View style={{flexDirection:"row", alignItems:"center", justifyContent: "center", width: "100%"}}>
+            <View style={{ justifyContent: "center", alignItems: "center", paddingHorizontal: 20, paddingVertical: 4 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", width: "100%" }}>
                     {editingplaylistname === false ? (
                         <>
-                            <View style={{flexShrink: 1}}>
-                                <Text style={{color:"white",fontSize:17,fontWeight:"bold",textAlign:"center"}}>{playlist_details.playlist_name}</Text>
+                            <View style={{ flexShrink: 1 }}>
+                                <Text style={{ color: "white", fontSize: 17, fontWeight: "bold", textAlign: "center" }}>{playlist_details.playlist_name}</Text>
                             </View>
-                            <TouchableOpacity onPress={() =>{setUserInput(playlist_details.playlist_name); setEditingPlaylistName(true)}} style={{marginLeft: 8}}>
+                            <TouchableOpacity onPress={() => { setUserInput(playlist_details.playlist_name); setEditingPlaylistName(true) }} style={{ marginLeft: 8 }}>
                                 <Feather size={15} color="grey" name="edit-2" />
                             </TouchableOpacity>
                         </>
                     ) : (
                         <>
-                            <TextInput 
-                                onSubmitEditing={() =>{editplaylistname()}} 
-                                onTouchStart={() =>{setIsTyping(true)}} 
-                                onEndEditing={() =>{setIsTyping(false)}} 
-                                style={{width:150, color: "white", borderBottomWidth: 1, borderBottomColor: "white", padding: 2, fontSize: 16}} 
-                                placeholder="Enter New Playlist" 
+                            <TextInput
+                                onSubmitEditing={() => { editplaylistname() }}
+                                onTouchStart={() => { setIsTyping(true) }}
+                                onEndEditing={() => { setIsTyping(false) }}
+                                style={{ width: 150, color: "white", borderBottomWidth: 1, borderBottomColor: "white", padding: 2, fontSize: 16 }}
+                                placeholder="Enter New Playlist"
                                 placeholderTextColor="grey"
                                 value={userinput}
-                                onChangeText={(text) =>{setUserInput(text)}}
+                                onChangeText={(text) => { setUserInput(text) }}
                             />
-                            <TouchableOpacity style={{marginLeft: 8}} onPress={() =>{setEditingPlaylistName(false);setIsTyping(false)}}>
-                                <Text style={{color: "red", fontSize: 16}}>x</Text>
+                            <TouchableOpacity style={{ marginLeft: 8 }} onPress={() => { setEditingPlaylistName(false); setIsTyping(false) }}>
+                                <Text style={{ color: "red", fontSize: 16 }}>x</Text>
                             </TouchableOpacity>
                         </>
                     )}
                 </View>
-                <Text style={{color:"grey",fontSize:13,marginTop:2}}>{playlist_details.playlist_size} Tracks</Text>
+                <Text style={{ color: "grey", fontSize: 13, marginTop: 2 }}>{playlist_details.playlist_size} Tracks</Text>
             </View>
 
             {/* Backup & Reorder Icons (under the title, aligned to the right, above the search input) */}
-            <View style={{flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: 0, marginTop: -5, marginBottom: -10, alignItems: "center"}}>
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: 0, marginTop: -5, marginBottom: -10, alignItems: "center" }}>
                 {/* Reorder Mode Toggle */}
-                <GestureTouchableOpacity 
-                    onPress={toggleReorderMode} 
+                <GestureTouchableOpacity
+                    onPress={toggleReorderMode}
                     delayPressIn={0}
-                    style={{padding: 6, marginRight: 8}}
+                    style={{ padding: 6, marginRight: 8 }}
                 >
-                    <MaterialIcons 
-                        name={isReorderMode ? "playlist-play" : "reorder"} 
-                        size={25} 
-                        color={isReorderMode ? "#1db954" : "white"} 
+                    <MaterialIcons
+                        name={isReorderMode ? "playlist-play" : "reorder"}
+                        size={25}
+                        color={isReorderMode ? "#1db954" : "white"}
                     />
                 </GestureTouchableOpacity>
 
                 {/* Spotify Backup Status and Toggle */}
                 {isSyncing ? (
-                    <ActivityIndicator size="small" color="#1db954" style={{marginHorizontal: 5}} />
+                    <ActivityIndicator size="small" color="#1db954" style={{ marginHorizontal: 5 }} />
                 ) : (
-                    <GestureTouchableOpacity 
-                        onPress={handleBackupToggle} 
-                        onLongPress={handleBackupLongPress}
+                    <GestureTouchableOpacity
+                        onPress={handleBackupToggle}
                         delayPressIn={0}
-                        style={{padding: 6}}
+                        style={{ padding: 6 }}
                     >
-                        <MaterialIcons 
-                            name={playlist_details.spotify_backup_enabled ? "cloud-done" : "cloud-queue"} 
-                            size={25} 
-                            color={playlist_details.spotify_backup_enabled ? "#1db954" : "grey"} 
+                        <MaterialIcons
+                            name={playlist_details.spotify_backup_enabled ? "cloud-done" : "cloud-queue"}
+                            size={25}
+                            color={playlist_details.spotify_backup_enabled ? "#1db954" : "grey"}
                         />
                     </GestureTouchableOpacity>
                 )}
             </View>
 
             {hasbeenshuffled === true &&
-            <View style={{alignItems:"flex-end",marginRight:20, marginBottom: 4}}>
-                <TouchableOpacity onLongPress={() =>{unlockshuffle();}}>
-                    <AntDesign name="lock" size={20} style={{color:"green"}}></AntDesign>
-                </TouchableOpacity>
-            </View>
+                <View style={{ alignItems: "flex-end", marginRight: 20, marginBottom: 4 }}>
+                    <TouchableOpacity onLongPress={() => { unlockshuffle(); }}>
+                        <AntDesign name="lock" size={20} style={{ color: "green" }}></AntDesign>
+                    </TouchableOpacity>
+                </View>
             }
 
             {/* Filter Search Input */}
-            <View style={{flexDirection:"row", marginTop: -6}}>
-            <AntDesign style={{position:"relative",top:18}} name="filter"/>
-            <TextInput style={{width:"100%"}} placeholder="Enter Here" onEndEditing={() =>{setIsFilterTyping(false)}} onTouchStart={() =>{setIsFilterTyping(true)}} onChangeText={(text) => {setFilterInput(text);}}/>
+            <View style={{ flexDirection: "row", marginTop: -6 }}>
+                <AntDesign style={{ position: "relative", top: 18 }} name="filter" />
+                <TextInput style={{ width: "100%" }} placeholder="Enter Here" onEndEditing={() => { setIsFilterTyping(false) }} onTouchStart={() => { setIsFilterTyping(true) }} onChangeText={(text) => { setFilterInput(text); }} />
             </View>
-            <FlatList 
-            data={album_tracks}
-            style={{flex:1,backgroundColor:"#141212"}}
-            renderItem={({item,index}) => {
-                if (isReorderMode) {
-                    return (
-                        <ReorderTrackItem 
-                            item={item} 
-                            index={index} 
-                            selectedTrackIndex={selectedTrackIndex}
-                            setSelectedTrackIndex={setSelectedTrackIndex}
-                            moveItem={moveItem}
-                        />
-                    );
-                }
-                return filterData(item,index);
-            }}
-            keyExtractor={(item, idx) => `track-${item.name}-${idx}`}
+            <FlatList
+                data={album_tracks}
+                style={{ flex: 1, backgroundColor: "#141212" }}
+                renderItem={({ item, index }) => {
+                    if (isReorderMode) {
+                        return (
+                            <ReorderTrackItem
+                                item={item}
+                                index={index}
+                                selectedTrackIndex={selectedTrackIndex}
+                                setSelectedTrackIndex={setSelectedTrackIndex}
+                                moveItem={moveItem}
+                            />
+                        );
+                    }
+                    return filterData(item, index);
+                }}
+                keyExtractor={(item, idx) => `track-${item.name}-${idx}`}
             />
-            <ShowCurrentTrack tracks={true}/>
-            <ShowQueue/>
+            <ShowCurrentTrack tracks={true} />
+            <ShowQueue />
 
-            <TrackProgress  seek={seek} setSeek={setSeek}/>
-  
-            <NavigationFooter currentpage={"home"} setShowCustomYTInput={setShowCustomYTInput}/>
-            <PlaylistModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} trackforplaylist={trackforplaylist}/>
-            <CustomYTModal isModalVisible={showCustomYTInput} setIsModalVisible={setShowCustomYTInput} playlistchanged={playlisttrackremoved} setPlaylistChanged={setPlaylistTrackRemoved} playlist_details={playlist_details} setPlaylistDetails={setPlaylistDetails}/>
+            <TrackProgress seek={seek} setSeek={setSeek} />
+
+            <NavigationFooter currentpage={"home"} setShowCustomYTInput={setShowCustomYTInput} />
+            <PlaylistModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} trackforplaylist={trackforplaylist} />
+            <CustomYTModal isModalVisible={showCustomYTInput} setIsModalVisible={setShowCustomYTInput} playlistchanged={playlisttrackremoved} setPlaylistChanged={setPlaylistTrackRemoved} playlist_details={playlist_details} setPlaylistDetails={setPlaylistDetails} />
 
             {customAlert && (
                 <RNModal
@@ -569,7 +528,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
                                 textAlign: "center",
                                 marginBottom: 12
                             }}>{customAlert.title}</Text>
-                            
+
                             <Text style={{
                                 color: "grey",
                                 fontSize: 14,
@@ -577,7 +536,7 @@ export default function PlaylistTracks({currentTrack,setCurrentTrack,seek, setSe
                                 marginBottom: 20,
                                 lineHeight: 20
                             }}>{customAlert.message}</Text>
-                            
+
                             <View style={{ width: "100%" }}>
                                 {customAlert.buttons.map((btn, idx) => {
                                     const isCancel = btn.style === "cancel" || btn.text.toLowerCase() === "cancel";
@@ -630,7 +589,7 @@ const ReorderTrackItem = ({ item, index, selectedTrackIndex, setSelectedTrackInd
     };
 
     return (
-        <View 
+        <View
             style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -644,25 +603,25 @@ const ReorderTrackItem = ({ item, index, selectedTrackIndex, setSelectedTrackInd
                 <Text numberOfLines={1} style={{ color: "white", fontSize: 14, fontWeight: "500" }}>{item.name}</Text>
                 <Text numberOfLines={1} style={{ color: "grey", fontSize: 12, marginTop: 2 }}>{item.artist}</Text>
             </View>
-            
+
             {selectedTrackIndex === null || isSelected ? (
-                <TouchableOpacity 
+                <TouchableOpacity
                     onPress={handlePress}
                     activeOpacity={0.5}
                     delayPressIn={0}
-                    style={{ 
-                        paddingVertical: 15, 
-                        paddingHorizontal: 20, 
+                    style={{
+                        paddingVertical: 15,
+                        paddingHorizontal: 20,
                         marginRight: -10,
-                        justifyContent: "center", 
-                        alignItems: "center" 
+                        justifyContent: "center",
+                        alignItems: "center"
                     }}
                 >
                     <MaterialIcons name="reorder" size={25} color={isSelected ? "#1db954" : "grey"} />
                 </TouchableOpacity>
             ) : (
                 <View style={{ flexDirection: "column", alignItems: "center", paddingRight: 10 }}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={() => moveItem(selectedTrackIndex, index, 'above')}
                         hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                         style={{
@@ -678,7 +637,7 @@ const ReorderTrackItem = ({ item, index, selectedTrackIndex, setSelectedTrackInd
                     >
                         <MaterialIcons name="arrow-upward" size={14} color="white" />
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={() => moveItem(selectedTrackIndex, index, 'below')}
                         hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                         style={{
