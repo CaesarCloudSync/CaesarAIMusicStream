@@ -6,7 +6,7 @@ import { getSystemVersion } from 'react-native-device-info';
 import { Image } from 'react-native-compressor';
 import { PermissionsAndroid } from 'react-native';
 import { Alert } from 'react-native';
-const FILE_MAX_SIZE = 300_000
+const FILE_MAX_SIZE = 300000
 const requestDocumentWithPermission = async () => {
   try {
     if (Platform.OS === 'android') {
