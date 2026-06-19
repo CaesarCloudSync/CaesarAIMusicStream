@@ -441,8 +441,9 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
         backdropTransitionInTiming={1000}
         backdropTransitionOutTiming={500}
         style={styles.modal}
+          coverScreen={true}
       >
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureHandlerRootView style={{ flex: 1, justifyContent: "flex-end" }}>
           <View style={styles.modalContent}>
             <View style={styles.center}>
               <View style={[styles.barIcon, { alignSelf: "center" }]} />
