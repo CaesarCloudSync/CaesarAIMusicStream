@@ -15,7 +15,7 @@ import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
 import PlaylistModal from "../PlaylistModal/playlistmodal";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
-import { check_if_failed_download, downloadFile, notifyDownloadChange } from "./DownloadSong";
+import { check_if_failed_download, downloadFile } from "./DownloadSong";
 import RNFS from "react-native-fs"
 import { get_access_token } from "../access_token/getaccesstoken";
 import { convertToValidFilename } from "../tool/tools";
@@ -90,10 +90,6 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
   setAlbumTracks(location.state?.album_tracks || []);
 }, [location.state?.album_tracks]);
     const check_all_downloaded = async () =>{
-        if (!album_tracks || album_tracks.length === 0) {
-            setIsDownloaded(false);
-            return;
-        }
         let number_of_downloaded = 0
         const promises = album_tracks.map(async(album_track) =>{
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
@@ -119,22 +115,18 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
     }
     useEffect(() =>{
         check_all_downloaded()
-    },[downloadalbumisfull, album_tracks])
+    },[downloadalbumisfull])
     const downloadallsong = async () =>{
         setIsDownloading(true)
         let number_of_downloaded = 0
         const promises = album_tracks.map(async (album_track) => {
-            const [youtube_link, title, isTransient] = await getstreaminglink(album_track)
+            const [youtube_link,title] = await getstreaminglink(album_track)
             if (!youtube_link) {
-                if (!isTransient) {
-                    console.log("Age-restricted track in downloadallsong, marking as skipped:", album_track.name)
-                    await AsyncStorage.setItem(
-                        `downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`,
-                        JSON.stringify({...album_track, skipped: true})
-                    );
-                } else {
-                    console.log("Transient error in downloadallsong, skipping download attempt for:", album_track.name)
-                }
+                console.log("Age-restricted track in downloadallsong, marking as skipped:", album_track.name)
+                await AsyncStorage.setItem(
+                    `downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`,
+                    JSON.stringify({...album_track, skipped: true})
+                );
                 number_of_downloaded += 1
                 return;
             }
@@ -191,26 +183,11 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             }
         })
         await Promise.all(promises)
-        notifyDownloadChange('all', 'removed');
         setRemoveAllDownloadsDone(true)
 
+
+
     }
-
-    const getCoverArtSource = () => {
-        if (!album_tracks || album_tracks.length === 0) {
-            return require('../../assets/CaesarAILogo.png');
-        }
-        const track = album_tracks[0];
-        if (isDownloaded) {
-            if ("playlist_thumbnail" in track) {
-                return { uri: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(track.playlist_name)}.jpg` };
-            } else {
-                return { uri: `file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${track.artist}-${track.album_name}-${track.name}`)}.jpg` };
-            }
-        }
-        return { uri: "playlist_thumbnail" in track ? track.playlist_thumbnail : track.thumbnail };
-    };
-
     return(
         <View  style={{flex:1,backgroundColor:"#141212"}}>
    
@@ -234,11 +211,11 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             
  
             <TouchableOpacity onLongPress={() =>{storeonlineplaylist()}} onPress={() =>{navartistprofile()}} style={{justifyContent:"center",alignItems:"center",flex:0.4}}>
-                <Image style={{borderRadius:5,width: 175, height: 175}} source={getCoverArtSource()}></Image>
+                <Image style={{borderRadius:5,width: 175, height: 175}} source={{uri:"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_thumbnail : album_tracks[0].thumbnail}}></Image>
 
             </TouchableOpacity>
             <View style={{flex:0.1,justifyContent:"center",alignItems:"center"}}>
-                    <Text style={{color:"white",fontSize:20}}>{album_tracks && album_tracks.length > 0 ? ("playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_name : album_tracks[0].album_name) : ""}</Text>
+                    <Text style={{color:"white",fontSize:20}}>{"playlist_thumbnail" in album_tracks[0] ? album_tracks[0].playlist_name : album_tracks[0].album_name}</Text>
             </View>
             <TouchableOpacity style={{alignItems:"flex-end"}} onLongPress={() =>{removealldownloads()}} onPress={()=>{if (isDownloaded === false && isDownloading === false){downloadallsong()}}}>
                         <MaterialCommunityIcons name="download-circle-outline" style={{fontSize:25,color:(isDownloaded === true || isDownloading === true)? "green" : "white",marginRight:15}}/>

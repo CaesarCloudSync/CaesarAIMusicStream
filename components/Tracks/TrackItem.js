@@ -7,7 +7,7 @@ import { getTableNames } from "../SQLDB/SQLDB";
 import Entypo from "react-native-vector-icons/Entypo";
 import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
-import { check_if_failed_download, downloadFile, subscribeToDownloads, notifyDownloadChange } from "./DownloadSong";
+import { check_if_failed_download, downloadFile } from "./DownloadSong";
 import TrackPlayer, { RepeatMode } from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
@@ -137,30 +137,25 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
         setIsDownloading(true);
         setIsSongLoading(true);
         try {
-            const [youtube_link, title, isTransient] = await getstreaminglink(album_track_state);
+            const [youtube_link, title] = await getstreaminglink(album_track_state);
             if (!youtube_link) {
-                if (!isTransient) {
-                    await AsyncStorage.setItem(
-                        `downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,
-                        JSON.stringify({ ...album_track_state, skipped: true })
-                    );
-                    setIsDownloaded(true);
-                    Alert.alert(
-                        "Track Unavailable",
-                        `"${album_track_state.name}" is age-restricted and can't be downloaded.`
-                    );
-                    let number_of_downloaded = 0;
-                    const promises = album_tracks_state.map(async (album_track) => {
-                        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`);
-                        if (track_downloaded) { number_of_downloaded += 1; }
-                    });
-                    await Promise.all(promises);
-                    if (number_of_downloaded === album_tracks_state.length) {
-                        setDownloadedAlbumIsFull(prev => !prev);
-                    }
-                } else {
-                    console.log(`Download failed: transient error for "${album_track_state.name}".`);
-                    Alert.alert("Download Failed", "A network error occurred. Please check your connection and try again.");
+                await AsyncStorage.setItem(
+                    `downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`,
+                    JSON.stringify({ ...album_track_state, skipped: true })
+                );
+                setIsDownloaded(true);
+                Alert.alert(
+                    "Track Unavailable",
+                    `"${album_track_state.name}" is age-restricted and can't be downloaded.`
+                );
+                let number_of_downloaded = 0;
+                const promises = album_tracks_state.map(async (album_track) => {
+                    const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`);
+                    if (track_downloaded) { number_of_downloaded += 1; }
+                });
+                await Promise.all(promises);
+                if (number_of_downloaded === album_tracks_state.length) {
+                    setDownloadedAlbumIsFull(prev => !prev);
                 }
                 return;
             }
@@ -183,28 +178,19 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
     };
 
     const playnowsong = async () => {
-        let existsInQueue = false;
-        try {
-            const queue = await TrackPlayer.getQueue();
-            existsInQueue = queue.some(track => track.id === album_track_state.id && track.url !== "dummy");
-        } catch (queueError) {
-            console.log("Error checking queue in playnowsong:", queueError);
-        }
-
-        if (!existsInQueue && !isDownloaded && getLoadingTrackId() !== null) {
+        if (!isDownloaded && getLoadingTrackId() !== null) {
             console.log("A song is already loading, ignoring press.");
             return;
         }
         
         const is_real_dl = isDownloaded && !isSkipped;
-        if (!existsInQueue && !is_real_dl) {
+        if (!is_real_dl) {
             setIsSongLoading(true);
-            setLoadingTrackId(album_track_state.id);
         }
 
         try {
             // 1. PREFETCH ABSOLUTE FIRST - Fetch stream link before anything else changes or gets reset
-            if (!existsInQueue && !is_real_dl && typeof prefetchsong === 'function') {
+            if (!is_real_dl && typeof prefetchsong === 'function') {
                 console.log("Prefetching stream URL at the beginning of the sequence...");
                 try {
                     await prefetchsong(album_track_state);
@@ -214,12 +200,6 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
                 }
             }
 
-            // Check if we were interrupted/overwritten while we were fetching
-            if (!existsInQueue && !is_real_dl && getLoadingTrackId() !== album_track_state.id) {
-                console.log("Play request cancelled: another track took over during fetch.");
-                return;
-            }
-
             // Update metadata states in storage
             if (album_tracks_state && album_tracks_state.length > 0) {
                 await AsyncStorage.setItem("current-tracks", JSON.stringify(album_tracks_state));
@@ -227,25 +207,23 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
             }
             
             // 2. CONTEXT RESET - Clear track errors and clean state only after network resolving finishes
-            if (!existsInQueue) {
-                try {
-                    const activeTrackInd = await TrackPlayer.getActiveTrackIndex();
-                    if (activeTrackInd != null) {
-                        const activeTrack = await TrackPlayer.getTrack(activeTrackInd);
-                        const newContext = album_track_state.playlist_name || album_track_state.album_name;
-                        const activeContext = activeTrack?.playlist_name || activeTrack?.album_name;
-                        
-                        if (newContext && activeContext && newContext !== activeContext) {
-                            console.log('Context switch: Resetting player engine to load new context sequence.');
-                            await TrackPlayer.reset();
-                        }
-                    } else {
+            try {
+                const activeTrackInd = await TrackPlayer.getActiveTrackIndex();
+                if (activeTrackInd != null) {
+                    const activeTrack = await TrackPlayer.getTrack(activeTrackInd);
+                    const newContext = album_track_state.playlist_name || album_track_state.album_name;
+                    const activeContext = activeTrack?.playlist_name || activeTrack?.album_name;
+                    
+                    if (newContext && activeContext && newContext !== activeContext) {
+                        console.log('Context switch: Resetting player engine to load new context sequence.');
                         await TrackPlayer.reset();
                     }
-                } catch (e) {
-                    console.log('Context evaluation dropped into error state. Executing fallback reset:', e);
+                } else {
                     await TrackPlayer.reset();
                 }
+            } catch (e) {
+                console.log('Context evaluation dropped into error state. Executing fallback reset:', e);
+                await TrackPlayer.reset();
             }
 
             // 3. EXECUTE PLAYBACK - Instantly skips to the target pre-cached song
@@ -253,9 +231,6 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
 
         } catch (globalError) {
             console.error("Playback execution failed:", globalError);
-            if (!existsInQueue && !is_real_dl) {
-                setLoadingTrackId(null);
-            }
         } finally {
             setIsSongLoading(false);
         }
@@ -306,7 +281,6 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
             await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg`);
         } catch { }
         await AsyncStorage.removeItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
-        notifyDownloadChange(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`, 'removed');
         await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
         const numofdownloaded = await AsyncStorage.getItem("downloaded_num");
         if (numofdownloaded) {
@@ -345,16 +319,14 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
 
     useEffect(() => {
         check_is_downloaded();
-        check_downloaded();
-        const unsubscribe = subscribeToDownloads((event) => {
-            const trackKey = `${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`;
-            if (event.trackKey === trackKey || event.trackKey === 'all') {
-                check_is_downloaded();
-                check_downloaded();
-            }
-        });
-        return unsubscribe;
-    }, [album_track_state]);
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            check_is_downloaded();
+        }, 2000);
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{ flex: 1 }}>

@@ -67,22 +67,8 @@ export default function ShowCurrentTrack({searchscreen,tracks,setAlbumTracks}) {
 
           let keys = await AsyncStorage.getAllKeys()
           const playlist_details = JSON.parse(await AsyncStorage.getItem(`playlist:${currentTrack.playlist_name}`))
-          const items = await AsyncStorage.multiGet(keys.filter((key) => { return key.includes(`playlist-track:${currentTrack.playlist_name}`); }))
-          const playlist_tracks = items.map((item) => { return JSON.parse(item[1]); })
-
-          const items_order = await AsyncStorage.multiGet(keys.filter((key) => { return key.includes(`playlist-track-order:${currentTrack.playlist_name}`); }))
-          const playlist_tracks_order = items_order.map((item) => { return JSON.parse(item[1]); })
-
-          function customSort(a, b) {
-              const orderObjA = playlist_tracks_order.find(item => item.name === a.name);
-              const orderObjB = playlist_tracks_order.find(item => item.name === b.name);
-              const orderA = orderObjA ? orderObjA.order : 0;
-              const orderB = orderObjB ? orderObjB.order : 0;
-              return orderA - orderB;
-          }
-
-          playlist_tracks.sort(customSort);
-
+          const items = await AsyncStorage.multiGet(keys.filter((key) =>{return(key.includes(`playlist-track:${currentTrack.playlist_name}`))}))
+          const playlist_tracks = items.map((item) =>{return(JSON.parse(item[1]))})
           console.log("current",playlist_tracks,playlist_details)
           navigate("/playlist-tracks", { state: {playlist_details:playlist_details,playlist_tracks:playlist_tracks}});
         }

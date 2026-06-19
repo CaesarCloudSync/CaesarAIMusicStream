@@ -335,18 +335,14 @@ export async function playbackService() {
     
             const currentTrackIndexInaAlbum = album_tracks.findIndex(track => track.id == currentTrack.id)
             let nextsong = album_tracks[currentTrackIndexInaAlbum]
-            const [streaming_link,title,isTransient] = await getstreaminglink(nextsong)
+            const [streaming_link,title] = await getstreaminglink(nextsong)
 
             // If stream URL comes back undefined (age-restricted / unavailable),
             // skip to the next song instead of stopping playback entirely
             if (!streaming_link) {
-              if (!isTransient) {
-                console.log("Age-restricted track during playback, marking as restricted and auto-skipping:", nextsong?.name)
-                if (nextsong) {
-                  await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
-                }
-              } else {
-                console.log("Transient error during playback, auto-skipping without marking as restricted:", nextsong?.name)
+              console.log("Age-restricted track during playback, marking as restricted and auto-skipping:", nextsong?.name)
+              if (nextsong) {
+                await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
               }
               await AsyncStorage.removeItem("current_autonext_error")
               await autoplaynextsong()

@@ -37,22 +37,6 @@ const get_thumbnail = async (album_id) =>{
     return album_thumbnail_after
 
 }
-const isLinkExpired = (link) => {
-    if (!link) return true;
-    try {
-        const expireMatch = link.match(/[&?]expire=(\d+)/);
-        if (expireMatch) {
-            const expireTime = parseInt(expireMatch[1], 10);
-            const currentTime = Math.floor(Date.now() / 1000);
-            // Consider expired if past expiration time or within 5 minutes of expiring
-            return currentTime >= (expireTime - 300);
-        }
-    } catch (e) {
-        console.log("Error checking link expiration:", e);
-    }
-    return false;
-};
-
 const get_prefetched_song = async (nextsong) =>{
     const current_prefetched = await AsyncStorage.getItem("current-prefetched-nextsong")
     if (current_prefetched){
@@ -62,14 +46,9 @@ const get_prefetched_song = async (nextsong) =>{
         console.log("prefetched-keys",prefetchedsong_key)
         console.log("nextsong_key",nextsong_key)
         if (nextsong_key === prefetchedsong_key){
+            console.log("current_prefectehd",current_prefetched_nextsong)
             await AsyncStorage.removeItem("current-prefetched-nextsong")
-            if (current_prefetched_nextsong.streaming_link && !isLinkExpired(current_prefetched_nextsong.streaming_link)) {
-                console.log("current_prefectehd",current_prefetched_nextsong)
-                return [current_prefetched_nextsong.streaming_link,current_prefetched_nextsong.name, false]
-            } else {
-                console.log("Prefetched link was undefined or expired, calling getstreaminglink directly");
-                return await getstreaminglink(nextsong)
-            }
+            return [current_prefetched_nextsong.streaming_link,current_prefetched_nextsong.name]
         }
         else{
             console.warn("Prefetch not cleaned correctly")
@@ -105,8 +84,8 @@ export const is_track_restricted = async (track) => {
 
 
 export const prefetchsong = async (nextsong) =>{
-    const [streaming_link,title,isTransient] = await getstreaminglink(nextsong)
-    if (!streaming_link && !isTransient) {
+    const [streaming_link,title] = await getstreaminglink(nextsong)
+    if (!streaming_link) {
         console.log("Prefetch failed: restricted track. Marking as restricted:", nextsong.name);
         await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
     }
@@ -115,37 +94,14 @@ export const prefetchsong = async (nextsong) =>{
 }
 
 export const skipToTrack = async (nextsong,player_ind)=>{
-    let queue = [];
-    let next_exists_queue = [];
-    let exists = false;
-    let is_downloaded = false;
-    try {
-        queue = await TrackPlayer.getQueue();
-        next_exists_queue = queue.filter((track) => { return (track.id === nextsong.id); });
-        exists = next_exists_queue.length > 0;
-
-        const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`);
-        const track_downloaded_data = track_downloaded ? JSON.parse(track_downloaded) : null;
-        const is_skipped = track_downloaded_data?.skipped === true;
-        is_downloaded = track_downloaded !== null && !is_skipped;
-    } catch (e) {
-        console.log("Error evaluating bypass flags in skipToTrack:", e);
-    }
-
-    const should_bypass_lock = exists || is_downloaded;
-
-    if (!should_bypass_lock && loadingTrackId !== null && loadingTrackId !== nextsong.id) {
+    if (loadingTrackId !== null) {
         console.log("skipToTrack ignored: another song is currently loading.");
         return;
     }
-
-    if (should_bypass_lock) {
-        setLoadingTrackId(null);
-    } else {
-        setLoadingTrackId(nextsong.id);
-    }
-
+    setLoadingTrackId(nextsong.id);
     try {
+        let queue = await TrackPlayer.getQueue();
+        let next_exists_queue = queue.filter((track) =>{return (track.id === nextsong.id)})
         if (next_exists_queue.length === 0){
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)
             // Check if it's a skipped placeholder (age-restricted) — has the key but no real file
@@ -160,17 +116,11 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             }
             
             const use_local = track_downloaded !== null;
-            let [streaming_link,title,isTransient] = !use_local 
-                ? ((nextsong.streaming_link && !isLinkExpired(nextsong.streaming_link)) ? [nextsong.streaming_link, undefined, false] : await get_prefetched_song(nextsong)) 
-                : [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined,false]
+            let [streaming_link,title] = !use_local ? await get_prefetched_song(nextsong) : [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
             // If track still can't get a stream, auto-skip to next song
             if (!use_local && !streaming_link) {
-                if (!isTransient) {
-                    console.log("Unavailable track, marking as restricted and auto-advancing:", nextsong.name);
-                    await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
-                } else {
-                    console.log("Transient fetch failure for track, auto-advancing without marking as restricted:", nextsong.name);
-                }
+                console.log("Unavailable track, marking as restricted and auto-advancing:", nextsong.name);
+                await AsyncStorage.setItem(`downloaded-track:${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`, JSON.stringify({ skipped: true }));
                 setLoadingTrackId(null);
                 await autoplaynextsong();
                 return;

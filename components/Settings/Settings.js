@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, Switch, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, Switch, TouchableOpacity, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import AntDesign from "react-native-vector-icons/AntDesign"
 import { useNavigate } from "react-router-native";
@@ -13,86 +13,11 @@ import RNFS from 'react-native-fs';
 
 import { PermissionsAndroid, Platform } from 'react-native';
 import axios from "axios";
-import { getSpotifyBackupConfig, saveSpotifyBackupConfig, clearSpotifyBackupConfig, authorizeWithSpotify } from "../access_token/spotifyBackupHelper";
-
 
 export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack }) {
     const navigate = useNavigate();
   const [proxyUrl, setProxyUrl] = useState("");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-  const [spotifyUserId, setSpotifyUserId] = useState("");
-  const [spotifyAccessToken, setSpotifyAccessToken] = useState("");
-  const [spotifyRefreshToken, setSpotifyRefreshToken] = useState("");
-  const [spotifyClientId, setSpotifyClientId] = useState("");
-  const [spotifyClientSecret, setSpotifyClientSecret] = useState("");
-  const [spotifyRedirectUri, setSpotifyRedirectUri] = useState("");
-  const [showSpotifyDetails, setShowSpotifyDetails] = useState(false);
-
-  const loadSpotifyCredentials = async () => {
-    try {
-      const config = await getSpotifyBackupConfig();
-      setSpotifyUserId(config.userId);
-      setSpotifyAccessToken(config.accessToken);
-      setSpotifyRefreshToken(config.refreshToken);
-      
-      const customClientId = await AsyncStorage.getItem("spotify_backup_client_id");
-      const customClientSecret = await AsyncStorage.getItem("spotify_backup_client_secret");
-      const customRedirectUri = await AsyncStorage.getItem("spotify_backup_redirect_uri");
-      
-      if (customClientId) setSpotifyClientId(customClientId);
-      if (customClientSecret) setSpotifyClientSecret(customClientSecret);
-      if (customRedirectUri) setSpotifyRedirectUri(customRedirectUri);
-    } catch (err) {
-      console.error("Failed to load Spotify credentials:", err);
-    }
-  };
-
-  const saveManualCredentials = async () => {
-    try {
-      await saveSpotifyBackupConfig({
-        userId: spotifyUserId,
-        accessToken: spotifyAccessToken,
-        refreshToken: spotifyRefreshToken,
-        clientId: spotifyClientId || undefined,
-        clientSecret: spotifyClientSecret || undefined,
-        redirectUri: spotifyRedirectUri || undefined,
-      });
-      Alert.alert("Success", "Spotify credentials saved successfully.");
-    } catch (err) {
-      Alert.alert("Error", err.message);
-    }
-  };
-
-  const connectSpotify = async () => {
-    try {
-      const userId = await authorizeWithSpotify();
-      await loadSpotifyCredentials();
-      Alert.alert("Connected", `Successfully connected to Spotify account: ${userId}`);
-    } catch (error) {
-      Alert.alert("Authentication Failed", error.message);
-    }
-  };
-
-  const disconnectSpotify = async () => {
-    try {
-      await clearSpotifyBackupConfig();
-      setSpotifyUserId("");
-      setSpotifyAccessToken("");
-      setSpotifyRefreshToken("");
-      setSpotifyClientId("");
-      setSpotifyClientSecret("");
-      setSpotifyRedirectUri("");
-      Alert.alert("Disconnected", "Spotify account credentials removed.");
-    } catch (err) {
-      Alert.alert("Error", err.message);
-    }
-  };
-
-  useEffect(() => {
-    loadSpotifyCredentials();
-  }, []);
-
   const [lowDataMode, setLowDataMode] = useState(false);
   const [theme, setTheme] = useState("Dark");
   const [proxyEnabled, setProxyEnabled] = useState(false);
@@ -283,7 +208,7 @@ const healthcheck = async () => {
       <View style={styles.header}>
         <Text style={styles.headerText}>Settings</Text>
       </View>
-      <ScrollView style={styles.content} contentContainerStyle={{padding: 20, paddingBottom: 60}}>
+      <View style={styles.content}>
         <Text style={styles.sectionTitle}>Health Check</Text>
         <View style={styles.settingRow}>
           <Text style={[{height:20},styles.label]}>{healthcheckactive === true ? "Active" : "Not Active"}</Text>
@@ -339,86 +264,7 @@ const healthcheck = async () => {
         </TouchableOpacity>
                
         </View>
-
-        <Text style={styles.sectionTitle}>Spotify Backup Settings</Text>
-        <View style={styles.settingRow}>
-          <Text style={styles.label}>Connected Account:</Text>
-          <Text style={{color: spotifyUserId ? "#1db954" : "grey", fontSize: 16, fontWeight: "600"}}>{spotifyUserId || "Not Connected"}</Text>
-        </View>
-        <View style={{flexDirection: "row", gap: 10, marginBottom: 10}}>
-          {!spotifyUserId ? (
-            <TouchableOpacity style={[styles.button, {flex: 1, alignItems: "center"}]} onPress={connectSpotify}>
-              <Text style={styles.buttonText}>Connect Spotify</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={[styles.button, {flex: 1, backgroundColor: "red", alignItems: "center"}]} onPress={disconnectSpotify}>
-              <Text style={styles.buttonText}>Disconnect</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity style={[styles.button, {flex: 1, backgroundColor: "#333", alignItems: "center"}]} onPress={() => setShowSpotifyDetails(!showSpotifyDetails)}>
-            <Text style={styles.buttonText}>{showSpotifyDetails ? "Hide Config" : "Manual Config"}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {showSpotifyDetails && (
-          <View style={{backgroundColor: "#1e1b1b", padding: 15, borderRadius: 5, marginBottom: 15, borderWidth: 1, borderColor: "#333"}}>
-            <Text style={[styles.label, {fontSize: 14, marginBottom: 5}]}>Spotify User ID</Text>
-            <TextInput
-              style={[styles.input, {marginBottom: 10, padding: 8, fontSize: 14}]}
-              value={spotifyUserId}
-              onChangeText={setSpotifyUserId}
-              placeholder="Spotify User ID"
-              placeholderTextColor="#888"
-            />
-            <Text style={[styles.label, {fontSize: 14, marginBottom: 5}]}>Access Token</Text>
-            <TextInput
-              style={[styles.input, {marginBottom: 10, padding: 8, fontSize: 14}]}
-              value={spotifyAccessToken}
-              onChangeText={setSpotifyAccessToken}
-              placeholder="Spotify User Access Token"
-              placeholderTextColor="#888"
-            />
-            <Text style={[styles.label, {fontSize: 14, marginBottom: 5}]}>Refresh Token</Text>
-            <TextInput
-              style={[styles.input, {marginBottom: 10, padding: 8, fontSize: 14}]}
-              value={spotifyRefreshToken}
-              onChangeText={setSpotifyRefreshToken}
-              placeholder="Spotify Refresh Token"
-              placeholderTextColor="#888"
-            />
-            <Text style={[styles.label, {fontSize: 14, marginBottom: 5}]}>Client ID (Optional)</Text>
-            <TextInput
-              style={[styles.input, {marginBottom: 10, padding: 8, fontSize: 14}]}
-              value={spotifyClientId}
-              onChangeText={setSpotifyClientId}
-              placeholder="Client ID (Defaults to app ID)"
-              placeholderTextColor="#888"
-            />
-            <Text style={[styles.label, {fontSize: 14, marginBottom: 5}]}>Client Secret (Optional)</Text>
-            <TextInput
-              style={[styles.input, {marginBottom: 10, padding: 8, fontSize: 14}]}
-              value={spotifyClientSecret}
-              onChangeText={setSpotifyClientSecret}
-              placeholder="Client Secret (Defaults to app Secret)"
-              placeholderTextColor="#888"
-              secureTextEntry
-            />
-            <Text style={[styles.label, {fontSize: 14, marginBottom: 5}]}>Redirect URI (Optional)</Text>
-            <TextInput
-              style={[styles.input, {marginBottom: 15, padding: 8, fontSize: 14}]}
-              value={spotifyRedirectUri}
-              onChangeText={setSpotifyRedirectUri}
-              placeholder="caesaraimusic://callback"
-              placeholderTextColor="#888"
-            />
-            <TouchableOpacity style={[styles.button, {alignItems: "center"}]} onPress={saveManualCredentials}>
-              <Text style={styles.buttonText}>Save Credentials</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
         <Text style={styles.sectionTitle}>Scripts</Text>
-
           <TouchableOpacity style={[styles.button,{"backgroundColor": "red"}]} onPress={() =>{handledownloadedmetadataconfirm()}}>
             <Text style={styles.buttonText}>Delete Downloaded Metadata</Text>
         </TouchableOpacity>
@@ -431,7 +277,7 @@ const healthcheck = async () => {
 
 
 
-      </ScrollView>
+      </View>
                         
                   <ShowCurrentTrack/>
                   <ShowQueue/>
@@ -467,6 +313,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 0.9,
+    padding: 20,
   },
   sectionTitle: {
     color: "white",

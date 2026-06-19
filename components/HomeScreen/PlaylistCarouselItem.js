@@ -69,7 +69,7 @@ export default function PlaylistCarouselItem({access_token, favouritecards,playl
             <GestureDetector gesture={Gesture.Exclusive(longPress,singleTap)}>
             <View   style={{backgroundColor:!addingtolibrary ? "#141212" : "grey",flexDirection:"row",justifyContent:"center",alignItems:"center",flex:1}}>
                 <View style={{flex:favouritecards ? 0.5 : 1}}>
-                    <Image style={{borderRadius:5,width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
+                    <Image style={{borderRadius:2,width: '100%', height: '100%'}} source={{uri:thumbnail}}></Image>
                 </View>
                 <View style={{padding:10}}>
                 </View>

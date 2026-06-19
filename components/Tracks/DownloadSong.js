@@ -1,4 +1,4 @@
-import { Alert, Platform } from "react-native";
+import { Alert} from "react-native";;
 import ytdl from "react-native-ytdl"
 
 import RNFetchBlob from 'rn-fetch-blob'
@@ -13,23 +13,6 @@ import { Buffer } from 'buffer';
 import RNBackgroundDownloader, { download, completeHandler } from '@kesha-antonov/react-native-background-downloader'
 
 import axios from "axios";
-
-const downloadListeners = new Set();
-export const subscribeToDownloads = (listener) => {
-    downloadListeners.add(listener);
-    return () => {
-        downloadListeners.delete(listener);
-    };
-};
-export const notifyDownloadChange = (trackKey, status) => {
-    downloadListeners.forEach(listener => {
-        try {
-            listener({ trackKey, status });
-        } catch (e) {
-            console.error("Error in download listener:", e);
-        }
-    });
-};
 const get_thumbnail = async (album_id) =>{
   const access_token = await get_access_token();
   const headers = {Authorization: `Bearer ${access_token}`}
@@ -120,7 +103,6 @@ const downloadM3U8 = async (songurl, filePath, notif_title, notif_id, channelId,
 
     // Step 7: Save metadata to AsyncStorage
     await AsyncStorage.setItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`, JSON.stringify(album_track));
-    notifyDownloadChange(`${album_track.artist}-${album_track.album_name}-${name}`, 'done');
     const numofdownloaded = await AsyncStorage.getItem('downloaded_num');
     if (numofdownloaded) {
       const keys = await AsyncStorage.getAllKeys();
@@ -193,7 +175,7 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
   const jobId = notif_id; // stable & unique
 
   if (songurl.toLowerCase().endsWith('.m3u8')) {
-    console.warn("M3U8 manifests are not supported yet.");
+    Alert.alert("M3U8 manifests are not supported yet.");
     return;
   }
 
@@ -254,7 +236,6 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
           `downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`,
           JSON.stringify(album_track)
         );
-        notifyDownloadChange(`${album_track.artist}-${album_track.album_name}-${name}`, 'done');
 
         // Update download stats (your original logic)
         const allKeys = await AsyncStorage.getAllKeys();
@@ -304,7 +285,12 @@ export const downloadFile = async (songurl, name, notif_title, album_track) => {
     })
     .error(async (error) => {
       console.log('Download error/canceled:', error);
-      notifyDownloadChange(`${album_track.artist}-${album_track.album_name}-${name}`, 'error');
+
+      // Mark as skipped/restricted so it doesn't keep attempting downloads
+      await AsyncStorage.setItem(
+        `downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`,
+        JSON.stringify({...album_track, skipped: true})
+      );
 
       await notifee.displayNotification({
         id: `err_${notif_id}`,
@@ -358,7 +344,7 @@ export const downloadSong = async (songurl,name) => {
         await config(options).fetch('GET', songurl)
         await RNFS.copyFile(external_path,internal_path)
         await RNFS.unlink(external_path)
-        console.log(`Success downloading ${name}`)
+         Alert.alert(`Success downloading ${name}`)
         
                         // The picked document is available in the 'result' object
         /*let filename = image?.filename || `image_${Date.now()}.${getFileExtension(imageCompressed?.path)}`
@@ -366,7 +352,7 @@ export const downloadSong = async (songurl,name) => {
         */
       }
       catch(err){
-        console.warn("Error copying downloaded song file:", err)
+        Alert.alert(err)
       }
     
         /*
@@ -375,7 +361,7 @@ export const downloadSong = async (songurl,name) => {
       
   } catch (err) {
     console.log(err)
-    console.warn(`Error downloading song:`, err)
+    Alert.alert(`Error downloading from ${url}`)
   }
 
 }
