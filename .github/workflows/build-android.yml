@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - CaesarAIMusicStreamV0-STABLE
     tags:
       - 'v*'
   pull_request:
