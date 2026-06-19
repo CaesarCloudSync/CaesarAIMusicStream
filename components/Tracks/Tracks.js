@@ -15,7 +15,7 @@ import ShowQueue from "../ShowQueue/showqueue";
 import { ImageManipulator } from 'expo';
 import PlaylistModal from "../PlaylistModal/playlistmodal";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
-import { check_if_failed_download, downloadFile } from "./DownloadSong";
+import { check_if_failed_download, downloadFile, notifyDownloadChange } from "./DownloadSong";
 import RNFS from "react-native-fs"
 import { get_access_token } from "../access_token/getaccesstoken";
 import { convertToValidFilename } from "../tool/tools";
@@ -191,6 +191,7 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             }
         })
         await Promise.all(promises)
+        notifyDownloadChange('all', 'removed');
         setRemoveAllDownloadsDone(true)
 
     }

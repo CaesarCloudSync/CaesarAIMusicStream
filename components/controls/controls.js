@@ -37,6 +37,22 @@ const get_thumbnail = async (album_id) =>{
     return album_thumbnail_after
 
 }
+const isLinkExpired = (link) => {
+    if (!link) return true;
+    try {
+        const expireMatch = link.match(/[&?]expire=(\d+)/);
+        if (expireMatch) {
+            const expireTime = parseInt(expireMatch[1], 10);
+            const currentTime = Math.floor(Date.now() / 1000);
+            // Consider expired if past expiration time or within 5 minutes of expiring
+            return currentTime >= (expireTime - 300);
+        }
+    } catch (e) {
+        console.log("Error checking link expiration:", e);
+    }
+    return false;
+};
+
 const get_prefetched_song = async (nextsong) =>{
     const current_prefetched = await AsyncStorage.getItem("current-prefetched-nextsong")
     if (current_prefetched){
@@ -46,12 +62,12 @@ const get_prefetched_song = async (nextsong) =>{
         console.log("prefetched-keys",prefetchedsong_key)
         console.log("nextsong_key",nextsong_key)
         if (nextsong_key === prefetchedsong_key){
-            console.log("current_prefectehd",current_prefetched_nextsong)
             await AsyncStorage.removeItem("current-prefetched-nextsong")
-            if (current_prefetched_nextsong.streaming_link) {
+            if (current_prefetched_nextsong.streaming_link && !isLinkExpired(current_prefetched_nextsong.streaming_link)) {
+                console.log("current_prefectehd",current_prefetched_nextsong)
                 return [current_prefetched_nextsong.streaming_link,current_prefetched_nextsong.name, false]
             } else {
-                console.log("Prefetched link was undefined, calling getstreaminglink directly");
+                console.log("Prefetched link was undefined or expired, calling getstreaminglink directly");
                 return await getstreaminglink(nextsong)
             }
         }
@@ -145,7 +161,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             
             const use_local = track_downloaded !== null;
             let [streaming_link,title,isTransient] = !use_local 
-                ? (nextsong.streaming_link ? [nextsong.streaming_link, undefined, false] : await get_prefetched_song(nextsong))
+                ? ((nextsong.streaming_link && !isLinkExpired(nextsong.streaming_link)) ? [nextsong.streaming_link, undefined, false] : await get_prefetched_song(nextsong)) 
                 : [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined,false]
             // If track still can't get a stream, auto-skip to next song
             if (!use_local && !streaming_link) {

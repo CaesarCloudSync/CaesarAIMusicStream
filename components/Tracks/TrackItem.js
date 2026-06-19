@@ -7,7 +7,7 @@ import { getTableNames } from "../SQLDB/SQLDB";
 import Entypo from "react-native-vector-icons/Entypo";
 import { connectToDatabase } from "../SQLDB/SQLDB";
 import { getyoutubelink } from "./getstreamlinks";
-import { check_if_failed_download, downloadFile } from "./DownloadSong";
+import { check_if_failed_download, downloadFile, subscribeToDownloads, notifyDownloadChange } from "./DownloadSong";
 import TrackPlayer, { RepeatMode } from "react-native-track-player";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getstreaminglink } from "./getstreamlinks";
@@ -306,6 +306,7 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
             await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg`);
         } catch { }
         await AsyncStorage.removeItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
+        notifyDownloadChange(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`, 'removed');
         await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
         const numofdownloaded = await AsyncStorage.getItem("downloaded_num");
         if (numofdownloaded) {
@@ -344,14 +345,16 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
 
     useEffect(() => {
         check_is_downloaded();
-    }, []);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            check_is_downloaded();
-        }, 2000);
-        return () => clearInterval(intervalId);
-    }, []);
+        check_downloaded();
+        const unsubscribe = subscribeToDownloads((event) => {
+            const trackKey = `${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`;
+            if (event.trackKey === trackKey || event.trackKey === 'all') {
+                check_is_downloaded();
+                check_downloaded();
+            }
+        });
+        return unsubscribe;
+    }, [album_track_state]);
 
     return (
         <GestureDetector gesture={Gesture.Exclusive(flingleft)} style={{ flex: 1 }}>

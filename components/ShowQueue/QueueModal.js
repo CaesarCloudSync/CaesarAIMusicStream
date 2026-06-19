@@ -15,12 +15,147 @@ import { skipToTrack } from "../controls/controls";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { getrecommendations } from "../Tracks/getrecommendations";
 import Entypo from 'react-native-vector-icons/Entypo';
+import { GestureDetector, Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
 import { SectionList } from "react-native";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { prefetchsong } from "../controls/controls";
 import { searchsongsrecommend } from "../Tracks/getrecommendations";
 import { getsongrecommendation, getspecificsongrecommendation, repopulaterecommendations } from "../../trackPlayerServices";
 import PlaylistModal from "../PlaylistModal/playlistmodal";
+
+function RecommendTrackItem({
+  item,
+  index,
+  loadingItemId,
+  globalLoadingTrackId,
+  playnextrecommend,
+  removefromrecommend,
+  resolveRecommendTrack,
+  multiRecommendSelect,
+  setMultiRecommendSelect,
+  trackforplaylist,
+  setTrackForPlaylist,
+  setPlaylistModalVisible,
+  recommendpositionsrc,
+  handlerecommendchange
+}) {
+
+  const resolveAndSinglePress = async () => {
+    const track = await resolveRecommendTrack(item);
+    if (!multiRecommendSelect) {
+      setTrackForPlaylist([track]);
+      setPlaylistModalVisible(true);
+    } else {
+      const isIn = trackforplaylist.some(t => t.name?.toLowerCase() === track.name?.toLowerCase());
+      if (isIn) {
+        setTrackForPlaylist(prev => prev.filter(t => t.name?.toLowerCase() !== track.name?.toLowerCase()));
+      } else {
+        setTrackForPlaylist(prev => [...prev, track]);
+      }
+    }
+  };
+
+  const resolveAndToggleMultiSelect = async () => {
+    const track = await resolveRecommendTrack(item);
+    if (!multiRecommendSelect) {
+      setMultiRecommendSelect(true);
+      setTrackForPlaylist([track]);
+    } else {
+      setMultiRecommendSelect(false);
+      setTrackForPlaylist([]);
+    }
+  };
+
+  const togglemultiplaylistselectlongPress = Gesture.LongPress().onStart(async () => {
+    await resolveAndToggleMultiSelect();
+  });
+
+  const showplaylistoptionsdoubleTap = Gesture.Tap().numberOfTaps(2).onEnd(() => {
+    setPlaylistModalVisible(true);
+  });
+
+  const toggleaddplaylistselectsinglePress = Gesture.Tap().onEnd(async () => {
+    await resolveAndSinglePress();
+  });
+
+  const isLoading = loadingItemId === item.title;
+
+  return (
+    <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 8, width: "100%" }}>
+      <TouchableOpacity 
+        style={{ flexDirection: "row", flex: 1, marginRight: 10 }} 
+        onLongPress={() => { removefromrecommend(item) }} 
+        onPress={() => { playnextrecommend(item) }} 
+      >
+        <View style={{ position: "relative", width: 60, height: 60 }}>
+          <Image style={{ borderRadius: 5, width: 60, height: 60, opacity: isLoading ? 0.6 : 1 }} source={{ uri: item.thumbnail[0].url }} />
+          {isLoading && (
+            <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.4)", borderRadius: 5 }}>
+              <ActivityIndicator size="small" color="white" />
+            </View>
+          )}
+        </View>
+
+        <View style={{ marginLeft: 10, justifyContent: "center", flex: 1 }}>
+          <Text numberOfLines={1} style={{ color: "white", fontSize: 14, fontWeight: "500" }}>{item.title}</Text>
+          <Text numberOfLines={1} style={{ color: "grey", fontSize: 12, marginTop: 2 }}>{item.artists[0].name}</Text>
+        </View>
+      </TouchableOpacity>
+
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 15 }}>
+        <GestureDetector gesture={Gesture.Exclusive(showplaylistoptionsdoubleTap, togglemultiplaylistselectlongPress, toggleaddplaylistselectsinglePress)}>
+          <View style={{ padding: 10 }}>
+            <MaterialIcons
+              name="playlist-add"
+              size={24}
+              color={multiRecommendSelect && trackforplaylist.some(t => t.name?.toLowerCase() === item.title?.toLowerCase()) ? "#7097d6" : "white"}
+            />
+          </View>
+        </GestureDetector>
+
+        {recommendpositionsrc === "" || recommendpositionsrc === index ? (
+          <TouchableOpacity onPress={() => { handlerecommendchange(index) }} style={{ paddingHorizontal: 10, paddingVertical: 10 }}>
+            <Entypo size={19} name="dots-three-vertical" color={recommendpositionsrc === index ? "green" : "white"} />
+          </TouchableOpacity>
+        ) : (
+          <View style={{ flexDirection: "column", alignItems: "center", width: 49 }}>
+            <TouchableOpacity 
+              onPress={() => handlerecommendchange(index, 'above')}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              style={{
+                borderWidth: 1,
+                borderColor: "white",
+                borderRadius: 12,
+                width: 24,
+                height: 24,
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: 4
+              }}
+            >
+              <MaterialIcons name="arrow-upward" size={14} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => handlerecommendchange(index, 'below')}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              style={{
+                borderWidth: 1,
+                borderColor: "white",
+                borderRadius: 12,
+                width: 24,
+                height: 24,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <MaterialIcons name="arrow-downward" size={14} color="white" />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
 
 export default function QueueModal({ queue, toggleModal, isModalVisible, setModalVisible, setQueue }) {//console.log("queue in QueueModal",queue)
 
@@ -346,7 +481,8 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
         backdropTransitionOutTiming={500}
         style={styles.modal}
       >
-        <View style={styles.modalContent}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <View style={styles.modalContent}>
           <View style={styles.center}>
             <View style={[styles.barIcon, { alignSelf: "center" }]} />
             <View style={{ marginTop: 10, alignSelf: "flex-end" }}>
@@ -356,6 +492,7 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
             </View>
 
             <SectionList
+              style={{ width: "100%" }}
               sections={sections}
               keyExtractor={(item, index) => item + index}
               renderItem={({ item, index, section: { title } }) => {
@@ -363,7 +500,7 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
                   // Show spinner if tapped locally OR if remote next is loading this exact track
                   const isLoading = loadingItemId === item.name || globalLoadingTrackId === item.id;
                   return (
-                    <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 8, width: 355 }}>
+                    <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 8, width: "100%" }}>
                       <TouchableOpacity style={{ flexDirection: "row", flex: 1, marginRight: 10 }} onLongPress={() => { removefromqueue(item) }} onPress={() => { playnextqueue(item) }} >
                         {/* Thumbnail with spinner overlay */}
                         <View style={{ position: "relative", width: 60, height: 60 }}>
@@ -424,62 +561,23 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
                   )
                 }
                 else if (title === "Shuffling From:") {
-                  const isLoading = loadingItemId === item.title;
                   return (
-                    <View style={{ flex: 1, flexDirection: "row", margin: 10, alignItems: "center" }}>
-                      <TouchableOpacity style={{ flexDirection: "row", flex: 1 }} onLongPress={() => { removefromrecommend(item) }} onPress={() => { playnextrecommend(item) }} >
-                        {/* Thumbnail with spinner overlay */}
-                        <View style={{ position: "relative", width: 60, height: 60 }}>
-                          <Image style={{ borderRadius: 5, width: 60, height: 60, opacity: isLoading ? 0.6 : 1 }} source={{ uri: item.thumbnail[0].url }}></Image>
-                          {isLoading && (
-                            <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.4)", borderRadius: 5 }}>
-                              <ActivityIndicator size="small" color="white" />
-                            </View>
-                          )}
-                        </View>
-
-                        <View style={{ marginLeft: 10, justifyContent: "center", flex: 1 }}>
-                          <Text numberOfLines={1} style={{ color: "white", fontSize: 14, fontWeight: "500" }}>{item.title}</Text>
-                          <Text numberOfLines={1} style={{ color: "grey", fontSize: 12, marginTop: 2 }}>{item.artists[0].name}</Text>
-                        </View>
-                      </TouchableOpacity>
-
-                      {/* playlist-add icon — matches TrackItem right-side layout */}
-                      <View style={{ flex: 0.15, height: "100%", justifyContent: "center", alignItems: "center", flexDirection: "row", gap: 20 }}>
-                        <TouchableOpacity
-                          onLongPress={async () => {
-                            const track = await resolveRecommendTrack(item);
-                            if (!multiRecommendSelect) {
-                              setMultiRecommendSelect(true);
-                              setTrackForPlaylist([track]);
-                            } else {
-                              setMultiRecommendSelect(false);
-                              setTrackForPlaylist([]);
-                            }
-                          }}
-                          onPress={async () => {
-                            const track = await resolveRecommendTrack(item);
-                            if (!multiRecommendSelect) {
-                              setTrackForPlaylist([track]);
-                              setPlaylistModalVisible(true);
-                            } else {
-                              const isIn = trackforplaylist.some(t => t.name === track.name);
-                              if (isIn) {
-                                setTrackForPlaylist(prev => prev.filter(t => t.name !== track.name));
-                              } else {
-                                setTrackForPlaylist(prev => [...prev, track]);
-                              }
-                            }
-                          }}
-                        >
-                          <MaterialIcons
-                            name="playlist-add"
-                            size={24}
-                            color={multiRecommendSelect && trackforplaylist.some(t => t.name === item.title) ? "#7097d6" : "white"}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
+                    <RecommendTrackItem
+                      item={item}
+                      index={index}
+                      loadingItemId={loadingItemId}
+                      globalLoadingTrackId={globalLoadingTrackId}
+                      playnextrecommend={playnextrecommend}
+                      removefromrecommend={removefromrecommend}
+                      resolveRecommendTrack={resolveRecommendTrack}
+                      multiRecommendSelect={multiRecommendSelect}
+                      setMultiRecommendSelect={setMultiRecommendSelect}
+                      trackforplaylist={trackforplaylist}
+                      setTrackForPlaylist={setTrackForPlaylist}
+                      setPlaylistModalVisible={setPlaylistModalVisible}
+                      recommendpositionsrc={recommendpositionsrc}
+                      handlerecommendchange={handlerecommendchange}
+                    />
                   )
                 }
               }}
@@ -508,8 +606,8 @@ export default function QueueModal({ queue, toggleModal, isModalVisible, setModa
 
 
           </View>
-
         </View>
+        </GestureHandlerRootView>
         </Modal>
 
       <PlaylistModal
@@ -631,8 +729,9 @@ const styles = StyleSheet.create({
   },
   center: {
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "stretch",
     justifyContent: "center",
+    width: "100%",
   },
   barIcon: {
     width: 60,
