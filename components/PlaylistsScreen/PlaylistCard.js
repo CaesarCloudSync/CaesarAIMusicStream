@@ -86,11 +86,11 @@ export default function PlaylistCard({ playlist, index, setPlaylistChanged, play
     const deleteLocalPlaylistOnly = async () => {
         try {
             await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(playliststate.playlist_name)}.jpg`);
-        } catch {}
+        } catch { }
         await AsyncStorage.removeItem(`playlist:${playliststate.playlist_name}`);
         let keys = await AsyncStorage.getAllKeys();
-        await AsyncStorage.multiRemove(keys.filter((key) => { return key.includes(`playlist-track:${playliststate.playlist_name}`); })); 
-        await AsyncStorage.multiRemove(keys.filter((key) => { return key.includes(`playlist-track-order:${playliststate.playlist_name}`); })); 
+        await AsyncStorage.multiRemove(keys.filter((key) => { return key.includes(`playlist-track:${playliststate.playlist_name}`); }));
+        await AsyncStorage.multiRemove(keys.filter((key) => { return key.includes(`playlist-track-order:${playliststate.playlist_name}`); }));
         if (playlistchanged === false) {
             setPlaylistChanged(true);
         } else {
