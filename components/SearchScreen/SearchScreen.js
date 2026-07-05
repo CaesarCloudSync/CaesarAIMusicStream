@@ -19,6 +19,8 @@ import GenreItem from "../HomeScreen/GenreItem";
 import { genreslist } from "../HomeScreen/genres";
 
 const RenderSection = ({ title, items, onPressItem, onSwipeItem }) => {
+    const [swipedItemId, setSwipedItemId] = useState(null);
+
     if (items.length === 0) return null;
     return (
         <View style={{ marginBottom: 18 }}>
@@ -26,6 +28,9 @@ const RenderSection = ({ title, items, onPressItem, onSwipeItem }) => {
                 {title}
             </Text>
             {items.map((item, idx) => {
+                const itemId = item.id || item.label || idx;
+                const isAdding = swipedItemId === itemId;
+
                 const singleTap = Gesture.Tap().onEnd((_event, success) => {
                     if (success) {
                         onPressItem(item);
@@ -34,9 +39,11 @@ const RenderSection = ({ title, items, onPressItem, onSwipeItem }) => {
 
                 const flingLeft = Gesture.Fling()
                     .direction(Directions.LEFT)
-                    .onStart(() => {
+                    .onStart(async () => {
                         if (onSwipeItem && (item.type === "album" || item.type === "track")) {
-                            onSwipeItem(item);
+                            setSwipedItemId(itemId);
+                            await onSwipeItem(item);
+                            setSwipedItemId(null);
                         }
                     });
 
@@ -54,7 +61,7 @@ const RenderSection = ({ title, items, onPressItem, onSwipeItem }) => {
                                 paddingHorizontal: 14,
                                 borderBottomWidth: idx < items.length - 1 ? 0.3 : 0,
                                 borderBottomColor: "#222",
-                                backgroundColor: "#141212"
+                                backgroundColor: isAdding ? "grey" : "#141212"
                             }}
                         >
                             {item.image ? (
