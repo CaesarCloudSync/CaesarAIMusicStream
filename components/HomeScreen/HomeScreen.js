@@ -1,4 +1,4 @@
-import { View,Text, ScrollView, FlatList,Image,SafeAreaView,RefreshControl,ActivityIndicator} from "react-native";
+import { View, Text, ScrollView, FlatList, Image, SafeAreaView, RefreshControl, ActivityIndicator } from "react-native";
 
 import NavigationFooter from "../NavigationFooter/NavigationFooter";
 import { useEffect, useState } from "react";
@@ -6,8 +6,8 @@ import GenreItem from "./GenreItem";
 import TrackProgress from "../TrackProgress/TrackProgress";
 import FavouriteItem from "./FavouriteItem";
 import { get_access_token } from "../access_token/getaccesstoken";
-import {FavouriteAlbums,FavouriteRecommendations, FavouriteRecommendationsHomeScreen, FavouritePlaylistsHomeScreen} from "./FavouriteRenders";
-import {useNetInfo} from "@react-native-community/netinfo";
+import { FavouriteAlbums, FavouriteRecommendations, FavouriteRecommendationsHomeScreen, FavouritePlaylistsHomeScreen } from "./FavouriteRenders";
+import { useNetInfo } from "@react-native-community/netinfo";
 import ShowCurrentTrack from "../ShowCurrentTrack/ShowCurrentTrack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Await, json } from "react-router-native";
@@ -15,6 +15,7 @@ import { genreslist } from "./genres";
 import ShowQueue from "../ShowQueue/showqueue";
 import { Button } from "react-native-elements";
 import { getdownloadedmetadata } from "../scripts/MusicInternalToSDCard";
+import { requestStoragePermission } from "../Tracks/askpermission";
 
 const GENRES = [
     {
@@ -48,14 +49,14 @@ const GENRES = [
 let l1InitialFeed = null;
 let l1DynamicFeeds = null;
 
-export default function Home({seek, setSeek}){
+export default function Home({ seek, setSeek }) {
     const netInfo = useNetInfo();
-    const [initialfeed,setInitialFeed] = useState([]);
-    const [dynamicFeeds,setDynamicFeeds] = useState([]);
-    const [savedArtists,setSavedArtists] = useState([]);
-    const [access_token,setAccessToken] = useState("");
-    const [genres,setGenres] = useState([]);
-    const [randomcolors,setRandomColors] = useState([]);
+    const [initialfeed, setInitialFeed] = useState([]);
+    const [dynamicFeeds, setDynamicFeeds] = useState([]);
+    const [savedArtists, setSavedArtists] = useState([]);
+    const [access_token, setAccessToken] = useState("");
+    const [genres, setGenres] = useState([]);
+    const [randomcolors, setRandomColors] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
 
@@ -71,7 +72,7 @@ export default function Home({seek, setSeek}){
         setRefreshing(false);
     };
 
-    const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
         const paddingToBottom = 150; // Trigger 150px before reaching the end for a seamless scroll feel
         return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
     };
@@ -109,7 +110,7 @@ export default function Home({seek, setSeek}){
             let title = "";
             let searchQuery = "";
             let fallbackQuery = "";
-            const headers = {Authorization: `Bearer ${access_token}`};
+            const headers = { Authorization: `Bearer ${access_token}` };
 
             if (isOtherGenre) {
                 // Occasional genre — use genre name as the query
@@ -120,7 +121,7 @@ export default function Home({seek, setSeek}){
             } else {
                 // Priority genre — pick a personalized artist from pool
                 let candidates = [...new Set([...savedArtists, ...genre.pool])];
-                
+
                 // Deduplicate against already-displayed artists
                 let displayedArtists = dynamicFeeds.map(f => {
                     for (const prefix of ["Because you like ", "Recommended for fans of ", "Dancehall Anthems: ", "Afrobeats Riddims: ", "Soca Carnival: ", "Exploring: "]) {
@@ -144,13 +145,13 @@ export default function Home({seek, setSeek}){
                 fallbackQuery = genre.id === "rnb" ? "rnb r&b" : genre.id === "hiphop" ? "hiphop rap" : genre.defaultTitle;
             }
 
-            const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=playlist&limit=24&offset=0`, {headers});
+            const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=playlist&limit=24&offset=0`, { headers });
             const result = await resp.json();
             let playlists = result.playlists?.items || [];
 
             if (playlists.length === 0) {
                 const randomOffset = Math.floor(Math.random() * 15);
-                const fallbackResp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(fallbackQuery)}&type=playlist&limit=24&offset=${randomOffset}`, {headers});
+                const fallbackResp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(fallbackQuery)}&type=playlist&limit=24&offset=${randomOffset}`, { headers });
                 const fallbackResult = await fallbackResp.json();
                 playlists = fallbackResult.playlists?.items || [];
                 if (!isOtherGenre) title = genre.defaultTitle;
@@ -174,49 +175,49 @@ export default function Home({seek, setSeek}){
 
 
 
-const chunkcards = (arr,chunksizeval=6) =>{
-    const chunkSize = chunksizeval;
-    const chunks = [];
+    const chunkcards = (arr, chunksizeval = 6) => {
+        const chunkSize = chunksizeval;
+        const chunks = [];
 
-    for (let i = 0; i < arr.length; i += chunkSize) {
-    const chunk = arr.slice(i, i + chunkSize);
-    chunks.push(chunk);
-    }
-    return chunks
-}
-
-const generaterandomcolors = (array) =>{
-    const colors = [];
-
-    for (let i = 0; i < array.length; i++) {
-    const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-    colors.push(randomColor);
+        for (let i = 0; i < arr.length; i += chunkSize) {
+            const chunk = arr.slice(i, i + chunkSize);
+            chunks.push(chunk);
+        }
+        return chunks
     }
 
-    return colors
-}
+    const generaterandomcolors = (array) => {
+        const colors = [];
+
+        for (let i = 0; i < array.length; i++) {
+            const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+            colors.push(randomColor);
+        }
+
+        return colors
+    }
 
 
-const createxpiration = async () =>{
-    const storageExpirationTimeInMinutes = 30; // 30 minutes caching to avoid Spotify rate limits
-    console.log(storageExpirationTimeInMinutes)
-    
-    let dt= new Date()
-    dt = new Date(dt.getTime() + storageExpirationTimeInMinutes * 60 * 1000)
+    const createxpiration = async () => {
+        const storageExpirationTimeInMinutes = 30; // 30 minutes caching to avoid Spotify rate limits
+        console.log(storageExpirationTimeInMinutes)
 
-    // store the data with expiration time in there
-    await AsyncStorage.setItem(
-      "storageWithExpiry",
-      dt.toISOString()
-    );
-}
-function parseISOString(s) {
-    var b = s.split(/\D+/);
-    return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
-  }
+        let dt = new Date()
+        dt = new Date(dt.getTime() + storageExpirationTimeInMinutes * 60 * 1000)
+
+        // store the data with expiration time in there
+        await AsyncStorage.setItem(
+            "storageWithExpiry",
+            dt.toISOString()
+        );
+    }
+    function parseISOString(s) {
+        var b = s.split(/\D+/);
+        return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+    }
 
 
-    const getall = async (force = false) =>{
+    const getall = async (force = false) => {
         // Fetch library/playlists metadata from AsyncStorage to build dynamic feeds
         let keys = await AsyncStorage.getAllKeys();
         let libraryKeys = keys.filter(k => k.includes("library:") || k.includes("playlist-track:"));
@@ -290,26 +291,26 @@ function parseISOString(s) {
         const currentTimestamp = new Date().toISOString()
 
         // Remove the saved data if it expires.
-        if (savedData !== null){
+        if (savedData !== null) {
             if (parseISOString(currentTimestamp) >= parseISOString(savedData)) {
-              await AsyncStorage.removeItem("storageWithExpiry");
-              await AsyncStorage.removeItem("initial_feed");
-              await AsyncStorage.removeItem("dynamic_feeds_cache");
-              let keys2 = await AsyncStorage.getAllKeys()
-              await AsyncStorage.multiRemove(keys2.filter((key) =>{return(key.includes("album:"))}))
-              l1InitialFeed = null;
-              l1DynamicFeeds = null;
+                await AsyncStorage.removeItem("storageWithExpiry");
+                await AsyncStorage.removeItem("initial_feed");
+                await AsyncStorage.removeItem("dynamic_feeds_cache");
+                let keys2 = await AsyncStorage.getAllKeys()
+                await AsyncStorage.multiRemove(keys2.filter((key) => { return (key.includes("album:")) }))
+                l1InitialFeed = null;
+                l1DynamicFeeds = null;
             }
         }
 
         // Fetch fresh initial feed if needed (we'll save it to L2 and L1)
         let freshFeed = null;
         let cache_initial = forceRefresh ? null : await AsyncStorage.getItem("initial_feed")
-        if (!cache_initial){
+        if (!cache_initial) {
             // Fetch initial albums feed
-            const headers = {Authorization: `Bearer ${access_token}`}
+            const headers = { Authorization: `Bearer ${access_token}` }
             const randomOffset = Math.floor(Math.random() * 40);
-            const resp = await fetch(`https://api.spotify.com/v1/browse/new-releases?limit=14&offset=${randomOffset}`, {headers: headers})
+            const resp = await fetch(`https://api.spotify.com/v1/browse/new-releases?limit=14&offset=${randomOffset}`, { headers: headers })
             const feedresult = await resp.json()
             freshFeed = feedresult.albums.items;
             await AsyncStorage.setItem("initial_feed", JSON.stringify(freshFeed));
@@ -317,7 +318,7 @@ function parseISOString(s) {
             setInitialFeed(freshFeed);
             l1InitialFeed = freshFeed;
         }
-        else{
+        else {
             freshFeed = JSON.parse(cache_initial);
             setInitialFeed(freshFeed);
             l1InitialFeed = freshFeed;
@@ -357,28 +358,28 @@ function parseISOString(s) {
             const fetchFeeds = GENRES.map(async (genre) => {
                 let candidates = [...new Set([...savedArtists, ...genre.pool])];
                 let selectedArtist = candidates[Math.floor(Math.random() * candidates.length)];
-                
+
                 let title = "";
                 if (genre.id === "rnb") title = `Because you like ${selectedArtist}`;
                 else if (genre.id === "hiphop") title = `Recommended for fans of ${selectedArtist}`;
                 else if (genre.id === "dancehall") title = `Dancehall Anthems: ${selectedArtist}`;
                 else if (genre.id === "afrobeats") title = `Afrobeats Riddims: ${selectedArtist}`;
                 else if (genre.id === "soca") title = `Soca Carnival: ${selectedArtist}`;
-                
-                const headers = {Authorization: `Bearer ${access_token}`}
-                const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(selectedArtist)}&type=playlist&limit=24&offset=0`, {headers: headers});
+
+                const headers = { Authorization: `Bearer ${access_token}` }
+                const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(selectedArtist)}&type=playlist&limit=24&offset=0`, { headers: headers });
                 const result = await resp.json();
                 let playlists = result.playlists?.items || [];
-                
+
                 if (playlists.length === 0) {
                     const fallbackQuery = genre.id === "rnb" ? 'rnb OR "r%26b"' : (genre.id === "hiphop" ? 'hiphop OR rap' : genre.id);
                     const randomOffset = Math.floor(Math.random() * 15);
-                    const fallbackResp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(fallbackQuery)}&type=playlist&limit=24&offset=${randomOffset}`, {headers: headers});
+                    const fallbackResp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(fallbackQuery)}&type=playlist&limit=24&offset=${randomOffset}`, { headers: headers });
                     const fallbackResult = await fallbackResp.json();
                     playlists = fallbackResult.playlists?.items || [];
                     title = genre.defaultTitle;
                 }
-                
+
                 const chunks = chunkcards(playlists);
                 return {
                     id: genre.id,
@@ -388,10 +389,10 @@ function parseISOString(s) {
             });
 
             const completedFeeds = await Promise.all(fetchFeeds);
-            
+
             // Render fresh feeds dynamically to user
             setDynamicFeeds(completedFeeds);
-            
+
             // Populate L1 and L2 caches concurrently!
             l1DynamicFeeds = completedFeeds;
             await AsyncStorage.setItem("dynamic_feeds_cache", JSON.stringify(completedFeeds));
@@ -406,135 +407,138 @@ function parseISOString(s) {
             "#008000", "#006600", "#004C00", "#003300", "#001900"
         ]
         setRandomColors(randomcolors)
-        const chunks = chunkcards(genreslist,chunksizeval=20);
+        const chunks = chunkcards(genreslist, chunksizeval = 20);
         setGenres(chunks)
     }
-    useEffect(() =>{
+    useEffect(() => {
         //console.log(netInfo)
-        if (netInfo.isInternetReachable === true){
+        if (netInfo.isInternetReachable === true) {
             getall()
         }
-       
-    
-    },[netInfo])
-    if (netInfo.isInternetReachable === true){
-    return(
-        <View style={{flex:1,backgroundColor:"#141212"}}>
-            {/*Header */}
-            <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
-                <View style={{flex:1,margin:10}}>
-                <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
-                
-                </View>
-                <View style={{flex:0.13,margin:10}}>
-                <Image style={{borderRadius:5,width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
-                </View>
-
-            </View>
-            {/*Main Scroll Body*/}
-            <ScrollView 
-                removeClippedSubviews={true} 
-                style={{flex:1,backgroundColor:"#141212"}}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="white" />
-                }
-                scrollEventThrottle={400}
-                onScroll={({nativeEvent}) => {
-                    if (isCloseToBottom(nativeEvent)) {
-                        loadMoreSections();
-                    }
-                }}
-            >
-                {/* Favourite Playlists */}
-                {initialfeed.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0,8)}/>}
-                {initialfeed.length > 0 && access_token !== ""  &&
-                <View style={{flex:1}}>
-                    <Text style={{margin:15,fontSize:23,color:"white",fontWeight: 'bold'}}>Latest Playlists</Text>
-                </View>
-                }
-                {initialfeed.length > 0 && access_token !== ""  && <FavouriteAlbums access_token={access_token} favouritecards={false} playlists={initialfeed.slice(8,)}/>}
-
-                {/* Dynamic recommendation feeds — always at the bottom so infinite scroll appends below */}
-                {dynamicFeeds.length > 0 && access_token !== "" && 
-                dynamicFeeds.map((feed) => {
-                    return (
-                        <View key={feed.id} style={{flex: 1}}>
-                            <View style={{flex: 1}}>
-                                <Text style={{margin: 15, fontSize: 23, color: "white", fontWeight: "bold"}}>
-                                    {feed.title}
-                                </Text>
-                            </View>
-                            {feed.chunks.map((carousel, idx) => (
-                                <FavouritePlaylistsHomeScreen 
-                                    key={idx} 
-                                    access_token={access_token} 
-                                    playlists={carousel}
-                                />
-                            ))}
-                        </View>
-                    );
-                })
-                }
-
-                {/* Infinite scroll loader — always the very last element */}
-                {loadingMore && (
-                    <View style={{marginVertical: 30, justifyContent: "center", alignItems: "center"}}>
-                        <ActivityIndicator size="large" color="#1DB954" />
-                    </View>
-                )}
-            </ScrollView>
-                        {/*Song Progress Tracker */}
-       
-                <ShowCurrentTrack/>
-                <ShowQueue/>
-
-            
-            {/*Song Progress Tracker */}
-            <View style={{flex:0.018,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
-                <TrackProgress seek={seek} setSeek={setSeek}/>
-
-            </View>
-
-            {/*Navigation Footer*/}
-            <NavigationFooter currentpage={"home"}/>
 
 
- 
-        </View>
-    )
-    }
-    else{
-        return(
-            <View style={{flex:1,backgroundColor:"#141212"}}>
+    }, [netInfo])
+    useEffect(() => {
+        requestStoragePermission();
+    }, []);
+    if (netInfo.isInternetReachable === true) {
+        return (
+            <View style={{ flex: 1, backgroundColor: "#141212" }}>
                 {/*Header */}
-                <View  style={{flex:0.08,backgroundColor:"green",flexDirection:"row",backgroundColor:"#141212"}}>
-                    <View style={{flex:1,margin:10}}>
-                    <Text style={{fontSize:20}}>CaesarAIMusicStream</Text>
-                    
+                <View style={{ flex: 0.08, backgroundColor: "green", flexDirection: "row", backgroundColor: "#141212" }}>
+                    <View style={{ flex: 1, margin: 10 }}>
+                        <Text style={{ fontSize: 20 }}>CaesarAIMusicStream</Text>
+
                     </View>
-                    <View style={{flex:0.13,margin:10}}>
-                    <Image style={{borderRadius:5,width:44,height:39}} source={require('../../assets/CaesarAILogo.png')} />
+                    <View style={{ flex: 0.13, margin: 10 }}>
+                        <Image style={{ borderRadius: 5, width: 44, height: 39 }} source={require('../../assets/CaesarAILogo.png')} />
+                    </View>
+
+                </View>
+                {/*Main Scroll Body*/}
+                <ScrollView
+                    removeClippedSubviews={true}
+                    style={{ flex: 1, backgroundColor: "#141212" }}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="white" />
+                    }
+                    scrollEventThrottle={400}
+                    onScroll={({ nativeEvent }) => {
+                        if (isCloseToBottom(nativeEvent)) {
+                            loadMoreSections();
+                        }
+                    }}
+                >
+                    {/* Favourite Playlists */}
+                    {initialfeed.length > 0 && access_token !== "" && <FavouriteAlbums access_token={access_token} favouritecards={true} playlists={initialfeed.slice(0, 8)} />}
+                    {initialfeed.length > 0 && access_token !== "" &&
+                        <View style={{ flex: 1 }}>
+                            <Text style={{ margin: 15, fontSize: 23, color: "white", fontWeight: 'bold' }}>Latest Playlists</Text>
+                        </View>
+                    }
+                    {initialfeed.length > 0 && access_token !== "" && <FavouriteAlbums access_token={access_token} favouritecards={false} playlists={initialfeed.slice(8,)} />}
+
+                    {/* Dynamic recommendation feeds — always at the bottom so infinite scroll appends below */}
+                    {dynamicFeeds.length > 0 && access_token !== "" &&
+                        dynamicFeeds.map((feed) => {
+                            return (
+                                <View key={feed.id} style={{ flex: 1 }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ margin: 15, fontSize: 23, color: "white", fontWeight: "bold" }}>
+                                            {feed.title}
+                                        </Text>
+                                    </View>
+                                    {feed.chunks.map((carousel, idx) => (
+                                        <FavouritePlaylistsHomeScreen
+                                            key={idx}
+                                            access_token={access_token}
+                                            playlists={carousel}
+                                        />
+                                    ))}
+                                </View>
+                            );
+                        })
+                    }
+
+                    {/* Infinite scroll loader — always the very last element */}
+                    {loadingMore && (
+                        <View style={{ marginVertical: 30, justifyContent: "center", alignItems: "center" }}>
+                            <ActivityIndicator size="large" color="#1DB954" />
+                        </View>
+                    )}
+                </ScrollView>
+                {/*Song Progress Tracker */}
+
+                <ShowCurrentTrack />
+                <ShowQueue />
+
+
+                {/*Song Progress Tracker */}
+                <View style={{ flex: 0.018, backgroundColor: "#141212", justifyContent: "center", alignItems: "center" }}>
+                    <TrackProgress seek={seek} setSeek={setSeek} />
+
+                </View>
+
+                {/*Navigation Footer*/}
+                <NavigationFooter currentpage={"home"} />
+
+
+
+            </View>
+        )
+    }
+    else {
+        return (
+            <View style={{ flex: 1, backgroundColor: "#141212" }}>
+                {/*Header */}
+                <View style={{ flex: 0.08, backgroundColor: "green", flexDirection: "row", backgroundColor: "#141212" }}>
+                    <View style={{ flex: 1, margin: 10 }}>
+                        <Text style={{ fontSize: 20 }}>CaesarAIMusicStream</Text>
+
+                    </View>
+                    <View style={{ flex: 0.13, margin: 10 }}>
+                        <Image style={{ borderRadius: 5, width: 44, height: 39 }} source={require('../../assets/CaesarAILogo.png')} />
                     </View>
 
                 </View>
                 {/* No Internet Main Body */}
-                <View style={{flex:1,backgroundColor:"#141212",justifyContent:"center",alignItems:"center"}}>
-                    <Text style={{fontSize:30}}>No Internet Connection</Text>
+                <View style={{ flex: 1, backgroundColor: "#141212", justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 30 }}>No Internet Connection</Text>
                     <Text>
-                    Play your Downloads
+                        Play your Downloads
                     </Text>
                 </View>
                 {/*Song Progress Tracker */}
                 <ShowCurrentTrack />
-                <ShowQueue/>
-                <TrackProgress seek={seek} setSeek={setSeek}/>
+                <ShowQueue />
+                <TrackProgress seek={seek} setSeek={setSeek} />
 
                 {/*Navigation Footer*/}
-                <NavigationFooter currentpage={"home"}/>
+                <NavigationFooter currentpage={"home"} />
 
             </View>
         )
-        
+
     }
 }
 

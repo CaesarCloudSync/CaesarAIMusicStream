@@ -14,12 +14,16 @@ import RNFS from 'react-native-fs';
 import { PermissionsAndroid, Platform } from 'react-native';
 import axios from "axios";
 import { getSpotifyBackupConfig, saveSpotifyBackupConfig, clearSpotifyBackupConfig, authorizeWithSpotify } from "../access_token/spotifyBackupHelper";
+import { MUSICSDCARDPATH } from "../constants/constants";
+import { requestStoragePermission } from "../Tracks/askpermission";
 
 
 export default function Settings({ seek, setSeek, currentTrack, setCurrentTrack }) {
     const navigate = useNavigate();
   const [proxyUrl, setProxyUrl] = useState("");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [exportingSongs, setExportingSongs] = useState(false);
+  const [exportProgress, setExportProgress] = useState("");
 
   const [spotifyUserId, setSpotifyUserId] = useState("");
   const [spotifyAccessToken, setSpotifyAccessToken] = useState("");
@@ -249,6 +253,83 @@ const exportAsyncStorageChunkedToExternal = async (
     externalPath
   };
 };
+
+const exportSongsToPublicFolder = async () => {
+  try {
+    setExportingSongs(true);
+    setExportProgress("Requesting permissions...");
+
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      Alert.alert("Permission Denied", "CaesarAIMusicStream needs storage permission to export files to your public Music folder.");
+      setExportingSongs(false);
+      setExportProgress("");
+      return;
+    }
+
+    const sourceDir = MUSICSDCARDPATH;
+    const destDir = "/storage/emulated/0/Music";
+
+    // Ensure public Music directory exists
+    const destDirExists = await RNFS.exists(destDir);
+    if (!destDirExists) {
+      await RNFS.mkdir(destDir);
+    }
+
+    setExportProgress("Reading internal downloads...");
+    const files = await RNFS.readDir(sourceDir);
+    const mp3Files = files.filter(f => f.isFile() && f.name.endsWith('.mp3'));
+
+    if (mp3Files.length === 0) {
+      Alert.alert("No Downloads Found", "There are no downloaded songs in the app's internal storage to export.");
+      setExportingSongs(false);
+      setExportProgress("");
+      return;
+    }
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < mp3Files.length; i++) {
+      const file = mp3Files[i];
+      setExportProgress(`Exporting ${i + 1}/${mp3Files.length}: ${file.name}`);
+      const destPath = `${destDir}/${file.name}`;
+      
+      try {
+        const destExists = await RNFS.exists(destPath);
+        if (destExists) {
+          await RNFS.unlink(destPath);
+        }
+        await RNFS.copyFile(file.path, destPath);
+        successCount++;
+      } catch (copyErr) {
+        console.error(`Failed to copy ${file.name}:`, copyErr.message);
+        failCount++;
+      }
+    }
+
+    setExportProgress("Refreshing system media index...");
+    for (const file of mp3Files) {
+      const destPath = `${destDir}/${file.name}`;
+      try {
+        await RNFS.scanFile(destPath);
+      } catch (scanErr) {
+        console.warn("Scan failed for", destPath, scanErr);
+      }
+    }
+
+    Alert.alert(
+      "Export Complete",
+      `Successfully exported ${successCount} songs to /storage/emulated/0/Music.${failCount > 0 ? ` (${failCount} failed)` : ""}`
+    );
+  } catch (err) {
+    console.error("Export songs error:", err);
+    Alert.alert("Export Failed", err.message);
+  } finally {
+    setExportingSongs(false);
+    setExportProgress("");
+  }
+};
 const healthcheck = async () => {
   try{
       const response = await axios.get("https://music.caesaraihub.org/")
@@ -427,6 +508,10 @@ const healthcheck = async () => {
         {externalPath !== "" ? <Text style={{color:"white",marginTop:10}}>Exported to now adb pull {externalPath}</Text> : null}
           <TouchableOpacity style={[styles.button,{"backgroundColor": "blue"},{"marginTop":20}]} onPress={() =>{exportAsyncStorageChunkedToExternal()}}>
             <Text style={styles.buttonText}>Export AsyncStorage Metadata</Text>
+        </TouchableOpacity>
+        {exportingSongs ? <Text style={{color:"white",marginTop:10}}>{exportProgress}</Text> : null}
+        <TouchableOpacity style={[styles.button,{"backgroundColor": "#1db954"},{"marginTop":20}]} onPress={() =>{exportSongsToPublicFolder()}}>
+            <Text style={styles.buttonText}>Export All Downloaded Songs</Text>
         </TouchableOpacity>
 
 

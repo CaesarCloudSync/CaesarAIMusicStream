@@ -1,4 +1,4 @@
-import { View,Text, ScrollView, FlatList,Image,TextInput, StatusBar,Pressable,TouchableOpacity, Dimensions, Keyboard} from "react-native";
+import { View,Text, ScrollView, FlatList,Image,TextInput, StatusBar,Pressable,TouchableOpacity, Dimensions, Keyboard, Vibration} from "react-native";
 import { useState,useEffect,useRef} from "react";
 import { useNavigate } from "react-router-native";
 import TrackProgress from "../TrackProgress/TrackProgress";
@@ -18,63 +18,84 @@ import ShowQueue from "../ShowQueue/showqueue";
 import GenreItem from "../HomeScreen/GenreItem";
 import { genreslist } from "../HomeScreen/genres";
 
-const RenderSection = ({ title, items, onPressItem }) => {
+const RenderSection = ({ title, items, onPressItem, onSwipeItem }) => {
     if (items.length === 0) return null;
     return (
         <View style={{ marginBottom: 18 }}>
             <Text style={{ color: "#b3b3b3", fontSize: 13, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1, marginLeft: 14, marginBottom: 8 }}>
                 {title}
             </Text>
-            {items.map((item, idx) => (
-                <TouchableOpacity
-                    key={(item.id || item.label || idx) + "-" + idx}
-                    onPress={() => onPressItem(item)}
-                    style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        paddingVertical: 10,
-                        paddingHorizontal: 14,
-                        borderBottomWidth: idx < items.length - 1 ? 0.3 : 0,
-                        borderBottomColor: "#222"
-                    }}
-                >
-                    {item.image ? (
-                        <Image
-                            source={{ uri: item.image }}
+            {items.map((item, idx) => {
+                const singleTap = Gesture.Tap().onEnd((_event, success) => {
+                    if (success) {
+                        onPressItem(item);
+                    }
+                });
+
+                const flingLeft = Gesture.Fling()
+                    .direction(Directions.LEFT)
+                    .onStart(() => {
+                        if (onSwipeItem && (item.type === "album" || item.type === "track")) {
+                            onSwipeItem(item);
+                        }
+                    });
+
+                const gesture = (item.type === "album" || item.type === "track")
+                    ? Gesture.Exclusive(flingLeft, singleTap) 
+                    : singleTap;
+
+                return (
+                    <GestureDetector key={(item.id || item.label || idx) + "-" + idx} gesture={gesture}>
+                        <View
                             style={{
-                                width: 44,
-                                height: 44,
-                                borderRadius: item.type === "artist" ? 22 : 5,
-                                marginRight: 14
+                                flexDirection: "row",
+                                alignItems: "center",
+                                paddingVertical: 10,
+                                paddingHorizontal: 14,
+                                borderBottomWidth: idx < items.length - 1 ? 0.3 : 0,
+                                borderBottomColor: "#222",
+                                backgroundColor: "#141212"
                             }}
-                        />
-                    ) : (
-                        <View style={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: item.type === "artist" ? 22 : 5,
-                            backgroundColor: "#282828",
-                            marginRight: 14,
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}>
-                            <AntDesign 
-                                name={item.type === "artist" ? "user" : item.type === "album" ? "folderopen" : item.type === "playlist" ? "bars" : "sound"} 
-                                style={{ color: "#b3b3b3", fontSize: 18 }}
-                            />
+                        >
+                            {item.image ? (
+                                <Image
+                                    source={{ uri: item.image }}
+                                    style={{
+                                        width: 44,
+                                        height: 44,
+                                        borderRadius: item.type === "artist" ? 22 : 5,
+                                        marginRight: 14
+                                    }}
+                                />
+                            ) : (
+                                <View style={{
+                                    width: 44,
+                                    height: 44,
+                                    borderRadius: item.type === "artist" ? 22 : 5,
+                                    backgroundColor: "#282828",
+                                    marginRight: 14,
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                }}>
+                                    <AntDesign 
+                                        name={item.type === "artist" ? "user" : item.type === "album" ? "folderopen" : item.type === "playlist" ? "bars" : "sound"} 
+                                        style={{ color: "#b3b3b3", fontSize: 18 }}
+                                    />
+                                </View>
+                            )}
+                            <View style={{ flex: 1 }}>
+                                <Text style={{ color: "white", fontSize: 15, fontWeight: "500" }} numberOfLines={1}>
+                                    {item.type === "track" || item.type === "album" ? item.label.split(" – ")[0] : item.label}
+                                </Text>
+                                <Text style={{ color: "#b3b3b3", fontSize: 12, marginTop: 2 }} numberOfLines={1}>
+                                    {item.type === "track" || item.type === "album" ? item.label.split(" – ")[1] || item.type : item.type}
+                                </Text>
+                            </View>
+                            <AntDesign name="right" style={{ color: "#555", fontSize: 12 }} />
                         </View>
-                    )}
-                    <View style={{ flex: 1 }}>
-                        <Text style={{ color: "white", fontSize: 15, fontWeight: "500" }} numberOfLines={1}>
-                            {item.type === "track" || item.type === "album" ? item.label.split(" – ")[0] : item.label}
-                        </Text>
-                        <Text style={{ color: "#b3b3b3", fontSize: 12, marginTop: 2 }} numberOfLines={1}>
-                            {item.type === "track" || item.type === "album" ? item.label.split(" – ")[1] || item.type : item.type}
-                        </Text>
-                    </View>
-                    <AntDesign name="right" style={{ color: "#555", fontSize: 12 }} />
-                </TouchableOpacity>
-            ))}
+                    </GestureDetector>
+                );
+            })}
         </View>
     );
 };
@@ -349,6 +370,57 @@ export default function Search({seek, setSeek}){
             } catch(e) { console.log(e); }
         }
     }
+    const handleSwipeItem = async (item) => {
+        if (item.type !== "album" && item.type !== "track") return;
+        try {
+            Vibration.vibrate(80);
+            
+            let albumId, albumName, artistName, image;
+            if (item.type === "album") {
+                const parts = item.label.split(" – ");
+                albumName = parts[0];
+                artistName = parts[1] || "Unknown Artist";
+                albumId = item.id;
+                image = item.image;
+            } else {
+                albumName = item.album_name || "Unknown Album";
+                artistName = item.artist_name || "Unknown Artist";
+                albumId = item.album_id;
+                image = item.image;
+            }
+            
+            if (!albumId) {
+                console.error("Missing albumId for swiped item");
+                return;
+            }
+            
+            console.log(`Swiped ${item.type} to add album to library:`, albumName);
+            
+            const headers = { Authorization: `Bearer ${access_token}` };
+            const resp = await fetch(`https://api.spotify.com/v1/albums/${albumId}`, { headers });
+            if (!resp.ok) throw new Error("Failed to fetch album tracks");
+            
+            const feedresult = await resp.json();
+            const album_tracks = feedresult.tracks.items.map((track) => ({
+                "album_id": feedresult.id,
+                "album_name": albumName,
+                "name": track.name,
+                "id": track.id,
+                "artist": track.artists[0]?.name || artistName,
+                "artist_id": track.artists[0]?.id || "",
+                "thumbnail": feedresult.images?.[0]?.url || image,
+                "track_number": track.track_number,
+                "duration_ms": track.duration_ms
+            }));
+            
+            await AsyncStorage.setItem(`library:${albumName}|${artistName}`, JSON.stringify(album_tracks));
+            
+            // Navigate to library
+            navigate("/library");
+        } catch (err) {
+            console.error("Error adding swiped album to library:", err);
+        }
+    };
     const fetchSuggestions = async (query) => {
         if (!query || !access_token) { setSuggestions([]); return; }
         try {
@@ -515,6 +587,7 @@ export default function Search({seek, setSeek}){
                                     handleSuggestionTap(item);
                                     saveToHistory(item.label, item.type, item.image, item);
                                 }}
+                                onSwipeItem={handleSwipeItem}
                             />
                             <RenderSection 
                                 title="Albums" 
@@ -523,6 +596,7 @@ export default function Search({seek, setSeek}){
                                     handleSuggestionTap(item);
                                     saveToHistory(item.label, item.type, item.image, item);
                                 }}
+                                onSwipeItem={handleSwipeItem}
                             />
                             <RenderSection 
                                 title="Playlists" 

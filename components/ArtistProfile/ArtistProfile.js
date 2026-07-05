@@ -23,22 +23,62 @@ export default function ArtistProfile({seek, setSeek}){
     const [singles,setSingles] = useState([]);
     const [artistname,setArtistName] = useState("");
 
-    const get_artist_thumbnail = async (headers) =>{
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=artist&limit=20`, {headers: headers})
-        const feedresult = await resp.json();
-        console.log(feedresult)
-        const artist = feedresult.artists.items.find((artist) => artist.name.toLowerCase() === album_tracks[0].artist.toLowerCase())
-        await AsyncStorage.setItem(`artist:${artist.name}`,JSON.stringify({"artist_id":artist.id,"artist_name":artist.name,"thumbnail":artist.images[0].url}))
-        setArtistName(artist.name)
-        setArtistThumbnail(artist.images[0].url)
-    }
+    const get_artist_thumbnail = async (headers) => {
+        try {
+            if (!album_tracks || album_tracks.length === 0) return;
+            const artistId = album_tracks[0].artist_id;
+            let artist = null;
+
+            if (artistId) {
+                console.log("Fetching artist by ID:", artistId);
+                const resp = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, { headers: headers });
+                if (resp.ok) {
+                    artist = await resp.json();
+                }
+            }
+
+            // Fallback search if ID fetch failed or returned nothing
+            if (!artist || !artist.id) {
+                console.log("Fallback search for artist:", album_tracks[0].artist);
+                const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=artist&limit=20`, { headers: headers });
+                const feedresult = await resp.json();
+                if (feedresult && feedresult.artists && feedresult.artists.items && feedresult.artists.items.length > 0) {
+                    artist = feedresult.artists.items.find(
+                        (a) => a.name.toLowerCase() === album_tracks[0].artist.toLowerCase()
+                    ) || feedresult.artists.items[0];
+                }
+            }
+
+            if (artist) {
+                const artistNameVal = artist.name || album_tracks[0].artist;
+                const thumbnailUrlVal = (artist.images && artist.images[0]) ? artist.images[0].url : "";
+                
+                await AsyncStorage.setItem(
+                    `artist:${artistNameVal}`,
+                    JSON.stringify({ "artist_id": artist.id, "artist_name": artistNameVal, "thumbnail": thumbnailUrlVal })
+                );
+                setArtistName(artistNameVal);
+                setArtistThumbnail(thumbnailUrlVal);
+            } else {
+                setArtistName(album_tracks[0].artist);
+            }
+        } catch (err) {
+            console.error("Error in get_artist_thumbnail:", err);
+            if (album_tracks && album_tracks[0]) {
+                setArtistName(album_tracks[0].artist);
+            }
+        }
+    };
+
 function processAlbums(items, artistName, sortOrder = "desc", albumType = "album") {
   // normalize for safe comparisons
   const target = artistName.toLowerCase().trim();
 
   // keep only albums of selected type AND matching artist
   const filtered = items.filter(item =>
+    item &&
     item.album_type === albumType &&
+    item.artists &&
     item.artists.some(a => a.name.toLowerCase().trim() === target)
   );
 
@@ -57,54 +97,96 @@ function processAlbums(items, artistName, sortOrder = "desc", albumType = "album
   return uniqueAlbums;
 }
 
-    const get_albums_compilations = async (headers) =>{
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=album&limit=50`, {headers: headers})
-        const feedresult = await resp.json();
-        let artist_items = feedresult.albums.items
-        const cleanedAlbums = processAlbums(feedresult.albums.items, album_tracks[0].artist, "desc","album");
-        const cleanedSingles = processAlbums(feedresult.albums.items, album_tracks[0].artist, "desc","single");
-        setAllAlbumTracks(cleanedAlbums)
-        //const compilations = artist_items.filter((item) =>{return(item.album_type === "compilation")})
-        //const singles = artist_items.filter((item) =>{return(item.album_type === "single")})
-        //console.log(compilations)
-        setSingles(cleanedSingles)
-        //setCompilations(compilations)
-    }
-    const get_appears_on = async (headers) =>{
-        const resp = await fetch(`https://api.spotify.com/v1/artists/${album_tracks[0].artist_id}/albums?include_groups=appears_on&limit=50`, {headers: headers})
-        const feedresult = await resp.json();
-        let artist_items = feedresult.items
-        //setAppearsOn(artist_items)
+    const get_albums_compilations = async (headers) => {
+        try {
+            if (!album_tracks || album_tracks.length === 0) return;
+            const artistId = album_tracks[0].artist_id;
+            let items = [];
 
-    }
-    const get_top_tracks = async (headers) =>{
-        console.log(album_tracks[0].artist)
-        
-        const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=track&limit=20`, {headers: headers})
-        const feedresult = await resp.json()
-        console.log(feedresult)
- 
-        
-        setTopTracks(feedresult.tracks.items)
-        //console.log(feedresult)
-    
-    }
-    const getall = async() => {
+            if (artistId) {
+                console.log("Fetching albums by artist ID:", artistId);
+                const resp = await fetch(`https://api.spotify.com/v1/artists/${artistId}/albums?limit=50&include_groups=album,single`, { headers: headers });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    items = data.items || [];
+                }
+            }
+
+            // Fallback search if ID fetch failed or returned nothing
+            if (items.length === 0) {
+                console.log("Fallback search for albums by artist name:", album_tracks[0].artist);
+                const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=album&limit=50`, { headers: headers });
+                const feedresult = await resp.json();
+                items = (feedresult && feedresult.albums && feedresult.albums.items) ? feedresult.albums.items : [];
+            }
+
+            const cleanedAlbums = processAlbums(items, album_tracks[0].artist, "desc", "album");
+            const cleanedSingles = processAlbums(items, album_tracks[0].artist, "desc", "single");
+            setAllAlbumTracks(cleanedAlbums);
+            setSingles(cleanedSingles);
+        } catch (err) {
+            console.error("Error in get_albums_compilations:", err);
+        }
+    };
+
+    const get_appears_on = async (headers) => {
+        try {
+            if (!album_tracks || album_tracks.length === 0) return;
+            const artistId = album_tracks[0].artist_id;
+            if (!artistId) return;
+            const resp = await fetch(`https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=appears_on&limit=50`, { headers: headers });
+            if (resp.ok) {
+                const feedresult = await resp.json();
+                let artist_items = feedresult.items || [];
+                //setAppearsOn(artist_items)
+            }
+        } catch (err) {
+            console.error("Error in get_appears_on:", err);
+        }
+    };
+
+    const get_top_tracks = async (headers) => {
+        try {
+            if (!album_tracks || album_tracks.length === 0) return;
+            const artistId = album_tracks[0].artist_id;
+            let tracks = [];
+
+            if (artistId) {
+                console.log("Fetching top tracks by artist ID:", artistId);
+                const resp = await fetch(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`, { headers: headers });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    tracks = data.tracks || [];
+                }
+            }
+
+            // Fallback search if ID fetch failed or returned nothing
+            if (tracks.length === 0) {
+                console.log("Fallback search for top tracks by artist name:", album_tracks[0].artist);
+                const resp = await fetch(`https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(album_tracks[0].artist)}"&type=track&limit=20`, { headers: headers });
+                const feedresult = await resp.json();
+                tracks = (feedresult && feedresult.tracks && feedresult.tracks.items) ? feedresult.tracks.items : [];
+            }
+
+            setTopTracks(tracks);
+        } catch (err) {
+            console.error("Error in get_top_tracks:", err);
+        }
+    };
+
+    const getall = async () => {
+        if (!album_tracks || album_tracks.length === 0) return;
         const access_token = await get_access_token();
-        setAccessToken(access_token)
-        const headers = {Authorization: `Bearer ${access_token}`}
-        await get_artist_thumbnail(headers)
-        await get_albums_compilations(headers)
-        await get_top_tracks(headers)
-        //await get_appears_on(headers)
-        
+        setAccessToken(access_token);
+        const headers = { Authorization: `Bearer ${access_token}` };
+        await get_artist_thumbnail(headers);
+        await get_albums_compilations(headers);
+        await get_top_tracks(headers);
+    };
 
-        
-    }
-
-    useEffect(()=>{
-        getall()
-    },[])
+    useEffect(() => {
+        getall();
+    }, []);
     //console.log(album_tracks[0])
     return(
         <View style={{flex:1,backgroundColor:"#141212"}}>
