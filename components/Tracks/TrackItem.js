@@ -277,8 +277,20 @@ export default function TrackItem({ album_track, setCurrentTrack, index, num_of_
 
     const removedownload = async () => {
         try {
-            await RNFS.unlink(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.mp3`);
-            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`)}.jpg`);
+            const baseFilename = convertToValidFilename(`${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
+            await RNFS.unlink(`file://${MUSICSDCARDPATH}/${baseFilename}.mp3`);
+            let counter = 1;
+            while (true) {
+                const suffixPath = `${MUSICSDCARDPATH}/${baseFilename}_${counter}.mp3`;
+                if (await RNFS.exists(suffixPath)) {
+                    await RNFS.unlink(suffixPath);
+                } else {
+                    break;
+                }
+                counter++;
+                if (counter > 10) break;
+            }
+            await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${baseFilename}.jpg`);
         } catch { }
         await AsyncStorage.removeItem(`downloaded-track:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);
         await AsyncStorage.removeItem(`downloaded-track-order:${album_track_state.artist}-${album_track_state.album_name}-${album_track_state.name}`);

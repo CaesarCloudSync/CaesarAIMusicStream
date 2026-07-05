@@ -1,4 +1,4 @@
-import { Alert} from "react-native";;
+import { Alert, Platform } from "react-native";;
 import ytdl from "react-native-ytdl"
 
 import RNFetchBlob from 'rn-fetch-blob'
@@ -143,13 +143,74 @@ export const check_if_failed_download = async (youtube_link,title) =>{
 export const downloadFile = async (songurl, name, notif_title, album_track) => {
   await ensureMusicDirectory();
 
-  const filename = `${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${name}`)}.mp3`;
-  const filePath = `${MUSICSDCARDPATH}/${filename}`;
+  let filename = `${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${name}`)}.mp3`;
+  let filePath = `${MUSICSDCARDPATH}/${filename}`;
 
   // Ensure directory exists
   const dirExists = await RNFS.exists(MUSICSDCARDPATH);
   if (!dirExists) {
     await RNFS.mkdir(MUSICSDCARDPATH);
+  }
+
+  // Check if file already exists
+  const exists = await RNFS.exists(filePath);
+  if (exists) {
+    let size = 0;
+    let readable = false;
+    try {
+      const stats = await RNFS.stat(filePath);
+      size = stats.size;
+      readable = true;
+    } catch (e) {
+      console.warn("File exists but is not readable/accessible:", e.message);
+    }
+
+    if (readable && size > 1024 * 1024) {
+      console.log("File already exists, is readable and non-empty. Skipping download and reusing:", filePath);
+      
+      // Mark track as downloaded
+      await AsyncStorage.setItem(
+        `downloaded-track:${album_track.artist}-${album_track.album_name}-${name}`,
+        JSON.stringify(album_track)
+      );
+
+      // Update stats
+      const allKeys = await AsyncStorage.getAllKeys();
+      const downloadedKeys = allKeys.filter(k => k.startsWith('downloaded-track:'));
+      const downloadedCount = downloadedKeys.length;
+
+      await AsyncStorage.setItem('downloaded_num', JSON.stringify(downloadedCount));
+      await AsyncStorage.setItem(
+        `downloaded-track-order:${album_track.artist}-${album_track.album_name}-${name}`,
+        JSON.stringify({ name, order: downloadedCount })
+      );
+
+      // Success notification
+      const channelId = await notifee.createChannel({
+        id: 'downloads',
+        name: 'Downloads',
+      });
+      await notifee.displayNotification({
+        id: `done`,
+        title: 'Download Complete',
+        body: `${notif_title} has been resolved from local storage.`,
+        android: {
+          channelId,
+          smallIcon: 'ic_launcher',
+          autoCancel: true,
+        },
+      });
+      return;
+    }
+
+    // If it exists but is not readable/writable (permission conflict), or is empty/corrupt,
+    // we find a unique suffix name to download to, leaving the existing file untouched.
+    let counter = 1;
+    while (await RNFS.exists(filePath)) {
+      filename = `${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${name}`)}_${counter}.mp3`;
+      filePath = `${MUSICSDCARDPATH}/${filename}`;
+      counter++;
+    }
   }
 
   // Thumbnail (quick → kept with RNFS for simplicity)

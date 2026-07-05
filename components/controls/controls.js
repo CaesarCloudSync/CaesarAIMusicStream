@@ -93,6 +93,43 @@ export const prefetchsong = async (nextsong) =>{
     await AsyncStorage.setItem("current-prefetched-nextsong",JSON.stringify(nextsong))
 }
 
+export const resolveLocalSongPath = async (track) => {
+  const baseFilename = convertToValidFilename(`${track.artist}-${track.album_name}-${track.name}`);
+  const basePath = `${MUSICSDCARDPATH}/${baseFilename}.mp3`;
+  
+  try {
+    const baseExists = await RNFS.exists(basePath);
+    if (baseExists) {
+      try {
+        await RNFS.stat(basePath);
+        return `file://${basePath}`;
+      } catch (e) {
+        console.log("Base file exists but is not readable (permission conflict). Checking suffixes...");
+      }
+    }
+    
+    let counter = 1;
+    while (true) {
+      const suffixPath = `${MUSICSDCARDPATH}/${baseFilename}_${counter}.mp3`;
+      const suffixExists = await RNFS.exists(suffixPath);
+      if (suffixExists) {
+        try {
+          await RNFS.stat(suffixPath);
+          return `file://${suffixPath}`;
+        } catch (e) {}
+      } else {
+        break;
+      }
+      counter++;
+      if (counter > 10) break;
+    }
+  } catch (err) {
+    console.error("Error resolving local song path:", err);
+  }
+  
+  return `file://${basePath}`;
+};
+
 export const skipToTrack = async (nextsong,player_ind)=>{
     if (loadingTrackId !== null) {
         console.log("skipToTrack ignored: another song is currently loading.");
@@ -116,7 +153,7 @@ export const skipToTrack = async (nextsong,player_ind)=>{
             }
             
             const use_local = track_downloaded !== null;
-            let [streaming_link,title] = !use_local ? await get_prefetched_song(nextsong) : [`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${nextsong.artist}-${nextsong.album_name}-${nextsong.name}`)}.mp3`,undefined]
+            let [streaming_link,title] = !use_local ? await get_prefetched_song(nextsong) : [await resolveLocalSongPath(nextsong), undefined]
             // If track still can't get a stream, auto-skip to next song
             if (!use_local && !streaming_link) {
                 console.log("Unavailable track, marking as restricted and auto-advancing:", nextsong.name);

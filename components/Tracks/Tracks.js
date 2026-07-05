@@ -165,8 +165,20 @@ export default function Tracks({currentTrack,setCurrentTrack,seek, setSeek}){
             const track_downloaded = await AsyncStorage.getItem(`downloaded-track:${album_track.artist}-${album_track.album_name}-${album_track.name}`)
             if (track_downloaded){
                 try{
-                    await RNFS.unlink(`file://${MUSICSDCARDPATH}/${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${album_track.name}`)}.mp3`)
-                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${album_track.name}`)}.jpg`)
+                    const baseFilename = convertToValidFilename(`${album_track.artist}-${album_track.album_name}-${album_track.name}`);
+                    await RNFS.unlink(`file://${MUSICSDCARDPATH}/${baseFilename}.mp3`)
+                    let counter = 1;
+                    while (true) {
+                        const suffixPath = `${MUSICSDCARDPATH}/${baseFilename}_${counter}.mp3`;
+                        if (await RNFS.exists(suffixPath)) {
+                            await RNFS.unlink(suffixPath);
+                        } else {
+                            break;
+                        }
+                        counter++;
+                        if (counter > 10) break;
+                    }
+                    await RNFS.unlink(`file://${RNFS.DocumentDirectoryPath}/${baseFilename}.jpg`)
                 }
                 catch{
         
