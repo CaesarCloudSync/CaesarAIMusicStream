@@ -100,3 +100,18 @@ jobs:
           allowUpdates: true
           makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to GitHub Releases (version branches)
+        if: github.event_name == 'push' && startsWith(github.ref_name, 'CaesarAIMusicStreamV')
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "android/app/build/outputs/apk/release/CaesarAIMusic-${{ steps.version.outputs.label }}.apk"
+          tag: ${{ steps.version.outputs.label }}
+          name: "CaesarAIMusicStream ${{ steps.version.outputs.label }}"
+          body: |
+            **Release:** ${{ steps.version.outputs.label }}
+            **Commit:** ${{ steps.commit_info.outputs.subject }}
+          allowUpdates: true
+          makeLatest: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
