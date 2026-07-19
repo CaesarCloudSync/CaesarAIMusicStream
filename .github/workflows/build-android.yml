@@ -3,14 +3,14 @@ name: Build Android APK
 on:
   push:
     branches:
-      - main
-      - 'CaesarAIMusicStreamV*'
+      - '*'
+      - '**'
     tags:
       - 'v*'
   pull_request:
     branches:
-      - main
-      - 'CaesarAIMusicStreamV*'
+      - '*'
+      - '**'
   workflow_dispatch:
 
 permissions:
@@ -44,13 +44,8 @@ jobs:
       - name: Determine Version Label
         id: version
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "label=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == CaesarAIMusicStreamV* ]]; then
-            echo "label=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-          else
-            echo "label=latest" >> $GITHUB_OUTPUT
-          fi
+          REF_CLEAN=$(echo "${GITHUB_REF_NAME}" | sed 's/\//-/g')
+          echo "label=${REF_CLEAN}" >> $GITHUB_OUTPUT
 
       - name: Build Release APK
         run: |
@@ -75,28 +70,30 @@ jobs:
           path: android/app/build/outputs/apk/release/CaesarAIMusic-${{ steps.version.outputs.label }}.apk
           if-no-files-found: error
 
-      - name: Publish to GitHub Releases (tags only)
+      - name: Publish to GitHub Releases (Tags)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: ncipollo/release-action@v1
         with:
           artifacts: "android/app/build/outputs/apk/release/CaesarAIMusic-${{ steps.version.outputs.label }}.apk"
-          tag: ${{ github.ref_name }}
-          name: "CaesarAIMusicStream ${{ github.ref_name }}"
+          tag: ${{ steps.version.outputs.label }}
+          name: "CaesarAIMusicStream ${{ steps.version.outputs.label }}"
           body: |
-            **Release:** ${{ github.ref_name }}
+            **Tag:** ${{ steps.version.outputs.label }}
             **Commit:** ${{ steps.commit_info.outputs.subject }}
-          allowUpdates: false
+          allowUpdates: true
           makeLatest: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to GitHub Releases (main branch → latest)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Publish to GitHub Releases (Branches)
+        if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "android/app/build/outputs/apk/release/CaesarAIMusic-latest.apk"
-          tag: "latest"
-          name: "CaesarAIMusicStream latest"
-          body: "Automated build of commit: ${{ steps.commit_info.outputs.subject }}"
+          artifacts: "android/app/build/outputs/apk/release/CaesarAIMusic-${{ steps.version.outputs.label }}.apk"
+          tag: ${{ steps.version.outputs.label }}
+          name: "CaesarAIMusicStream ${{ steps.version.outputs.label }}"
+          body: |
+            **Branch:** ${{ github.ref_name }}
+            **Commit:** ${{ steps.commit_info.outputs.subject }}
           allowUpdates: true
-          makeLatest: true
+          makeLatest: ${{ github.ref_name == 'main' }}
           token: ${{ secrets.GITHUB_TOKEN }}
