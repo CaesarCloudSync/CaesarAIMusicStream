@@ -15,7 +15,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import MaterialDesignIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import RNFS from "react-native-fs";
 import InAppBrowser from "react-native-inappbrowser-reborn";
-import { convertToValidFilename } from "../tool/tools";
+import { convertToValidFilename, fetchAllPlaylistItems } from "../tool/tools";
 import { get_access_token } from "../access_token/getaccesstoken";
 import { getUserAccessToken } from "../access_token/spotifyBackupHelper";
 
@@ -114,9 +114,11 @@ export default function AddSpotifyPlaylistModal({
       feedresult.images && feedresult.images.length > 0
         ? feedresult.images[0].url
         : thumbnailUrl;
-    const playlist_name = playlistName || `${feedresult.name} - ${feedresult.owner.display_name}`;
+    const playlist_name = playlistName || `${feedresult.name} - ${feedresult.owner?.display_name || ''}`;
 
-    const album_tracks = feedresult.tracks.items
+    const items = await fetchAllPlaylistItems(feedresult.tracks, headers);
+
+    const album_tracks = items
       .filter((ti) => ti && ti.track)
       .map((trackitem) => {
         const track = trackitem.track;
@@ -124,14 +126,14 @@ export default function AddSpotifyPlaylistModal({
           playlist_thumbnail,
           playlist_id: feedresult.id,
           playlist_name,
-          album_id: track.album.id,
-          album_name: track.album.name,
+          album_id: track.album?.id,
+          album_name: track.album?.name,
           name: track.name,
           id: track.id,
-          artist: track.artists[0].name,
-          artist_id: track.artists[0].id,
+          artist: track.artists?.[0]?.name,
+          artist_id: track.artists?.[0]?.id,
           thumbnail:
-            track.album.images && track.album.images[0]
+            track.album?.images && track.album.images[0]
               ? track.album.images[0].url
               : playlist_thumbnail,
           track_number: track.track_number,

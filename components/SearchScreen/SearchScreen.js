@@ -17,6 +17,7 @@ import ArtistCarouselItem from "../HomeScreen/ArtistCarouselItem";
 import ShowQueue from "../ShowQueue/showqueue";
 import GenreItem from "../HomeScreen/GenreItem";
 import { genreslist } from "../HomeScreen/genres";
+import { fetchAllPlaylistItems } from "../tool/tools";
 
 const RenderSection = ({ title, items, onPressItem, onSwipeItem }) => {
     const [swipedItemId, setSwipedItemId] = useState(null);
@@ -354,8 +355,9 @@ export default function Search({seek, setSeek}){
                 // Mirror PlaylistCarouselItem: embed playlist metadata on each track and
                 // navigate to /tracks (album-style online view). Long-pressing the cover
                 // in Tracks.js will save it as a real local playlist.
-                let album_tracks = feedresult.tracks.items
-                    .filter(item => item.track)
+                const items = await fetchAllPlaylistItems(feedresult.tracks, headers);
+                let album_tracks = items
+                    .filter(item => item && item.track)
                     .map((item) => {
                         const track = item.track;
                         return {

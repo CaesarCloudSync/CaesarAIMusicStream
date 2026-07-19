@@ -6,6 +6,7 @@ import { useNavigate} from "react-router-native";
 import { TouchableHighlight} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Gesture,GestureDetector,Swipeable,Directions } from "react-native-gesture-handler";
+import { fetchAllPlaylistItems } from "../tool/tools";
 
 export default function PlaylistCarouselItem({access_token, favouritecards,playlistid,thumbnail, playlist_name,total_tracks,album_type}){
     const [addingtolibrary,setAddingToLibrary] = useState(false);
@@ -36,7 +37,8 @@ export default function PlaylistCarouselItem({access_token, favouritecards,playl
         const headers = {Authorization: `Bearer ${access_token}`}
         const resp = await fetch(`https://api.spotify.com/v1/playlists/${playlistid}`, {headers: headers})
         const feedresult = await resp.json()
-        let album_tracks = feedresult.tracks.items.map((trackitem) =>{let track = trackitem.track;return({"playlist_thumbnail":thumbnail,"playlist_id":feedresult.id,"playlist_name":playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+        const items = await fetchAllPlaylistItems(feedresult.tracks, headers)
+        let album_tracks = items.filter(item => item && item.track).map((trackitem) =>{let track = trackitem.track;return({"playlist_thumbnail":thumbnail,"playlist_id":feedresult.id,"playlist_name":playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})})
         navigate(route, { state: {"album_tracks":album_tracks} });
     }
 

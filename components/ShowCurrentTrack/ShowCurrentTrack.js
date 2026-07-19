@@ -20,6 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { autoplaynextsong,autoplayprevioussong } from '../controls/controls';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MusicConnectMQTT from '../musicconnectmqtt/MusicConnectMQTT';
+import { fetchAllPlaylistItems } from '../tool/tools';
 export default function ShowCurrentTrack({searchscreen,tracks,setAlbumTracks}) {
 
     //console.log("hi")
@@ -83,8 +84,8 @@ export default function ShowCurrentTrack({searchscreen,tracks,setAlbumTracks}) {
           const headers = {Authorization: `Bearer ${access_token}`}
           const resp = await fetch(`https://api.spotify.com/v1/playlists/${currentTrack.playlist_id}`, {headers: headers})
           const feedresult = await resp.json()
-          //console.log(feedresult.tracks.items[0])
-          let album_tracks = feedresult.tracks.items.map((trackitem) =>{let track = trackitem.track;return({"playlist_thumbnail":currentTrack.playlist_thumbnail,"playlist_id":feedresult.id,"playlist_name":currentTrack.playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})})
+          const items = await fetchAllPlaylistItems(feedresult.tracks, headers);
+          let album_tracks = items.filter(item => item && item.track).map((trackitem) =>{let track = trackitem.track;return({"playlist_thumbnail":currentTrack.playlist_thumbnail,"playlist_id":feedresult.id,"playlist_name":currentTrack.playlist_name,"album_id":track.album.id,"album_name":track.album.name,"name":track.name,"id":track.id,"artist":track.artists[0].name,"artist_id":track.artists[0].id,"thumbnail":track.album.images[0].url,"track_number":track.track_number,"duration_ms":track.duration_ms})})
           navigate("/tracks", { state: {"album_tracks":album_tracks}});
 
         }
